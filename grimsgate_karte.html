@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Grimsgate – Hafenstadt</title>
+<style>
+  :root {
+    --parchment-dark: #2b1d10;
+    --ink: #3a2a18;
+    --accent: #a8391e;
+    --gold: #c9a24b;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 40px 20px;
+    background: #14100b;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 28px;
+    margin: 0 0 4px 0;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: #8a7a5c;
+    font-style: italic;
+    font-size: 14px;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .map-wrap {
+    position: relative;
+    max-width: 1200px;
+    width: 100%;
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+    border: 6px solid #1a130b;
+    border-radius: 2px;
+  }
+
+  .map-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 2px;
+  }
+
+  .pin {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+  }
+
+  .pin-dot {
+    width: 16px;
+    height: 16px;
+    background: var(--accent);
+    border: 2px solid var(--gold);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    margin: 5px auto 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .pin:hover .pin-dot {
+    transform: rotate(-45deg) scale(1.3);
+    background: var(--gold);
+  }
+
+  .tooltip {
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: #f4e9d0;
+    color: var(--ink);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 10px 14px;
+    width: 220px;
+    font-size: 13px;
+    line-height: 1.5;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 10;
+  }
+
+  .tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--gold);
+  }
+
+  .tooltip h3 {
+    margin: 0 0 6px 0;
+    font-size: 15px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  .pin:hover .tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .legend {
+    margin-top: 24px;
+    color: #8a7a5c;
+    font-size: 12px;
+    text-align: center;
+    max-width: 600px;
+  }
+
+  .pin-dot { pointer-events: auto; }
+
+  /* ---- Modal Overlay ---- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8,6,3,0.88);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 30px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .overlay.active {
+    display: flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .overlay-panel {
+    position: relative;
+    max-width: 900px;
+    width: 100%;
+    background: #1a130b;
+    border: 6px solid var(--gold);
+    border-radius: 4px;
+    box-shadow: 0 0 80px rgba(0,0,0,0.9);
+    overflow: hidden;
+  }
+
+  .overlay-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: #0e0b07;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .overlay-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .overlay-placeholder {
+    color: #8a7a5c;
+    font-style: italic;
+    font-size: 15px;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .overlay-caption {
+    padding: 18px 26px 22px;
+    border-top: 1px solid #3a2a18;
+  }
+
+  .overlay-caption h2 {
+    margin: 0 0 8px 0;
+    color: var(--gold);
+    font-size: 22px;
+    letter-spacing: 1px;
+  }
+
+  .overlay-caption p {
+    margin: 0;
+    color: #cbb98f;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .overlay-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(20,16,11,0.8);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+  }
+
+  .overlay-close:hover {
+    background: var(--accent);
+    color: #f4e9d0;
+  }
+</style>
+</head>
+<body>
+
+  <h1>Grimsgate</h1>
+  <div class="subtitle">Englische Küste — 1690er Jahre</div>
+
+  <div class="map-wrap">
+    <img src="grimsgate_karte.png" alt="Karte von Grimsgate">
+
+    <!-- Zur letzten Heuer -->
+    <div class="pin" style="top: 58.3%; left: 40%;"
+         data-title="Zur letzten Heuer"
+         data-desc="Raue Hafenkneipe. Kaum Stammgäste — die meisten, die hier trinken, sieht man Jahre nicht wieder. Wer anheuern will, landet früher oder später hier."
+         data-img="interior_heuer.png"
+         onclick="openLocation(this)">
+      <div class="pin-dot"></div>
+      <div class="tooltip">
+        <h3>Zur letzten Heuer</h3>
+        Raue Hafenkneipe. Kaum Stammgäste — die meisten, die hier trinken, sieht man Jahre nicht wieder. Wer anheuern will, landet früher oder später hier.
+      </div>
+    </div>
+
+    <!-- Hafenmeisterei -->
+    <div class="pin" style="top: 27.5%; left: 9.4%;"
+         data-title="Hafenmeisterei"
+         data-desc="Verwaltet Anlegerechte, Fracht und Papiere. Ordnungsmacht des Hafens."
+         data-img="interior_hafenmeisterei.png"
+         onclick="openLocation(this)">
+      <div class="pin-dot"></div>
+      <div class="tooltip">
+        <h3>Hafenmeisterei</h3>
+        Verwaltet Anlegerechte, Fracht und Papiere. Ordnungsmacht des Hafens.
+      </div>
+    </div>
+
+    <!-- Lagerhäuser -->
+    <div class="pin" style="top: 26.7%; left: 26.3%;"
+         data-title="Lagerhäuser"
+         data-desc="Von außen chaotisch, im Kern strikt organisiert. Hier läuft die Beladung des Konvois wie ein Uhrwerk."
+         data-img="interior_lagerhaeuser.png"
+         onclick="openLocation(this)">
+      <div class="pin-dot"></div>
+      <div class="tooltip">
+        <h3>Lagerhäuser</h3>
+        Von außen chaotisch, im Kern strikt organisiert. Hier läuft die Beladung des Konvois wie ein Uhrwerk.
+      </div>
+    </div>
+
+    <!-- Markt -->
+    <div class="pin" style="top: 74.6%; left: 53.2%;"
+         data-title="Marktplatz"
+         data-desc="Handel, Menschenmengen, guter Ort für Gerüchte und Zufallsbegegnungen."
+         data-img="interior_markt.png"
+         onclick="openLocation(this)">
+      <div class="pin-dot"></div>
+      <div class="tooltip">
+        <h3>Marktplatz</h3>
+        Handel, Menschenmengen, guter Ort für Gerüchte und Zufallsbegegnungen.
+      </div>
+    </div>
+
+    <!-- Krämerladen -->
+    <div class="pin" style="top: 58.9%; left: 49.8%;"
+         data-title="Krämerladen"
+         data-desc="Ausrüstung und Grundbedarf. Der Krämer hört viel — und vergisst wenig."
+         data-img="interior_kraemerladen.png"
+         onclick="openLocation(this)">
+      <div class="pin-dot"></div>
+      <div class="tooltip">
+        <h3>Krämerladen</h3>
+        Ausrüstung und Grundbedarf. Der Krämer hört viel — und vergisst wenig.
+      </div>
+    </div>
+
+    <!-- Bordell -->
+    <div class="pin" style="top: 50.5%; left: 85.1%;"
+         data-title="Bordell"
+         data-desc="Etwas abseits der Stadt gelegen, unauffällig. Rote Fenster, wenig Fragen."
+         data-img="interior_bordell.png"
+         onclick="openLocation(this)">
+      <div class="pin-dot"></div>
+      <div class="tooltip">
+        <h3>Bordell</h3>
+        Etwas abseits der Stadt gelegen, unauffällig. Rote Fenster, wenig Fragen.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    Mit der Maus über eine Markierung fahren für die Beschreibung — anklicken öffnet eine Innenansicht des Ortes.
+  </div>
+
+  <!-- ---- Modal Overlay ---- -->
+  <div class="overlay" id="overlay" onclick="if(event.target.id==='overlay') closeLocation()">
+    <div class="overlay-panel">
+      <div class="overlay-close" onclick="closeLocation()">✕</div>
+      <div class="overlay-img-wrap" id="overlayImgWrap"></div>
+      <div class="overlay-caption">
+        <h2 id="overlayTitle"></h2>
+        <p id="overlayDesc"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openLocation(el) {
+      const title = el.dataset.title;
+      const desc = el.dataset.desc;
+      const img = el.dataset.img;
+
+      document.getElementById('overlayTitle').textContent = title;
+      document.getElementById('overlayDesc').textContent = desc;
+
+      const wrap = document.getElementById('overlayImgWrap');
+      wrap.innerHTML = '';
+
+      const imageEl = new Image();
+      imageEl.src = img;
+      imageEl.alt = title;
+      imageEl.onerror = function () {
+        wrap.innerHTML = '<div class="overlay-placeholder">Noch kein Innenraumbild hinterlegt für „' + title + '“.<br>Datei erwartet unter: <code>' + img + '</code></div>';
+      };
+      wrap.appendChild(imageEl);
+
+      document.getElementById('overlay').classList.add('active');
+    }
+
+    function closeLocation() {
+      document.getElementById('overlay').classList.remove('active');
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeLocation();
+    });
+  </script>
+
+</body>
+</html>
