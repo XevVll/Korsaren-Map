@@ -344,32 +344,38 @@
           '<textarea id="ort-notiz" placeholder="z.B. allgemeine Stimmung, Vorfälle ohne Bezug zu einer einzelnen Interaktion…"></textarea>' +
           '<div class="save-hint" id="ort-notiz-hint"></div>' +
         '</div>' +
-        '<div class="interaktionen" id="interaktionen-list"></div>';
+        '<div class="interaktionen" id="interaktionen-list"></div>' +
+        '<div class="sync-warning" id="sync-warning" style="display:none; padding:0 24px 20px; font-size:11.5px; color:#c76a5a;"></div>';
 
       const iaKeys = Object.keys(ort.interaktionen || {});
-      const listEl = document.getElementById('interaktionen-list');
-      if (iaKeys.length === 0) {
-        listEl.innerHTML = '<div class="empty-hint">Für diesen Ort sind noch keine Interaktionen ausformuliert.</div>';
-      }
 
-      // dynamische Daten (Notizen + Trigger) einmalig laden
-      if (!db) {
-        // Ohne Firebase: nur statische Defaults anzeigen, kein Speichern möglich
-        document.getElementById('ort-notiz').value = ort.ortNotizenDefault || '';
-        renderInteraktionen(ort, iaKeys, {});
-        return;
-      }
+      // Sofort mit statischen Daten rendern (Trigger ungesetzt, Notizen leer),
+      // damit die Spalte auch ohne/bei langsamer Firebase-Verbindung nie leer bleibt.
+      document.getElementById('ort-notiz').value = ort.ortNotizenDefault || '';
+      renderInteraktionen(ort, iaKeys, {});
 
+      document.getElementById('ort-notiz').addEventListener('input', debounce(function (e) {
+        saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
+      }, 600));
+
+      if (!db) return; // ohne Firebase: statischer Stand bleibt, kein Speichern möglich
+
+      // Danach asynchron echten Stand nachladen und drüberlegen, falls vorhanden.
       db.ref(dynPath).once('value').then(function (snap) {
         const dyn = snap.val() || {};
-        document.getElementById('ort-notiz').value =
-          (typeof dyn.ortNotizen === 'string') ? dyn.ortNotizen : (ort.ortNotizenDefault || '');
-
-        document.getElementById('ort-notiz').addEventListener('input', debounce(function (e) {
-          saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
-        }, 600));
-
-        renderInteraktionen(ort, iaKeys, dyn.interaktionen || {});
+        if (typeof dyn.ortNotizen === 'string') {
+          document.getElementById('ort-notiz').value = dyn.ortNotizen;
+        }
+        if (dyn.interaktionen) {
+          renderInteraktionen(ort, iaKeys, dyn.interaktionen);
+        }
+      }).catch(function (err) {
+        const warn = document.getElementById('sync-warning');
+        if (warn) {
+          warn.style.display = 'block';
+          warn.textContent = 'Gespeicherter Stand (Trigger/Notizen) konnte nicht geladen werden: ' + err.message + ' — angezeigt wird der unbearbeitete Ausgangsstand. Änderungen werden trotzdem versucht zu speichern.';
+        }
+        console.error('Fehler beim Laden von', dynPath, err);
       });
     }
 
