@@ -272,6 +272,13 @@
       return scene.markers[0].id;
     }
 
+    // Firebase-Realtime-DB-Keys dürfen u.a. keinen Punkt enthalten.
+    // Szenen-IDs wie "1.1" müssen für Pfade umgewandelt werden (nur für
+    // den Firebase-Pfad, Anzeige/Label bleibt unverändert).
+    function fbKey(str) {
+      return String(str).replace(/[.#$\[\]]/g, '-');
+    }
+
     // ---------- Spalte 1: Szenen ----------
     function renderSzenen() {
       const col = document.getElementById('col-szenen');
@@ -342,7 +349,7 @@
       }
 
       const ort = ORTE[viewState.ort] || { personen: '', kurz: '', interaktionen: {}, ortHinweis: '' };
-      const dynPath = 'regie/' + viewState.szene + '/' + viewState.ort;
+      const dynPath = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort);
 
       col.innerHTML =
         '<div class="ort-detail-head"><h2>' + markerInfo.title + '</h2>' +
@@ -438,7 +445,7 @@
             triggerHint.textContent = '';
             triggerHint.style.color = '';
             if (!db) return;
-            const path = 'regie/' + viewState.szene + '/' + viewState.ort + '/interaktionen/' + iaId + '/trigger/' + t.id;
+            const path = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort) + '/interaktionen/' + iaId + '/trigger/' + t.id;
             db.ref(path).set(nowFired).catch(function (err) {
               console.error('Fehler beim Speichern von', path, err);
               row.classList.toggle('fired'); // zurücksetzen, da nicht gespeichert
@@ -452,7 +459,7 @@
 
         const notizTextarea = wrap.querySelector('.notiz-block textarea');
         const notizHint = wrap.querySelector('.notiz-block .save-hint');
-        const notizPath = 'regie/' + viewState.szene + '/' + viewState.ort + '/interaktionen/' + iaId + '/notizen';
+        const notizPath = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort) + '/interaktionen/' + iaId + '/notizen';
         notizTextarea.addEventListener('input', debounce(function (e) {
           saveField(notizPath, e.target.value, notizHint);
         }, 600));
