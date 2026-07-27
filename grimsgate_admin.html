@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Grimsgate – Admin</title>
+<style>
+  :root {
+    --bg: #14100b;
+    --panel: #1a130b;
+    --panel-2: #221808;
+    --line: #3a2a18;
+    --ink: #cbb98f;
+    --ink-dim: #8a7a5c;
+    --ink-faint: #6b5d45;
+    --gold: #c9a24b;
+    --accent: #a8391e;
+    --live: #7fa87f;
+    --live-dim: #3a4a3a;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 20px 24px 14px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1 {
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 24px;
+    margin: 0 0 4px 0;
+  }
+
+  .subtitle {
+    color: var(--ink-dim);
+    font-style: italic;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .status {
+    font-size: 12.5px;
+    color: var(--ink-dim);
+  }
+
+  .status.connected { color: var(--live); }
+  .status.error { color: #c76a5a; }
+
+  /* ---------- Board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: 260px 300px 1fr;
+    flex: 1;
+    min-height: 0;
+  }
+  .col { overflow-y: auto; border-right: 1px solid var(--line); }
+  .col:last-child { border-right: none; }
+  .col-head {
+    position: sticky; top: 0; z-index: 2;
+    padding: 10px 16px;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-faint);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* ---------- Col 1: Szenen ---------- */
+  .scene-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px 10px 16px;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .scene-row:hover { background: var(--panel); }
+  .scene-row.selected {
+    background: var(--panel-2);
+    border-left-color: var(--gold);
+  }
+  .scene-row .label { font-size: 14px; display: flex; align-items: center; gap: 7px; }
+  .scene-row .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--live); flex: 0 0 auto;
+    box-shadow: 0 0 5px var(--live);
+  }
+  .live-btn {
+    font-family: inherit; font-size: 10.5px;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink-faint); border-radius: 3px;
+    padding: 3px 7px; cursor: pointer; white-space: nowrap;
+    transition: border-color .12s, color .12s;
+  }
+  .live-btn:hover { border-color: var(--accent); color: #e0a08e; }
+  .live-btn.is-live { border-color: var(--live); color: var(--live); }
+
+  /* ---------- Col 2: Orte ---------- */
+  .ort-card {
+    margin: 10px 12px; padding: 12px 13px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    cursor: pointer;
+    transition: border-color .12s, background .12s;
+  }
+  .ort-card:hover { border-color: var(--ink-faint); }
+  .ort-card.active { border-color: var(--gold); background: var(--panel-2); }
+  .ort-card .title { font-size: 15px; color: var(--ink); margin-bottom: 4px; }
+  .ort-card .personen { font-size: 11px; color: var(--gold); margin-bottom: 6px; }
+  .ort-card .kurz { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
+  .ort-card.leer .kurz { font-style: italic; }
+
+  /* ---------- Col 3: Detail ---------- */
+  .ort-detail-head { padding: 18px 24px 10px; border-bottom: 1px solid var(--line); }
+  .ort-detail-head h2 { font-weight: 400; font-size: 21px; margin: 0 0 4px; color: var(--gold); }
+  .ort-detail-head .personen-line { font-size: 12px; color: var(--ink-dim); }
+
+  .ort-notiz-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
+  .ort-hinweis {
+    margin: 14px 24px 0; padding: 11px 14px;
+    background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--gold);
+    border-radius: 3px; font-size: 12.5px; line-height: 1.55; color: var(--ink-dim);
+  }
+  .ort-hinweis-label {
+    display: block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 5px;
+  }
+  .ort-notiz-block label,
+  .notiz-block label,
+  .trigger-label {
+    display: block; font-size: 10.5px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px;
+  }
+
+  textarea {
+    width: 100%; resize: vertical; min-height: 54px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 13px; padding: 8px 10px;
+    line-height: 1.5;
+  }
+  textarea:focus { outline: none; border-color: var(--gold); }
+
+  .save-hint { font-size: 10.5px; color: var(--ink-faint); margin-top: 4px; min-height: 14px; }
+  .save-hint.saved { color: var(--live); }
+
+  .interaktionen { padding: 14px 24px 40px; }
+  .interaktion {
+    border: 1px solid var(--line); border-radius: 4px; margin-bottom: 12px;
+    background: var(--panel); overflow: hidden;
+  }
+  .interaktion.open { border-color: var(--ink-faint); }
+  .interaktion-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; cursor: pointer;
+  }
+  .interaktion-head .title { font-size: 15px; color: var(--ink); }
+  .interaktion-head .kurz { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+  .chevron { color: var(--ink-faint); font-size: 12px; transition: transform .15s; }
+  .interaktion.open .chevron { transform: rotate(90deg); color: var(--gold); }
+  .interaktion-body { display: none; padding: 0 16px 16px; }
+  .interaktion.open .interaktion-body { display: block; }
+
+  .details-text {
+    font-size: 13px; line-height: 1.6; color: var(--ink-dim);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    padding: 12px 14px; margin-bottom: 14px; white-space: pre-line;
+  }
+
+  .trigger {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; border-bottom: 1px solid var(--line);
+    cursor: pointer; user-select: none;
+  }
+  .trigger:last-of-type { border-bottom: none; }
+  .seal {
+    width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto;
+    border: 1.5px solid var(--ink-faint); position: relative;
+    transition: border-color .15s, background .15s;
+  }
+  .trigger.fired .seal { border-color: var(--live); background: var(--live-dim); }
+  .trigger.fired .seal::after {
+    content: "✓"; position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center; font-size: 10px; color: var(--live);
+  }
+  .trigger-text { font-size: 13px; color: var(--ink-dim); }
+  .trigger.fired .trigger-text { color: var(--ink); }
+
+  .notiz-block { margin-top: 14px; }
+
+  .empty-hint {
+    padding: 60px 24px; text-align: center; color: var(--ink-faint); font-size: 13.5px;
+  }
+
+  ::-webkit-scrollbar { width: 9px; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+
+  <header>
+    <h1>Grimsgate – Admin</h1>
+    <div class="subtitle">Links: Szene wählen &amp; live setzen · Mitte/Rechts: Regie-Notizen (nur hier sichtbar)</div>
+    <div class="status" id="status">Verbinde mit Firebase…</div>
+  </header>
+
+  <div class="board">
+    <div class="col" id="col-szenen"><div class="col-head">Szenen</div></div>
+    <div class="col" id="col-orte"><div class="col-head">Orte</div></div>
+    <div class="col" id="col-detail"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <script src="firebase-config.js"></script>
+  <script src="scenes.js"></script>
+  <script src="regie.js"></script>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    let db = null;
+    let liveScene = null;       // aktuell für Spieler live gesetzte Szene (aus Firebase)
+    let viewState = { szene: null, ort: null }; // welche Szene/Ort gerade in der Regie-Ansicht angesehen wird
+
+    // ---------- Firebase-Verbindung ----------
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+
+      db.ref('currentScene').on('value', function (snapshot) {
+        liveScene = snapshot.val() || DEFAULT_SCENE;
+        if (!viewState.szene) {
+          viewState.szene = liveScene;
+          viewState.ort = firstOrtOf(viewState.szene);
+        }
+        statusEl.textContent = 'Verbunden — live für Spieler: ' + (SCENES[liveScene] ? SCENES[liveScene].label : liveScene);
+        statusEl.className = 'status connected';
+        renderAll();
+      }, function (err) {
+        statusEl.textContent = 'Fehler beim Verbinden: ' + err.message;
+        statusEl.className = 'status error';
+      });
+    } catch (e) {
+      statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft. Bitte firebase-config.js prüfen.';
+      statusEl.className = 'status error';
+      viewState.szene = DEFAULT_SCENE;
+      viewState.ort = firstOrtOf(viewState.szene);
+      renderAll();
+    }
+
+    function setLiveScene(sceneId) {
+      if (!db) { alert('Keine Verbindung zu Firebase — firebase-config.js prüfen.'); return; }
+      db.ref('currentScene').set(sceneId);
+    }
+
+    function firstOrtOf(sceneId) {
+      const scene = SCENES[sceneId];
+      if (!scene || !scene.markers || scene.markers.length === 0) return null;
+      return scene.markers[0].id;
+    }
+
+    // ---------- Spalte 1: Szenen ----------
+    function renderSzenen() {
+      const col = document.getElementById('col-szenen');
+      col.innerHTML = '<div class="col-head">Szenen</div>';
+      Object.keys(SCENES).forEach(function (sceneId) {
+        const scene = SCENES[sceneId];
+        const row = document.createElement('div');
+        row.className = 'scene-row' + (viewState.szene === sceneId ? ' selected' : '');
+        row.innerHTML =
+          '<span class="label">' +
+            (sceneId === liveScene ? '<span class="live-dot" title="aktuell live"></span>' : '') +
+            scene.label +
+          '</span>' +
+          '<button class="live-btn' + (sceneId === liveScene ? ' is-live' : '') + '">' +
+            (sceneId === liveScene ? 'live' : 'live setzen') +
+          '</button>';
+        row.querySelector('.label').onclick = function () {
+          viewState.szene = sceneId;
+          viewState.ort = firstOrtOf(sceneId);
+          renderAll();
+        };
+        row.querySelector('.live-btn').onclick = function (e) {
+          e.stopPropagation();
+          setLiveScene(sceneId);
+        };
+        col.appendChild(row);
+      });
+    }
+
+    // ---------- Spalte 2: Orte ----------
+    function renderOrte() {
+      const col = document.getElementById('col-orte');
+      col.innerHTML = '<div class="col-head">Orte</div>';
+      const scene = SCENES[viewState.szene];
+      if (!scene || !scene.markers || scene.markers.length === 0) {
+        col.innerHTML += '<div class="empty-hint">Keine Orte in dieser Szene</div>';
+        return;
+      }
+      scene.markers.forEach(function (marker) {
+        const ort = ORTE[marker.id] || {};
+        const hatInhalt = ort.interaktionen && Object.keys(ort.interaktionen).length > 0;
+        const card = document.createElement('div');
+        card.className = 'ort-card' + (viewState.ort === marker.id ? ' active' : '') + (hatInhalt ? '' : ' leer');
+        card.innerHTML =
+          '<div class="title">' + marker.title + '</div>' +
+          (ort.personen ? '<div class="personen">' + ort.personen + '</div>' : '') +
+          '<div class="kurz">' + (ort.kurz || marker.desc) + '</div>';
+        card.onclick = function () { viewState.ort = marker.id; renderAll(); };
+        col.appendChild(card);
+      });
+    }
+
+    // ---------- Spalte 3: Detail ----------
+    function debounce(fn, ms) {
+      let t = null;
+      return function (...args) { clearTimeout(t); t = setTimeout(function () { fn.apply(null, args); }, ms); };
+    }
+
+    function renderDetail() {
+      const col = document.getElementById('col-detail');
+      const marker = viewState.ort ? { id: viewState.ort } : null;
+      const sceneMarkers = SCENES[viewState.szene] ? SCENES[viewState.szene].markers : [];
+      const markerInfo = sceneMarkers.find(function (m) { return m.id === viewState.ort; });
+
+      if (!markerInfo) {
+        col.innerHTML = '<div class="empty-hint">Ort wählen, um Regie-Details zu sehen.</div>';
+        return;
+      }
+
+      const ort = ORTE[viewState.ort] || { personen: '', kurz: '', interaktionen: {}, ortHinweis: '' };
+      const dynPath = 'regie/' + viewState.szene + '/' + viewState.ort;
+
+      col.innerHTML =
+        '<div class="ort-detail-head"><h2>' + markerInfo.title + '</h2>' +
+          '<div class="personen-line">' + (ort.personen || '') + '</div>' +
+        '</div>' +
+        (ort.ortHinweis ? '<div class="ort-hinweis"><span class="ort-hinweis-label">Hinweis (Regie-Referenz)</span>' + ort.ortHinweis + '</div>' : '') +
+        '<div class="ort-notiz-block">' +
+          '<label>Notizen zum Ort (übergeordnet)</label>' +
+          '<textarea id="ort-notiz" placeholder="z.B. allgemeine Stimmung, Vorfälle ohne Bezug zu einer einzelnen Interaktion…"></textarea>' +
+          '<div class="save-hint" id="ort-notiz-hint"></div>' +
+        '</div>' +
+        '<div class="interaktionen" id="interaktionen-list"></div>' +
+        '<div class="sync-warning" id="sync-warning" style="display:none; padding:0 24px 20px; font-size:11.5px; color:#c76a5a;"></div>';
+
+      const iaKeys = Object.keys(ort.interaktionen || {});
+
+      // Sofort mit statischen Daten rendern (Trigger ungesetzt, Notizfeld leer),
+      // damit die Spalte auch ohne/bei langsamer Firebase-Verbindung nie leer bleibt.
+      document.getElementById('ort-notiz').value = '';
+      renderInteraktionen(ort, iaKeys, {});
+
+      document.getElementById('ort-notiz').addEventListener('input', debounce(function (e) {
+        saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
+      }, 600));
+      document.getElementById('ort-notiz').addEventListener('blur', function (e) {
+        saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
+      });
+
+      if (!db) return; // ohne Firebase: statischer Stand bleibt, kein Speichern möglich
+
+      // Danach asynchron echten Stand nachladen und drüberlegen, falls vorhanden.
+      db.ref(dynPath).once('value').then(function (snap) {
+        const dyn = snap.val() || {};
+        if (typeof dyn.ortNotizen === 'string') {
+          document.getElementById('ort-notiz').value = dyn.ortNotizen;
+        }
+        if (dyn.interaktionen) {
+          renderInteraktionen(ort, iaKeys, dyn.interaktionen);
+        }
+      }).catch(function (err) {
+        const warn = document.getElementById('sync-warning');
+        if (warn) {
+          warn.style.display = 'block';
+          warn.textContent = 'Gespeicherter Stand (Trigger/Notizen) konnte nicht geladen werden: ' + err.message + ' — angezeigt wird der unbearbeitete Ausgangsstand. Änderungen werden trotzdem versucht zu speichern.';
+        }
+        console.error('Fehler beim Laden von', dynPath, err);
+      });
+    }
+
+    function renderInteraktionen(ort, iaKeys, dynInteraktionen) {
+      const listEl = document.getElementById('interaktionen-list');
+      if (iaKeys.length === 0) return;
+      listEl.innerHTML = '';
+
+      iaKeys.forEach(function (iaId) {
+        const ia = ort.interaktionen[iaId];
+        const dynIa = dynInteraktionen[iaId] || {};
+        const dynTrigger = dynIa.trigger || {};
+
+        const wrap = document.createElement('div');
+        wrap.className = 'interaktion';
+        wrap.innerHTML =
+          '<div class="interaktion-head">' +
+            '<div><div class="title">' + ia.title + '</div><div class="kurz">' + ia.kurz + '</div></div>' +
+            '<div class="chevron">▶</div>' +
+          '</div>' +
+          '<div class="interaktion-body">' +
+            '<div class="details-text">' + ia.details + '</div>' +
+            '<div class="trigger-label">Trigger</div>' +
+            '<div class="trigger-list"></div>' +
+            '<div class="notiz-block">' +
+              '<label>Notizen zu dieser Interaktion</label>' +
+              '<textarea placeholder="z.B. besondere Reaktionen, Würfe, Abweichungen vom Skript…">' + (dynIa.notizen || '') + '</textarea>' +
+              '<div class="save-hint"></div>' +
+            '</div>' +
+          '</div>';
+
+        wrap.querySelector('.interaktion-head').onclick = function () {
+          wrap.classList.toggle('open');
+        };
+
+        const triggerList = wrap.querySelector('.trigger-list');
+        const triggerHint = document.createElement('div');
+        triggerHint.className = 'save-hint';
+        ia.trigger.forEach(function (t) {
+          const fired = !!dynTrigger[t.id];
+          const row = document.createElement('div');
+          row.className = 'trigger' + (fired ? ' fired' : '');
+          row.innerHTML = '<div class="seal"></div><div class="trigger-text">' + t.label + '</div>';
+          row.onclick = function () {
+            const nowFired = !row.classList.contains('fired');
+            row.classList.toggle('fired');
+            triggerHint.textContent = '';
+            triggerHint.style.color = '';
+            if (!db) return;
+            const path = 'regie/' + viewState.szene + '/' + viewState.ort + '/interaktionen/' + iaId + '/trigger/' + t.id;
+            db.ref(path).set(nowFired).catch(function (err) {
+              console.error('Fehler beim Speichern von', path, err);
+              row.classList.toggle('fired'); // zurücksetzen, da nicht gespeichert
+              triggerHint.style.color = '#c76a5a';
+              triggerHint.textContent = 'NICHT gespeichert — ' + err.message;
+            });
+          };
+          triggerList.appendChild(row);
+        });
+        triggerList.insertAdjacentElement('afterend', triggerHint);
+
+        const notizTextarea = wrap.querySelector('.notiz-block textarea');
+        const notizHint = wrap.querySelector('.notiz-block .save-hint');
+        const notizPath = 'regie/' + viewState.szene + '/' + viewState.ort + '/interaktionen/' + iaId + '/notizen';
+        notizTextarea.addEventListener('input', debounce(function (e) {
+          saveField(notizPath, e.target.value, notizHint);
+        }, 600));
+        notizTextarea.addEventListener('blur', function (e) {
+          saveField(notizPath, e.target.value, notizHint);
+        });
+
+        listEl.appendChild(wrap);
+      });
+    }
+
+    function saveField(path, value, hintTarget) {
+      const hintEl = typeof hintTarget === 'string' ? document.getElementById(hintTarget) : hintTarget;
+      if (!db) return;
+      db.ref(path).set(value).then(function () {
+        if (hintEl) {
+          hintEl.style.color = '';
+          hintEl.textContent = 'gespeichert';
+          hintEl.classList.add('saved');
+          setTimeout(function () { if (hintEl) { hintEl.textContent = ''; hintEl.classList.remove('saved'); } }, 1500);
+        }
+      }).catch(function (err) {
+        console.error('Fehler beim Speichern von', path, err);
+        if (hintEl) {
+          hintEl.style.color = '#c76a5a';
+          hintEl.textContent = 'NICHT gespeichert — ' + err.message;
+        }
+      });
+    }
+
+    function renderAll() {
+      renderSzenen();
+      renderOrte();
+      renderDetail();
+    }
+  </script>
+
+</body>
+</html>
