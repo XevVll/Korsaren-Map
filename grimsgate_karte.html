@@ -131,7 +131,12 @@
     max-width: 600px;
   }
 
-  .pin-dot { pointer-events: auto; }
+  .conn-status {
+    margin-top: 8px;
+    color: #6b5d45;
+    font-size: 11px;
+    text-align: center;
+  }
 
   /* ---- Modal Overlay ---- */
   .overlay {
@@ -240,92 +245,15 @@
   <h1>Grimsgate</h1>
   <div class="subtitle">Englische Küste — 1690er Jahre</div>
 
-  <div class="map-wrap">
+  <div class="map-wrap" id="mapWrap">
     <img src="grimsgate_karte.png" alt="Karte von Grimsgate">
-
-    <!-- Zur letzten Heuer -->
-    <div class="pin" style="top: 58.3%; left: 40%;"
-         data-title="Zur letzten Heuer"
-         data-desc="Raue Hafenkneipe. Kaum Stammgäste — die meisten, die hier trinken, sieht man Jahre nicht wieder. Wer anheuern will, landet früher oder später hier."
-         data-img="interior_heuer.png"
-         onclick="openLocation(this)">
-      <div class="pin-dot"></div>
-      <div class="tooltip">
-        <h3>Zur letzten Heuer</h3>
-        Raue Hafenkneipe. Kaum Stammgäste — die meisten, die hier trinken, sieht man Jahre nicht wieder. Wer anheuern will, landet früher oder später hier.
-      </div>
-    </div>
-
-    <!-- Hafenmeisterei -->
-    <div class="pin" style="top: 27.5%; left: 9.4%;"
-         data-title="Hafenmeisterei"
-         data-desc="Verwaltet Anlegerechte, Fracht und Papiere. Ordnungsmacht des Hafens."
-         data-img="interior_hafenmeisterei.png"
-         onclick="openLocation(this)">
-      <div class="pin-dot"></div>
-      <div class="tooltip">
-        <h3>Hafenmeisterei</h3>
-        Verwaltet Anlegerechte, Fracht und Papiere. Ordnungsmacht des Hafens.
-      </div>
-    </div>
-
-    <!-- Lagerhäuser -->
-    <div class="pin" style="top: 26.7%; left: 26.3%;"
-         data-title="Lagerhäuser"
-         data-desc="Von außen chaotisch, im Kern strikt organisiert. Hier läuft die Beladung des Konvois wie ein Uhrwerk."
-         data-img="interior_lagerhaeuser.png"
-         onclick="openLocation(this)">
-      <div class="pin-dot"></div>
-      <div class="tooltip">
-        <h3>Lagerhäuser</h3>
-        Von außen chaotisch, im Kern strikt organisiert. Hier läuft die Beladung des Konvois wie ein Uhrwerk.
-      </div>
-    </div>
-
-    <!-- Markt -->
-    <div class="pin" style="top: 74.6%; left: 53.2%;"
-         data-title="Marktplatz"
-         data-desc="Handel, Menschenmengen, guter Ort für Gerüchte und Zufallsbegegnungen."
-         data-img="interior_markt.png"
-         onclick="openLocation(this)">
-      <div class="pin-dot"></div>
-      <div class="tooltip">
-        <h3>Marktplatz</h3>
-        Handel, Menschenmengen, guter Ort für Gerüchte und Zufallsbegegnungen.
-      </div>
-    </div>
-
-    <!-- Krämerladen -->
-    <div class="pin" style="top: 58.9%; left: 49.8%;"
-         data-title="Krämerladen"
-         data-desc="Ausrüstung und Grundbedarf. Der Krämer hört viel — und vergisst wenig."
-         data-img="interior_kraemerladen.png"
-         onclick="openLocation(this)">
-      <div class="pin-dot"></div>
-      <div class="tooltip">
-        <h3>Krämerladen</h3>
-        Ausrüstung und Grundbedarf. Der Krämer hört viel — und vergisst wenig.
-      </div>
-    </div>
-
-    <!-- Bordell -->
-    <div class="pin" style="top: 50.5%; left: 85.1%;"
-         data-title="Bordell"
-         data-desc="Etwas abseits der Stadt gelegen, unauffällig. Rote Fenster, wenig Fragen."
-         data-img="interior_bordell.png"
-         onclick="openLocation(this)">
-      <div class="pin-dot"></div>
-      <div class="tooltip">
-        <h3>Bordell</h3>
-        Etwas abseits der Stadt gelegen, unauffällig. Rote Fenster, wenig Fragen.
-      </div>
-    </div>
-
+    <!-- Marker werden hier per JS eingefügt -->
   </div>
 
   <div class="legend">
     Mit der Maus über eine Markierung fahren für die Beschreibung — anklicken öffnet eine Innenansicht des Ortes.
   </div>
+  <div class="conn-status" id="connStatus">Verbinde…</div>
 
   <!-- ---- Modal Overlay ---- -->
   <div class="overlay" id="overlay" onclick="if(event.target.id==='overlay') closeLocation()">
@@ -339,23 +267,50 @@
     </div>
   </div>
 
-  <script>
-    function openLocation(el) {
-      const title = el.dataset.title;
-      const desc = el.dataset.desc;
-      const img = el.dataset.img;
+  <!-- Firebase SDK (compat, einfache script-tag Einbindung) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
-      document.getElementById('overlayTitle').textContent = title;
-      document.getElementById('overlayDesc').textContent = desc;
+  <script src="firebase-config.js"></script>
+  <script src="scenes.js"></script>
+
+  <script>
+    const mapWrap = document.getElementById('mapWrap');
+    const connStatus = document.getElementById('connStatus');
+
+    function renderScene(sceneId) {
+      const scene = SCENES[sceneId] || SCENES[DEFAULT_SCENE];
+
+      // alte Marker entfernen
+      mapWrap.querySelectorAll('.pin').forEach(function (el) { el.remove(); });
+
+      scene.markers.forEach(function (marker) {
+        const pin = document.createElement('div');
+        pin.className = 'pin';
+        pin.style.top = marker.top + '%';
+        pin.style.left = marker.left + '%';
+        pin.onclick = function () { openLocation(marker); };
+
+        pin.innerHTML =
+          '<div class="pin-dot"></div>' +
+          '<div class="tooltip"><h3>' + marker.title + '</h3>' + marker.desc + '</div>';
+
+        mapWrap.appendChild(pin);
+      });
+    }
+
+    function openLocation(marker) {
+      document.getElementById('overlayTitle').textContent = marker.title;
+      document.getElementById('overlayDesc').textContent = marker.desc;
 
       const wrap = document.getElementById('overlayImgWrap');
       wrap.innerHTML = '';
 
       const imageEl = new Image();
-      imageEl.src = img;
-      imageEl.alt = title;
+      imageEl.src = marker.img;
+      imageEl.alt = marker.title;
       imageEl.onerror = function () {
-        wrap.innerHTML = '<div class="overlay-placeholder">Noch kein Innenraumbild hinterlegt für „' + title + '“.<br>Datei erwartet unter: <code>' + img + '</code></div>';
+        wrap.innerHTML = '<div class="overlay-placeholder">Noch kein Innenraumbild hinterlegt für „' + marker.title + '“.<br>Datei erwartet unter: <code>' + marker.img + '</code></div>';
       };
       wrap.appendChild(imageEl);
 
@@ -369,6 +324,24 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeLocation();
     });
+
+    // Erstmal mit der Default-Szene rendern, damit sofort etwas sichtbar ist
+    renderScene(DEFAULT_SCENE);
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+
+      db.ref('currentScene').on('value', function (snapshot) {
+        const sceneId = snapshot.val() || DEFAULT_SCENE;
+        renderScene(sceneId);
+        connStatus.textContent = 'Live verbunden';
+      }, function (err) {
+        connStatus.textContent = 'Verbindung getrennt (zeige letzten bekannten Stand)';
+      });
+    } catch (e) {
+      connStatus.textContent = 'Keine Firebase-Verbindung — zeige Standard-Szene';
+    }
   </script>
 
 </body>
