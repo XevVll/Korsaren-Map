@@ -25,7 +25,7 @@ const ORTE = {
   "heuer": {
     personen: "Francesco · Tom Fletcher · Trewin-Zwillinge · Wat",
     kurz: "Ort zum Rekrutieren. Vier Wege an Bord, mit Fallback-Loop und Wat als letzte Instanz.",
-    ortNotizenDefault: "Fallback-Loop: Lehnt der Spieler Tom ab, fängt Francesco ihn ein zweites Mal ab (Gewinn feiern / Verlust ertränken). Erst wenn auch das scheitert, steht der Spieler draußen Walter gegenüber.",
+    ortHinweis: "Fallback-Loop: Lehnt der Spieler Tom ab, fängt Francesco ihn ein zweites Mal ab (Gewinn feiern / Verlust ertränken). Erst wenn auch das scheitert, steht der Spieler draußen Walter gegenüber.",
     interaktionen: {
       "francesco": {
         title: "Francesco — Verlockung",
@@ -75,37 +75,37 @@ const ORTE = {
   "hafenmeisterei": {
     personen: "Bartholomew Ashworth · Gehilfe",
     kurz: "Verwaltet Anlegerechte, Fracht und Papiere. Trigger-Szene möglich, wenn Spieler vor der Kneipe hierher gehen.",
-    ortNotizenDefault: "",
+    ortHinweis: "",
     interaktionen: {}
   },
   "lagerhaeuser": {
     personen: "–",
     kurz: "Von außen chaotisch, im Kern strikt organisiert. Noch nicht ausformuliert.",
-    ortNotizenDefault: "",
+    ortHinweis: "",
     interaktionen: {}
   },
   "markt": {
     personen: "–",
     kurz: "Handel, Menschenmengen, guter Ort für Gerüchte. Noch nicht ausformuliert.",
-    ortNotizenDefault: "",
+    ortHinweis: "",
     interaktionen: {}
   },
   "kraemerladen": {
     personen: "–",
     kurz: "Ausrüstung und Grundbedarf. Noch nicht ausformuliert.",
-    ortNotizenDefault: "",
+    ortHinweis: "",
     interaktionen: {}
   },
   "bordell": {
     personen: "Constance Wrey · Ezra Coombe · Ned Sharpe",
     kurz: "Sozialer Zugang + Wat-Falle + 'Raubein'-Zusatzszene. Noch nicht final ausformuliert.",
-    ortNotizenDefault: "",
+    ortHinweis: "",
     interaktionen: {}
   },
   "golden_lion": {
     personen: "–",
     kurz: "Ein stolzes kleines Kriegsschiff, mitten im Konvoi vor Anker. Noch nicht ausformuliert.",
-    ortNotizenDefault: "",
+    ortHinweis: "",
     interaktionen: {}
   }
 };
