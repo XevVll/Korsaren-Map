@@ -127,6 +127,15 @@
   .ort-detail-head .personen-line { font-size: 12px; color: var(--ink-dim); }
 
   .ort-notiz-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
+  .ort-hinweis {
+    margin: 14px 24px 0; padding: 11px 14px;
+    background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--gold);
+    border-radius: 3px; font-size: 12.5px; line-height: 1.55; color: var(--ink-dim);
+  }
+  .ort-hinweis-label {
+    display: block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 5px;
+  }
   .ort-notiz-block label,
   .notiz-block label,
   .trigger-label {
@@ -332,13 +341,14 @@
         return;
       }
 
-      const ort = ORTE[viewState.ort] || { personen: '', kurz: '', interaktionen: {}, ortNotizenDefault: '' };
+      const ort = ORTE[viewState.ort] || { personen: '', kurz: '', interaktionen: {}, ortHinweis: '' };
       const dynPath = 'regie/' + viewState.szene + '/' + viewState.ort;
 
       col.innerHTML =
         '<div class="ort-detail-head"><h2>' + markerInfo.title + '</h2>' +
           '<div class="personen-line">' + (ort.personen || '') + '</div>' +
         '</div>' +
+        (ort.ortHinweis ? '<div class="ort-hinweis"><span class="ort-hinweis-label">Hinweis (Regie-Referenz)</span>' + ort.ortHinweis + '</div>' : '') +
         '<div class="ort-notiz-block">' +
           '<label>Notizen zum Ort (übergeordnet)</label>' +
           '<textarea id="ort-notiz" placeholder="z.B. allgemeine Stimmung, Vorfälle ohne Bezug zu einer einzelnen Interaktion…"></textarea>' +
@@ -349,9 +359,9 @@
 
       const iaKeys = Object.keys(ort.interaktionen || {});
 
-      // Sofort mit statischen Daten rendern (Trigger ungesetzt, Notizen leer),
+      // Sofort mit statischen Daten rendern (Trigger ungesetzt, Notizfeld leer),
       // damit die Spalte auch ohne/bei langsamer Firebase-Verbindung nie leer bleibt.
-      document.getElementById('ort-notiz').value = ort.ortNotizenDefault || '';
+      document.getElementById('ort-notiz').value = '';
       renderInteraktionen(ort, iaKeys, {});
 
       document.getElementById('ort-notiz').addEventListener('input', debounce(function (e) {
