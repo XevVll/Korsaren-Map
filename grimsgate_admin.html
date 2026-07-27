@@ -367,6 +367,9 @@
       document.getElementById('ort-notiz').addEventListener('input', debounce(function (e) {
         saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
       }, 600));
+      document.getElementById('ort-notiz').addEventListener('blur', function (e) {
+        saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
+      });
 
       if (!db) return; // ohne Firebase: statischer Stand bleibt, kein Speichern möglich
 
@@ -422,6 +425,8 @@
         };
 
         const triggerList = wrap.querySelector('.trigger-list');
+        const triggerHint = document.createElement('div');
+        triggerHint.className = 'save-hint';
         ia.trigger.forEach(function (t) {
           const fired = !!dynTrigger[t.id];
           const row = document.createElement('div');
@@ -430,18 +435,30 @@
           row.onclick = function () {
             const nowFired = !row.classList.contains('fired');
             row.classList.toggle('fired');
+            triggerHint.textContent = '';
+            triggerHint.style.color = '';
+            if (!db) return;
             const path = 'regie/' + viewState.szene + '/' + viewState.ort + '/interaktionen/' + iaId + '/trigger/' + t.id;
-            if (db) db.ref(path).set(nowFired);
+            db.ref(path).set(nowFired).catch(function (err) {
+              console.error('Fehler beim Speichern von', path, err);
+              row.classList.toggle('fired'); // zurücksetzen, da nicht gespeichert
+              triggerHint.style.color = '#c76a5a';
+              triggerHint.textContent = 'NICHT gespeichert — ' + err.message;
+            });
           };
           triggerList.appendChild(row);
         });
+        triggerList.insertAdjacentElement('afterend', triggerHint);
 
         const notizTextarea = wrap.querySelector('.notiz-block textarea');
         const notizHint = wrap.querySelector('.notiz-block .save-hint');
+        const notizPath = 'regie/' + viewState.szene + '/' + viewState.ort + '/interaktionen/' + iaId + '/notizen';
         notizTextarea.addEventListener('input', debounce(function (e) {
-          const path = 'regie/' + viewState.szene + '/' + viewState.ort + '/interaktionen/' + iaId + '/notizen';
-          saveField(path, e.target.value, notizHint);
+          saveField(notizPath, e.target.value, notizHint);
         }, 600));
+        notizTextarea.addEventListener('blur', function (e) {
+          saveField(notizPath, e.target.value, notizHint);
+        });
 
         listEl.appendChild(wrap);
       });
@@ -452,9 +469,16 @@
       if (!db) return;
       db.ref(path).set(value).then(function () {
         if (hintEl) {
+          hintEl.style.color = '';
           hintEl.textContent = 'gespeichert';
           hintEl.classList.add('saved');
           setTimeout(function () { if (hintEl) { hintEl.textContent = ''; hintEl.classList.remove('saved'); } }, 1500);
+        }
+      }).catch(function (err) {
+        console.error('Fehler beim Speichern von', path, err);
+        if (hintEl) {
+          hintEl.style.color = '#c76a5a';
+          hintEl.textContent = 'NICHT gespeichert — ' + err.message;
         }
       });
     }
