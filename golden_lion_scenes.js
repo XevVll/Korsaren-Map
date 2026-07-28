@@ -54,7 +54,7 @@ const GOLDEN_LION_MARKERS_BASE = {
   achterdeck: {
     top: 22, left: 21,
     title: "Achterdeck",
-    desc: "Erhöhtes Deck am Heck, Offiziere, vermutlich das Ruder.",
+    desc: "Erhöhtes Deck am Heck. Tom Fletcher hält lässig das Ruder — scheinbar mühelos auf Kurs.",
     img: "interior_achterdeck.png"
   },
   kapitaenskajuete: {
@@ -72,7 +72,7 @@ const GOLDEN_LION_MARKERS_BASE = {
   batteriedeck: {
     top: 55, left: 60,
     title: "Batteriedeck",
-    desc: "Durchgehende Kanonenreihe, Hauptbewaffnung des Schiffs.",
+    desc: "Durchgehende Kanonenreihe, aber wenig Ordnung — Werkzeug und Pulverreste liegen, wie sie zuletzt gebraucht wurden. So viele Kanonen für ein einfaches Begleitschiff?",
     img: "interior_batteriedeck.png"
   },
   unterdeck: {
