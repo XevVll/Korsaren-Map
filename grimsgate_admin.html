@@ -99,6 +99,53 @@
   .char-toggle input { accent-color: var(--gold); cursor: pointer; }
   .char-toggle.active { color: var(--ink); }
 
+  /* ---------- Stoppuhr ---------- */
+  #timerBar {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    font-size: 13px;
+  }
+  #timerDisplay {
+    font-family: 'Georgia', serif; font-size: 20px; letter-spacing: 1px;
+    color: var(--gold); min-width: 84px;
+  }
+  .timer-btn {
+    font-family: inherit; font-size: 11.5px;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink-faint); border-radius: 3px;
+    padding: 5px 10px; cursor: pointer;
+    transition: border-color .12s, color .12s;
+  }
+  .timer-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .timer-btn.running { border-color: var(--live); color: var(--live); }
+  #timerMarkForm { display: flex; align-items: center; gap: 6px; }
+  #timerMarkLabel {
+    width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 8px;
+  }
+  #timerMarkMinutes {
+    width: 60px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 8px;
+  }
+  #timerMarkLabel:focus, #timerMarkMinutes:focus { outline: none; border-color: var(--gold); }
+  #timerMarks { display: flex; flex-wrap: wrap; gap: 6px; }
+  .timer-mark {
+    font-size: 11.5px; color: var(--ink-dim);
+    border: 1px solid var(--line); border-radius: 12px;
+    padding: 4px 10px; cursor: pointer; white-space: nowrap;
+  }
+  .timer-mark:hover { border-color: var(--accent); color: #e0a08e; }
+  .timer-mark.due {
+    border-color: var(--accent); color: #e0a08e; background: rgba(168,57,30,0.15);
+    animation: markPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes markPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(168,57,30,0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(168,57,30,0); }
+  }
+
   /* ---------- Board ---------- */
   .board {
     display: grid;
@@ -273,6 +320,18 @@
     <span class="soundBarIcon">🎵</span>
     <input type="text" id="soundLinkInput" placeholder="Dateiname der Audiodatei einfügen (z.B. sturm.mp3)…">
     <span class="save-hint" id="soundLinkHint"></span>
+  </div>
+
+  <div id="timerBar">
+    <span id="timerDisplay">00:00:00</span>
+    <button class="timer-btn" id="timerStartPause">Start</button>
+    <button class="timer-btn" id="timerReset">Reset</button>
+    <form id="timerMarkForm">
+      <input type="text" id="timerMarkLabel" placeholder="Label, z.B. Junge/Wat">
+      <input type="number" id="timerMarkMinutes" placeholder="Min" min="0">
+      <button type="submit" class="timer-btn">+ Merker</button>
+    </form>
+    <div id="timerMarks"></div>
   </div>
 
   <div id="charBar">
@@ -661,6 +720,129 @@
       renderSoundBar();
       renderCharBar();
     }
+
+    // ---------- Stoppuhr (rein admin-seitig, GM definiert eigene Merker) ----------
+    // Zustand liegt unter gmTimer/ in Firebase (nicht unter regie/ oder
+    // markerVariant/, da unabhängig von Szene/Ort - eine durchgehende
+    // Session-Uhr). So bleibt der Stand auch bei Neuladen der Admin-Seite
+    // erhalten. "Marks" sind frei benannte Erinnerungen (Label + Minute),
+    // die der SL live selbst setzt - keine im Code fest hinterlegten
+    // Zeitpunkte, damit sich später verzweigende Handlungsstränge nicht
+    // gegenseitig ins Gehege kommen.
+    const timerDisplayEl = document.getElementById('timerDisplay');
+    const timerStartPauseBtn = document.getElementById('timerStartPause');
+    const timerResetBtn = document.getElementById('timerReset');
+    const timerMarkForm = document.getElementById('timerMarkForm');
+    const timerMarkLabelInput = document.getElementById('timerMarkLabel');
+    const timerMarkMinutesInput = document.getElementById('timerMarkMinutes');
+    const timerMarksEl = document.getElementById('timerMarks');
+
+    let gmTimerState = { running: false, startedAt: null, elapsedBeforeStart: 0, marks: {} };
+    let timerTickInterval = null;
+
+    function formatElapsed(totalSeconds) {
+      const s = Math.max(0, Math.floor(totalSeconds));
+      const hh = String(Math.floor(s / 3600)).padStart(2, '0');
+      const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+      const ss = String(s % 60).padStart(2, '0');
+      return hh + ':' + mm + ':' + ss;
+    }
+
+    function currentElapsedSeconds() {
+      let sec = gmTimerState.elapsedBeforeStart || 0;
+      if (gmTimerState.running && gmTimerState.startedAt) {
+        sec += (Date.now() - gmTimerState.startedAt) / 1000;
+      }
+      return sec;
+    }
+
+    function renderTimerTick() {
+      const elapsedSec = currentElapsedSeconds();
+      timerDisplayEl.textContent = formatElapsed(elapsedSec);
+
+      const elapsedMin = elapsedSec / 60;
+      timerMarksEl.querySelectorAll('.timer-mark').forEach(function (el) {
+        const targetMin = parseFloat(el.dataset.minutes);
+        el.classList.toggle('due', elapsedMin >= targetMin);
+      });
+    }
+
+    function renderTimerBar() {
+      timerStartPauseBtn.textContent = gmTimerState.running ? 'Pause' : 'Start';
+      timerStartPauseBtn.classList.toggle('running', gmTimerState.running);
+
+      timerMarksEl.innerHTML = '';
+      Object.keys(gmTimerState.marks || {}).forEach(function (markId) {
+        const mark = gmTimerState.marks[markId];
+        const chip = document.createElement('div');
+        chip.className = 'timer-mark';
+        chip.dataset.minutes = mark.minutes;
+        chip.textContent = mark.label + ' (' + mark.minutes + ' Min)';
+        chip.title = 'Klicken zum Entfernen';
+        chip.onclick = function () {
+          if (!db) return;
+          db.ref('gmTimer/marks/' + markId).remove();
+        };
+        timerMarksEl.appendChild(chip);
+      });
+
+      renderTimerTick();
+
+      clearInterval(timerTickInterval);
+      if (gmTimerState.running) {
+        timerTickInterval = setInterval(renderTimerTick, 1000);
+      }
+    }
+
+    if (db) {
+      db.ref('gmTimer').on('value', function (snap) {
+        const val = snap.val() || {};
+        gmTimerState = {
+          running: !!val.running,
+          startedAt: val.startedAt || null,
+          elapsedBeforeStart: val.elapsedBeforeStart || 0,
+          marks: val.marks || {}
+        };
+        renderTimerBar();
+      });
+    } else {
+      renderTimerBar();
+    }
+
+    timerStartPauseBtn.onclick = function () {
+      if (!db) { alert('Keine Verbindung zu Firebase — firebase-config.js prüfen.'); return; }
+      if (gmTimerState.running) {
+        // Pausieren: laufende Zeit einfrieren, startedAt löschen
+        db.ref('gmTimer').update({
+          running: false,
+          elapsedBeforeStart: currentElapsedSeconds(),
+          startedAt: null
+        });
+      } else {
+        // Starten: ab jetzt weiterzählen, vorhandene elapsedBeforeStart bleibt Basis
+        db.ref('gmTimer').update({
+          running: true,
+          startedAt: Date.now()
+        });
+      }
+    };
+
+    timerResetBtn.onclick = function () {
+      if (!db) { alert('Keine Verbindung zu Firebase — firebase-config.js prüfen.'); return; }
+      db.ref('gmTimer').update({ running: false, startedAt: null, elapsedBeforeStart: 0 });
+    };
+
+    timerMarkForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!db) { alert('Keine Verbindung zu Firebase — firebase-config.js prüfen.'); return; }
+      const label = timerMarkLabelInput.value.trim();
+      const minutes = parseFloat(timerMarkMinutesInput.value);
+      if (!label || isNaN(minutes)) return;
+      db.ref('gmTimer/marks').push({ label: label, minutes: minutes });
+      timerMarkLabelInput.value = '';
+      timerMarkMinutesInput.value = '';
+      timerMarkLabelInput.focus();
+    });
 
     // ---------- Sound-Leiste (YouTube-Link pro Szene) ----------
     const soundLinkInput = document.getElementById('soundLinkInput');
