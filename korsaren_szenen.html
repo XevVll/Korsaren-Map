@@ -142,6 +142,33 @@
   .empty-state {
     color: var(--ink-dim); font-size: 14px; text-align: center; max-width: 400px;
   }
+
+  /* ---------- Audio-Steuerung ---------- */
+  #audioControl {
+    position: fixed; bottom: 16px; right: 16px; z-index: 60;
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(15,12,8,0.75);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 8px 14px 8px 10px;
+    backdrop-filter: blur(2px);
+  }
+  #muteBtn {
+    background: none; border: none; cursor: pointer;
+    font-size: 18px; line-height: 1; color: var(--ink);
+    padding: 2px; width: 24px; text-align: center;
+  }
+  #muteBtn:hover { color: var(--gold); }
+  #volumeSlider {
+    width: 90px; accent-color: var(--gold);
+    cursor: pointer;
+  }
+  /* Player selbst bleibt unsichtbar, nur Ton wird genutzt */
+  #ytPlayerHost {
+    position: fixed; bottom: 0; right: 0;
+    width: 1px; height: 1px; overflow: hidden;
+    opacity: 0; pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -165,6 +192,12 @@
       </div>
     </div>
   </div>
+
+  <div id="audioControl">
+    <button id="muteBtn" title="Ton an/aus">🔇</button>
+    <input type="range" id="volumeSlider" min="0" max="100" value="50">
+  </div>
+  <div id="ytPlayerHost"><div id="ytPlayer"></div></div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -237,6 +270,11 @@
     function getBackgroundForScene(sceneId) {
       const meta = findSceneMeta(sceneId);
       return meta && meta.raw.background ? meta.raw.background : null;
+    }
+
+    function getSoundForScene(sceneId) {
+      const meta = findSceneMeta(sceneId);
+      return meta && meta.raw.sound ? meta.raw.sound : null;
     }
 
     function getFallbackDefaultScene() {
@@ -350,6 +388,124 @@
     }
 
     // ==========================================================
+    // AUDIO: YouTube-Ton pro Szene, Video selbst unsichtbar
+    // ==========================================================
+    let ytPlayer = null;
+    let ytReady = false;
+    let currentSoundId = null;      // aktuell geladene YouTube-Video-ID
+    let pendingSoundId = undefined; // falls Szene wechselt, bevor der Player bereit ist
+
+    // Lautstärke/Stumm-Zustand pro Browser merken
+    let savedVolume = parseInt(localStorage.getItem('korsaren_volume'), 10);
+    if (isNaN(savedVolume)) savedVolume = 50;
+    let isMuted = localStorage.getItem('korsaren_muted') !== 'false'; // Default: stumm, bis der Spieler selbst aktiviert
+
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    volumeSlider.value = savedVolume;
+    updateMuteBtnIcon();
+
+    function updateMuteBtnIcon() {
+      muteBtn.textContent = isMuted ? '🔇' : '🔊';
+    }
+
+    function applyAudioState() {
+      if (!ytPlayer || !ytReady) return;
+      try {
+        ytPlayer.setVolume(savedVolume);
+        if (isMuted) ytPlayer.mute(); else ytPlayer.unMute();
+      } catch (e) { /* Player evtl. noch nicht ganz bereit */ }
+    }
+
+    muteBtn.addEventListener('click', function () {
+      isMuted = !isMuted;
+      localStorage.setItem('korsaren_muted', isMuted ? 'true' : 'false');
+      updateMuteBtnIcon();
+      applyAudioState();
+    });
+    volumeSlider.addEventListener('input', function (e) {
+      savedVolume = parseInt(e.target.value, 10);
+      localStorage.setItem('korsaren_volume', String(savedVolume));
+      if (savedVolume > 0 && isMuted) {
+        isMuted = false;
+        localStorage.setItem('korsaren_muted', 'false');
+        updateMuteBtnIcon();
+      }
+      applyAudioState();
+    });
+
+    // Browser blockieren Autoplay MIT Ton grundsätzlich - das lässt sich
+    // nicht umgehen. Um es so nah wie möglich an "startet direkt mit Ton"
+    // heranzubringen: der allererste Klick/Tap irgendwo auf der Seite
+    // schaltet automatisch frei, nicht erst ein gezielter Klick auf den
+    // Lautsprecher-Button. Da Spieler ohnehin schnell auf einen Marker
+    // klicken, fühlt sich das in der Praxis fast nahtlos an.
+    // Wurde der Ton beim letzten Besuch bewusst stummgeschaltet
+    // (localStorage), respektieren wir das und schalten NICHT automatisch frei.
+    const wasExplicitlyMuted = localStorage.getItem('korsaren_muted') === 'true';
+    if (!wasExplicitlyMuted) {
+      const unlockOnFirstInteraction = function () {
+        if (!isMuted) return;
+        isMuted = false;
+        localStorage.setItem('korsaren_muted', 'false');
+        updateMuteBtnIcon();
+        applyAudioState();
+      };
+      document.addEventListener('click', unlockOnFirstInteraction, { once: true });
+      document.addEventListener('touchstart', unlockOnFirstInteraction, { once: true });
+      document.addEventListener('keydown', unlockOnFirstInteraction, { once: true });
+    }
+
+    // YouTube IFrame API asynchron laden
+    const ytScript = document.createElement('script');
+    ytScript.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(ytScript);
+
+    window.onYouTubeIframeAPIReady = function () {
+      ytPlayer = new YT.Player('ytPlayer', {
+        height: '1', width: '1',
+        playerVars: {
+          autoplay: 1, controls: 0, disablekb: 1, modestbranding: 1,
+          fs: 0, iv_load_policy: 3, playsinline: 1
+        },
+        events: {
+          onReady: function () {
+            ytReady = true;
+            applyAudioState();
+            if (pendingSoundId !== undefined) {
+              syncAudioForScene(pendingSoundId);
+              pendingSoundId = undefined;
+            }
+          },
+          onStateChange: function (e) {
+            // Loop: Video am Ende neu starten (kein sichtbares Video, daher
+            // reicht ein einfacher Replay statt einer echten Playlist)
+            if (e.data === YT.PlayerState.ENDED && currentSoundId) {
+              ytPlayer.seekTo(0);
+              ytPlayer.playVideo();
+            }
+          }
+        }
+      });
+    };
+
+    // Erwartet die YouTube-Video-ID (oder null) als Parameter, nicht die
+    // Szenen-ID - Aufrufer übergibt bereits das Ergebnis von
+    // getSoundForScene(sceneId).
+    function syncAudioForScene(soundId) {
+      if (!ytReady) { pendingSoundId = soundId; return; }
+      if (soundId === currentSoundId) return; // schon richtig, nichts zu tun
+
+      currentSoundId = soundId;
+      if (!soundId) {
+        ytPlayer.stopVideo();
+        return;
+      }
+      ytPlayer.loadVideoById(soundId);
+      applyAudioState();
+    }
+
+    // ==========================================================
     // FIREBASE: live, ohne dass Spieler aktualisieren müssen
     // ==========================================================
     let db = null;
@@ -363,6 +519,7 @@
         statusEl.className = 'connected';
         setTimeout(function () { statusEl.classList.add('hidden'); }, 1200);
         renderScene(sceneId);
+        syncAudioForScene(getSoundForScene(sceneId));
       }, function (err) {
         statusEl.textContent = 'Verbindungsfehler: ' + err.message;
         statusEl.className = 'error';
@@ -371,6 +528,7 @@
       statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft.';
       statusEl.className = 'error';
       renderScene(getFallbackDefaultScene());
+      syncAudioForScene(getSoundForScene(getFallbackDefaultScene()));
     }
   </script>
 
