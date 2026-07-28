@@ -72,7 +72,7 @@ const GOLDEN_LION_MARKERS_BASE = {
   batteriedeck: {
     top: 55, left: 60,
     title: "Batteriedeck",
-    desc: "Durchgehende Kanonenreihe, Hauptbewaffnung des Schiffs.",
+    desc: "Durchgehende Kanonenreihe, aber wenig Ordnung — Werkzeug und Pulverreste liegen, wie sie zuletzt gebraucht wurden. So viele Kanonen für ein einfaches Begleitschiff?",
     img: "interior_batteriedeck.png"
   },
   unterdeck: {
