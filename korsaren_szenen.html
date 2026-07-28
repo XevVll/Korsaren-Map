@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Korsaren – Karte</title>
+<style>
+  :root {
+    --bg: #0f0c08;
+    --ink: #e6ddc7;
+    --ink-dim: #a89d81;
+    --gold: #c9a24b;
+    --line: #3a2a18;
+    --panel: #1a130b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    background: var(--bg);
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  /* ---------- Status / Ladezustand ---------- */
+  #status {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 50;
+    font-size: 12px; color: var(--ink-dim);
+    background: rgba(15,12,8,0.7);
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid var(--line);
+    letter-spacing: .04em;
+    pointer-events: none;
+    transition: opacity .4s ease;
+  }
+  #status.connected { color: #7fa87f; }
+  #status.error { color: #c76a5a; }
+  #status.hidden { opacity: 0; }
+
+  /* ---------- Bühne ---------- */
+  #stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #mapWrap {
+    position: relative;
+    max-width: 100%; max-height: 100%;
+    line-height: 0;
+  }
+  #mapImage {
+    display: block;
+    max-width: 100vw; max-height: 100vh;
+    width: auto; height: auto;
+    opacity: 0;
+    transition: opacity .6s ease;
+    user-select: none; -webkit-user-drag: none;
+  }
+  #mapImage.loaded { opacity: 1; }
+
+  /* ---------- Marker ---------- */
+  .marker {
+    position: absolute;
+    width: 26px; height: 26px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+  .marker .pin {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e8c876, var(--gold) 60%, #8a6a2a 100%);
+    border: 2px solid #1a1308;
+    box-shadow: 0 0 0 3px rgba(201,162,75,0.25), 0 2px 6px rgba(0,0,0,0.5);
+    animation: pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(201,162,75,0.25), 0 2px 6px rgba(0,0,0,0.5); }
+    50%      { box-shadow: 0 0 0 7px rgba(201,162,75,0.08), 0 2px 6px rgba(0,0,0,0.5); }
+  }
+  .marker:hover .pin { transform: scale(1.15); }
+  .marker .label {
+    position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+    white-space: nowrap;
+    background: rgba(15,12,8,0.9);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 12.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .15s ease;
+  }
+  .marker:hover .label { opacity: 1; }
+
+  /* ---------- Overlay / Modal ---------- */
+  #overlay {
+    position: fixed; inset: 0;
+    background: rgba(8,6,4,0.86);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 30px;
+  }
+  #overlay.open { display: flex; }
+  #overlayCard {
+    max-width: 720px; width: 100%;
+    max-height: 88vh;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  #overlayImgWrap {
+    width: 100%;
+    background: #000;
+    line-height: 0;
+    max-height: 55vh;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #overlayImgWrap img {
+    width: 100%; height: auto; display: block;
+  }
+  #overlayImgWrap.empty {
+    padding: 40px; color: var(--ink-dim); font-style: italic; font-size: 13px;
+    text-align: center;
+  }
+  #overlayBody { padding: 22px 26px 26px; overflow-y: auto; }
+  #overlayTitle {
+    font-size: 22px; color: var(--gold); margin: 0 0 10px; font-weight: 400;
+  }
+  #overlayDesc { font-size: 14.5px; line-height: 1.6; color: var(--ink); margin: 0; }
+  #overlayClose {
+    position: absolute; top: 14px; right: 18px;
+    background: none; border: none; color: var(--ink-dim);
+    font-size: 22px; cursor: pointer; line-height: 1;
+  }
+  #overlayClose:hover { color: var(--ink); }
+
+  .empty-state {
+    color: var(--ink-dim); font-size: 14px; text-align: center; max-width: 400px;
+  }
+</style>
+</head>
+<body>
+
+  <div id="status">Verbinde …</div>
+
+  <div id="stage">
+    <div id="mapWrap">
+      <img id="mapImage" alt="Karte">
+      <!-- Marker werden hier per JS eingefügt -->
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div id="overlayCard" style="position:relative;">
+      <button id="overlayClose" aria-label="Schließen">✕</button>
+      <div id="overlayImgWrap"><img id="overlayImg" alt=""></div>
+      <div id="overlayBody">
+        <h2 id="overlayTitle"></h2>
+        <p id="overlayDesc"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <script src="firebase-config.js"></script>
+
+  <!--
+    ALLE Karten-Dateien hier eintragen (scenes.js für Grimsgate-Stadt,
+    golden_lion_scenes.js fürs Schiff, künftige Karten genauso anhängen).
+    Diese Seite selbst muss dafür NICHT verändert werden - sie erkennt
+    neue Karten automatisch über MAP_REGISTRY weiter unten, solange jede
+    Datei dem bestehenden Muster folgt (SCENES-artiges Objekt + Zugriff
+    auf label/background/markers, wahlweise über eine Marker-Funktion
+    wie bei Golden Lion).
+  -->
+  <script src="scenes.js"></script>
+  <script src="golden_lion_scenes.js"></script>
+
+  <script>
+    // ==========================================================
+    // KARTEN-REGISTER
+    // ==========================================================
+    // Jeder Eintrag beschreibt eine Karten-Datenquelle: eine Funktion,
+    // die für eine Szenen-ID das rohe Szenen-Objekt liefert (für Label/
+    // Hintergrundbild), und eine Funktion, die die fertige Marker-Liste
+    // liefert - direkte Funktionsreferenzen statt String-Namen, damit es
+    // unabhängig davon funktioniert, ob eine Datei ihre Daten mit "var"
+    // oder "const" deklariert (const/let landen NICHT auf window, var
+    // schon - direkte Referenzen umgehen dieses Problem komplett).
+    //
+    // Neue Karte hinzufügen: einfach einen weiteren Eintrag in dieses
+    // Array aufnehmen, plus die passende <script src="..."> oben ergänzen.
+    // Diese Datei selbst braucht sonst keine Änderung mehr.
+    const MAP_REGISTRY = [
+      {
+        getScene: function (sceneId) {
+          return (typeof SCENES !== 'undefined') ? SCENES[sceneId] : undefined;
+        },
+        getMarkers: function (sceneId) {
+          return (typeof SCENES !== 'undefined' && SCENES[sceneId]) ? SCENES[sceneId].markers : null;
+        }
+      },
+      {
+        getScene: function (sceneId) {
+          return (typeof GOLDEN_LION_SCENES !== 'undefined') ? GOLDEN_LION_SCENES[sceneId] : undefined;
+        },
+        getMarkers: function (sceneId) {
+          if (typeof GOLDEN_LION_SCENES === 'undefined' || !GOLDEN_LION_SCENES[sceneId]) return null;
+          return (typeof getGoldenLionMarkers === 'function') ? getGoldenLionMarkers(sceneId) : [];
+        }
+      }
+    ];
+
+    function findSceneMeta(sceneId) {
+      for (const entry of MAP_REGISTRY) {
+        const raw = entry.getScene(sceneId);
+        if (raw) return { raw: raw, registryEntry: entry };
+      }
+      return null;
+    }
+
+    function getMarkersForScene(sceneId) {
+      const meta = findSceneMeta(sceneId);
+      if (!meta) return [];
+      const markers = meta.registryEntry.getMarkers(sceneId);
+      return markers || [];
+    }
+
+    function getBackgroundForScene(sceneId) {
+      const meta = findSceneMeta(sceneId);
+      return meta && meta.raw.background ? meta.raw.background : null;
+    }
+
+    function getFallbackDefaultScene() {
+      // Erste verfügbare DEFAULT_*-Konstante nehmen, sonst "1.1"
+      if (typeof DEFAULT_SCENE !== 'undefined') return DEFAULT_SCENE;
+      if (typeof DEFAULT_GOLDEN_LION_SCENE !== 'undefined') return DEFAULT_GOLDEN_LION_SCENE;
+      return '1.1';
+    }
+
+    // ==========================================================
+    // RENDERING
+    // ==========================================================
+    const statusEl = document.getElementById('status');
+    const mapImageEl = document.getElementById('mapImage');
+    const mapWrapEl = document.getElementById('mapWrap');
+    const overlayEl = document.getElementById('overlay');
+    const overlayImgWrap = document.getElementById('overlayImgWrap');
+    const overlayImg = document.getElementById('overlayImg');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayDesc = document.getElementById('overlayDesc');
+
+    let currentRenderedScene = null;
+
+    function renderScene(sceneId) {
+      if (sceneId === currentRenderedScene) return; // nichts geändert, kein Neu-Rendern nötig
+      currentRenderedScene = sceneId;
+
+      const background = getBackgroundForScene(sceneId);
+      const markers = getMarkersForScene(sceneId);
+
+      if (!background) {
+        // Unbekannte Szene - Kartendaten fehlen (z.B. Tippfehler in
+        // Firebase oder eine Karte, deren Datei noch nicht eingebunden ist)
+        mapImageEl.classList.remove('loaded');
+        clearMarkers();
+        showEmptyState('Für diese Szene liegt noch keine Karte vor.');
+        return;
+      }
+      hideEmptyState();
+
+      // Sanftes Überblenden: erst ausblenden, dann neues Bild laden
+      mapImageEl.classList.remove('loaded');
+      const nextImg = new Image();
+      nextImg.onload = function () {
+        mapImageEl.src = background;
+        mapImageEl.classList.add('loaded');
+        renderMarkers(markers);
+      };
+      nextImg.onerror = function () {
+        showEmptyState('Kartenbild "' + background + '" konnte nicht geladen werden.');
+      };
+      nextImg.src = background;
+    }
+
+    function clearMarkers() {
+      mapWrapEl.querySelectorAll('.marker').forEach(function (el) { el.remove(); });
+    }
+
+    function renderMarkers(markers) {
+      clearMarkers();
+      markers.forEach(function (marker) {
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.top = marker.top + '%';
+        el.style.left = marker.left + '%';
+        el.innerHTML = '<div class="pin"></div><div class="label">' + marker.title + '</div>';
+        el.onclick = function () { openOverlay(marker); };
+        mapWrapEl.appendChild(el);
+      });
+    }
+
+    function openOverlay(marker) {
+      overlayTitle.textContent = marker.title || '';
+      overlayDesc.textContent = marker.desc || '';
+      if (marker.img) {
+        overlayImgWrap.classList.remove('empty');
+        overlayImg.style.display = '';
+        overlayImg.src = marker.img;
+        overlayImg.alt = marker.title || '';
+      } else {
+        overlayImgWrap.classList.add('empty');
+        overlayImg.style.display = 'none';
+        overlayImgWrap.textContent = 'Kein Bild hinterlegt.';
+      }
+      overlayEl.classList.add('open');
+    }
+
+    function closeOverlay() {
+      overlayEl.classList.remove('open');
+    }
+    document.getElementById('overlayClose').onclick = closeOverlay;
+    overlayEl.addEventListener('click', function (e) {
+      if (e.target === overlayEl) closeOverlay();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeOverlay();
+    });
+
+    let emptyStateEl = null;
+    function showEmptyState(text) {
+      if (!emptyStateEl) {
+        emptyStateEl = document.createElement('div');
+        emptyStateEl.className = 'empty-state';
+        document.getElementById('stage').appendChild(emptyStateEl);
+      }
+      emptyStateEl.textContent = text;
+      emptyStateEl.style.display = 'block';
+    }
+    function hideEmptyState() {
+      if (emptyStateEl) emptyStateEl.style.display = 'none';
+    }
+
+    // ==========================================================
+    // FIREBASE: live, ohne dass Spieler aktualisieren müssen
+    // ==========================================================
+    let db = null;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+
+      db.ref('currentScene').on('value', function (snapshot) {
+        const sceneId = snapshot.val() || getFallbackDefaultScene();
+        statusEl.textContent = 'Verbunden';
+        statusEl.className = 'connected';
+        setTimeout(function () { statusEl.classList.add('hidden'); }, 1200);
+        renderScene(sceneId);
+      }, function (err) {
+        statusEl.textContent = 'Verbindungsfehler: ' + err.message;
+        statusEl.className = 'error';
+      });
+    } catch (e) {
+      statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft.';
+      statusEl.className = 'error';
+      renderScene(getFallbackDefaultScene());
+    }
+  </script>
+
+</body>
+</html>
