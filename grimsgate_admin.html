@@ -81,6 +81,24 @@
   #soundLinkHint.saved { color: var(--live); }
   #soundLinkHint.error { color: #c76a5a; }
 
+  /* ---------- Charakter-Leiste ---------- */
+  #charBar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    font-size: 13px;
+  }
+  #charBarLabel { color: var(--gold); white-space: nowrap; }
+  #charCheckboxes { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .char-toggle {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12.5px; color: var(--ink-dim);
+    cursor: pointer; user-select: none;
+  }
+  .char-toggle input { accent-color: var(--gold); cursor: pointer; }
+  .char-toggle.active { color: var(--ink); }
+
   /* ---------- Board ---------- */
   .board {
     display: grid;
@@ -243,6 +261,11 @@
     <span class="save-hint" id="soundLinkHint"></span>
   </div>
 
+  <div id="charBar">
+    <span id="charBarLabel">Charaktere in dieser Szene:</span>
+    <div id="charCheckboxes"></div>
+  </div>
+
   <div class="board">
     <div class="col" id="col-szenen"><div class="col-head">Szenen</div></div>
     <div class="col" id="col-orte"><div class="col-head">Orte</div></div>
@@ -256,6 +279,7 @@
   <script src="firebase-config.js"></script>
   <script src="scenes.js"></script>
   <script src="golden_lion_scenes.js"></script>
+  <script src="characters.js"></script>
   <script src="regie.js"></script>
 
   <script>
@@ -558,6 +582,7 @@
       renderOrte();
       renderDetail();
       renderSoundBar();
+      renderCharBar();
     }
 
     // ---------- Sound-Leiste (YouTube-Link pro Szene) ----------
@@ -625,6 +650,44 @@
         soundLinkHint.textContent = 'NICHT gespeichert — ' + err.message;
         soundLinkHint.className = 'save-hint error';
       });
+    }
+
+    // ---------- Charakter-Leiste (welche Portraits sind in der Szene sichtbar) ----------
+    const charCheckboxesEl = document.getElementById('charCheckboxes');
+    let charBarScene = null; // welche Szene aktuell die Checkboxen zeigen
+
+    function renderCharBar() {
+      charBarScene = viewState.szene;
+      charCheckboxesEl.innerHTML = '';
+      if (typeof CHARACTERS === 'undefined' || !charBarScene) return;
+
+      if (!db) {
+        CHARACTERS.forEach(function (ch) {
+          charCheckboxesEl.appendChild(buildCharToggle(ch, false));
+        });
+        return;
+      }
+
+      db.ref('sceneCharacters/' + fbKey(charBarScene)).once('value').then(function (snap) {
+        if (charBarScene !== viewState.szene) return; // Szene wurde inzwischen gewechselt
+        const active = snap.val() || {};
+        CHARACTERS.forEach(function (ch) {
+          charCheckboxesEl.appendChild(buildCharToggle(ch, !!active[ch.id]));
+        });
+      });
+    }
+
+    function buildCharToggle(ch, isActive) {
+      const label = document.createElement('label');
+      label.className = 'char-toggle' + (isActive ? ' active' : '');
+      label.innerHTML = '<input type="checkbox"' + (isActive ? ' checked' : '') + '> ' + ch.name;
+      const checkbox = label.querySelector('input');
+      checkbox.addEventListener('change', function () {
+        label.classList.toggle('active', checkbox.checked);
+        if (!db || !charBarScene) return;
+        db.ref('sceneCharacters/' + fbKey(charBarScene) + '/' + ch.id).set(checkbox.checked);
+      });
+      return label;
     }
   </script>
 
