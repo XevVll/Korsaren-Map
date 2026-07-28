@@ -101,9 +101,10 @@ const GOLDEN_LION_MARKERS_BASE = {
   }
 };
 
-// Szenen-Feld "sound" (optional, gleiches Prinzip wie in scenes.js):
-//   YouTube-Video-ID (nicht die volle URL) eines Videos, dessen TON als
-//   Hintergrundgeräusch läuft. Video selbst unsichtbar. Fehlt das Feld,
+// Szenen-Feld "soundFile" (optional, gleiches Prinzip wie in scenes.js):
+//   Dateiname einer selbst gehosteten Audiodatei (mp3/ogg/wav/m4a/aac).
+//   Dient nur als Fallback - im Admin-Panel gesetzte Werte (Firebase)
+//   haben Vorrang. Fehlt das Feld UND ist im Admin-Panel nichts gesetzt,
 //   läuft kein Ton für diese Szene.
 
 const GOLDEN_LION_SCENES = {
@@ -112,7 +113,7 @@ const GOLDEN_LION_SCENES = {
     background: "golden_lion_cutaway.png",
     imgOverrides: {}      // nutzt für alle Marker einfach die img aus BASE
     // descOverrides: {}  // optional, falls in einer Szene auch Texte abweichen sollen
-    // sound: "VIDEO_ID"  // z.B. ruhiges Meeresrauschen
+    // soundFile: "meeresrauschen.mp3"
   },
 
   "3.1": {
@@ -121,7 +122,7 @@ const GOLDEN_LION_SCENES = {
     imgOverrides: {
       achterdeck: "interior_achterdeck_sturm.png"
     },
-    sound: "VIDEO_ID_HIER_EINTRAGEN" // Platzhalter - echte YouTube-Video-ID einsetzen (z.B. Sturm/Donner-Ambience)
+    soundFile: "sturm.mp3" // Platzhalter - echte Datei in den Ordner legen bzw. Namen anpassen
   }
 
   // Beispiel für später, zum Reinkopieren und Anpassen:
