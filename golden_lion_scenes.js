@@ -40,61 +40,61 @@
 
 const GOLDEN_LION_MARKERS_BASE = {
   bug: {
-    top: 26, left: 20,
+    top: 20, left: 83,
     title: "Bug / Vorschiff",
     desc: "Vorderster Teil des offenen Oberdecks, Bugspriet und vorderes Tauwerk.",
     img: "interior_bug.png"
   },
   oberdeck: {
-    top: 33, left: 46,
+    top: 24, left: 55,
     title: "Oberdeck",
     desc: "Offene Decksmitte um den Hauptmast, Taljen, arbeitende Crew.",
     img: "interior_oberdeck.png"
   },
   achterdeck: {
-    top: 34, left: 75,
+    top: 22, left: 21,
     title: "Achterdeck",
     desc: "Erhöhtes Deck am Heck, Offiziere, vermutlich das Ruder.",
     img: "interior_achterdeck.png"
   },
   kapitaenskajuete: {
-    top: 40, left: 30,
+    top: 41, left: 30,
     title: "Kapitänskajüte",
     desc: "Großzügiger Raum mit hohen Fenstern unter dem Achterdeck, eigener Zugang über einen Niedergang.",
     img: "interior_kapitaenskajuete.png"
   },
   offiziersquartier: {
-    top: 54, left: 28,
+    top: 54, left: 23,
     title: "Offiziersquartier",
     desc: "Kleiner, schlichter eingerichteter Raum mit fester Koje, neben der Kapitänskajüte.",
     img: "interior_offiziersquartier.png"
   },
   batteriedeck: {
-    top: 56, left: 57,
+    top: 55, left: 60,
     title: "Batteriedeck",
     desc: "Durchgehende Kanonenreihe, Hauptbewaffnung des Schiffs.",
     img: "interior_batteriedeck.png"
   },
   unterdeck: {
-    top: 68, left: 46,
+    top: 66, left: 48,
     title: "Unterdeck (Mannschaft)",
     desc: "Hängematten über mehrere Bereiche verteilt, Alltag der einfachen Crew.",
     img: "interior_unterdeck.png"
   },
   werkstatt: {
-    top: 68, left: 65,
+    top: 66, left: 68,
     title: "Werkstatt",
     desc: "Werkbank und Werkzeug des Schiffszimmermanns.",
     img: "interior_werkstatt.png"
   },
   frachtraum: {
-    top: 73, left: 77,
+    top: 70, left: 82,
     title: "Frachtraum / Laderaum",
     desc: "Fässer, Kisten, aufgerolltes Tauwerk.",
     img: "interior_frachtraum.png"
   },
   kombuese: {
-    top: 78, left: 53,
+    top: 76, left: 52,
     title: "Kombüse",
     desc: "Ziegelherd, tief im Rumpf, über dem Ballast erbaut, Koch bei der Arbeit.",
     img: "interior_kombuese.png"
