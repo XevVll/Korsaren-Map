@@ -60,6 +60,27 @@
   .status.connected { color: var(--live); }
   .status.error { color: #c76a5a; }
 
+  /* ---------- Sound-Leiste ---------- */
+  #soundBar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    font-size: 13px;
+  }
+  #soundBarLabel { color: var(--gold); font-family: inherit; white-space: nowrap; }
+  .soundBarIcon { color: var(--ink-faint); }
+  #soundLinkInput {
+    flex: 1; max-width: 480px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 13px;
+    padding: 6px 10px;
+  }
+  #soundLinkInput:focus { outline: none; border-color: var(--gold); }
+  #soundLinkHint { font-size: 11px; color: var(--ink-faint); min-width: 140px; }
+  #soundLinkHint.saved { color: var(--live); }
+  #soundLinkHint.error { color: #c76a5a; }
+
   /* ---------- Board ---------- */
   .board {
     display: grid;
@@ -214,6 +235,13 @@
     <div class="subtitle">Links: Szene wählen &amp; live setzen · Mitte/Rechts: Regie-Notizen (nur hier sichtbar)</div>
     <div class="status" id="status">Verbinde mit Firebase…</div>
   </header>
+
+  <div id="soundBar">
+    <span id="soundBarLabel">Szene: –</span>
+    <span class="soundBarIcon">🎵</span>
+    <input type="text" id="soundLinkInput" placeholder="YouTube-Link oder Video-ID einfügen…">
+    <span class="save-hint" id="soundLinkHint"></span>
+  </div>
 
   <div class="board">
     <div class="col" id="col-szenen"><div class="col-head">Szenen</div></div>
@@ -529,6 +557,86 @@
       renderSzenen();
       renderOrte();
       renderDetail();
+      renderSoundBar();
+    }
+
+    // ---------- Sound-Leiste (YouTube-Link pro Szene) ----------
+    const soundLinkInput = document.getElementById('soundLinkInput');
+    const soundLinkHint = document.getElementById('soundLinkHint');
+    const soundBarLabel = document.getElementById('soundBarLabel');
+    let soundBarScene = null; // welche Szene aktuell im Eingabefeld steht
+
+    // Akzeptiert volle YouTube-URLs (watch?v=, youtu.be/, embed/, shorts/)
+    // oder direkt schon eine nackte Video-ID. Gibt null zurück, wenn nichts
+    // Sinnvolles erkannt wurde.
+    function extractYouTubeId(input) {
+      if (!input) return null;
+      const s = input.trim();
+      if (!s) return null;
+
+      const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtube\.com\/shorts\/|youtube\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})/
+      ];
+      for (const re of patterns) {
+        const m = s.match(re);
+        if (m) return m[1];
+      }
+      // Falls schon eine nackte ID eingegeben wurde (11 Zeichen, typisches Format)
+      if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+      return null;
+    }
+
+    function renderSoundBar() {
+      soundBarScene = viewState.szene;
+      soundBarLabel.textContent = 'Szene: ' + (soundBarScene ? getSceneLabel(soundBarScene) : '–');
+      soundLinkInput.value = '';
+      soundLinkHint.textContent = '';
+      soundLinkHint.className = 'save-hint';
+
+      if (!db || !soundBarScene) return;
+      db.ref('sceneSound/' + fbKey(soundBarScene)).once('value').then(function (snap) {
+        const savedId = snap.val();
+        if (savedId && soundBarScene === viewState.szene) {
+          soundLinkInput.value = savedId;
+        }
+      });
+    }
+
+    soundLinkInput.addEventListener('blur', saveSoundLink);
+    soundLinkInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); soundLinkInput.blur(); }
+    });
+
+    function saveSoundLink() {
+      if (!db || !soundBarScene) return;
+      const raw = soundLinkInput.value.trim();
+
+      if (!raw) {
+        // Leeres Feld = Ton für diese Szene entfernen
+        db.ref('sceneSound/' + fbKey(soundBarScene)).remove().then(function () {
+          soundLinkHint.textContent = 'entfernt';
+          soundLinkHint.className = 'save-hint saved';
+          setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
+        });
+        return;
+      }
+
+      const videoId = extractYouTubeId(raw);
+      if (!videoId) {
+        soundLinkHint.textContent = 'Kein gültiger YouTube-Link/ID erkannt';
+        soundLinkHint.className = 'save-hint error';
+        return;
+      }
+
+      soundLinkInput.value = videoId; // Feld auf die reine ID normalisieren
+      db.ref('sceneSound/' + fbKey(soundBarScene)).set(videoId).then(function () {
+        soundLinkHint.textContent = 'gespeichert';
+        soundLinkHint.className = 'save-hint saved';
+        setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
+      }).catch(function (err) {
+        soundLinkHint.textContent = 'NICHT gespeichert — ' + err.message;
+        soundLinkHint.className = 'save-hint error';
+      });
     }
   </script>
 
