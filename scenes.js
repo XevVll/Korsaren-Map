@@ -23,6 +23,13 @@
 //   neue Spieler-Seite korsaren_szenen.html liest dieses Feld pro Szene
 //   aus und lädt automatisch das passende Bild.
 
+// Szenen-Feld "sound" (optional):
+//   YouTube-Video-ID (nicht die volle URL, nur die ID nach "v=" bzw. nach
+//   "youtu.be/") eines Videos, dessen TON als Hintergrundgeräusch für diese
+//   Szene läuft - das Video selbst wird nirgends angezeigt, nur der Ton.
+//   Fehlt das Feld, läuft für diese Szene kein Ton.
+//   Beispiel: sound: "dQw4w9WgXcQ"
+
 const SCENES = {
   "1.1": {
     label: "1.1 – Grimsgate (Start)",
