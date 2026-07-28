@@ -239,7 +239,7 @@
   <div id="soundBar">
     <span id="soundBarLabel">Szene: –</span>
     <span class="soundBarIcon">🎵</span>
-    <input type="text" id="soundLinkInput" placeholder="YouTube-Link oder Video-ID einfügen…">
+    <input type="text" id="soundLinkInput" placeholder="Dateiname der Audiodatei einfügen (z.B. sturm.mp3)…">
     <span class="save-hint" id="soundLinkHint"></span>
   </div>
 
@@ -566,24 +566,14 @@
     const soundBarLabel = document.getElementById('soundBarLabel');
     let soundBarScene = null; // welche Szene aktuell im Eingabefeld steht
 
-    // Akzeptiert volle YouTube-URLs (watch?v=, youtu.be/, embed/, shorts/)
-    // oder direkt schon eine nackte Video-ID. Gibt null zurück, wenn nichts
-    // Sinnvolles erkannt wurde.
-    function extractYouTubeId(input) {
-      if (!input) return null;
+    // Prüft, ob der eingegebene Text plausibel eine Audiodatei benennt
+    // (endet auf eine gängige Audio-Dateiendung). Erlaubt auch relative
+    // Pfade (z.B. "audio/sturm.mp3"), falls die Dateien in einem
+    // Unterordner liegen.
+    function isPlausibleAudioFilename(input) {
+      if (!input) return false;
       const s = input.trim();
-      if (!s) return null;
-
-      const patterns = [
-        /(?:youtube\.com\/watch\?v=|youtube\.com\/shorts\/|youtube\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})/
-      ];
-      for (const re of patterns) {
-        const m = s.match(re);
-        if (m) return m[1];
-      }
-      // Falls schon eine nackte ID eingegeben wurde (11 Zeichen, typisches Format)
-      if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
-      return null;
+      return /\.(mp3|ogg|wav|m4a|aac)$/i.test(s);
     }
 
     function renderSoundBar() {
@@ -594,10 +584,10 @@
       soundLinkHint.className = 'save-hint';
 
       if (!db || !soundBarScene) return;
-      db.ref('sceneSound/' + fbKey(soundBarScene)).once('value').then(function (snap) {
-        const savedId = snap.val();
-        if (savedId && soundBarScene === viewState.szene) {
-          soundLinkInput.value = savedId;
+      db.ref('sceneAudioFile/' + fbKey(soundBarScene)).once('value').then(function (snap) {
+        const savedFile = snap.val();
+        if (savedFile && soundBarScene === viewState.szene) {
+          soundLinkInput.value = savedFile;
         }
       });
     }
@@ -613,7 +603,7 @@
 
       if (!raw) {
         // Leeres Feld = Ton für diese Szene entfernen
-        db.ref('sceneSound/' + fbKey(soundBarScene)).remove().then(function () {
+        db.ref('sceneAudioFile/' + fbKey(soundBarScene)).remove().then(function () {
           soundLinkHint.textContent = 'entfernt';
           soundLinkHint.className = 'save-hint saved';
           setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
@@ -621,15 +611,13 @@
         return;
       }
 
-      const videoId = extractYouTubeId(raw);
-      if (!videoId) {
-        soundLinkHint.textContent = 'Kein gültiger YouTube-Link/ID erkannt';
+      if (!isPlausibleAudioFilename(raw)) {
+        soundLinkHint.textContent = 'Kein gültiger Dateiname (.mp3/.ogg/.wav/.m4a/.aac erwartet)';
         soundLinkHint.className = 'save-hint error';
         return;
       }
 
-      soundLinkInput.value = videoId; // Feld auf die reine ID normalisieren
-      db.ref('sceneSound/' + fbKey(soundBarScene)).set(videoId).then(function () {
+      db.ref('sceneAudioFile/' + fbKey(soundBarScene)).set(raw).then(function () {
         soundLinkHint.textContent = 'gespeichert';
         soundLinkHint.className = 'save-hint saved';
         setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
