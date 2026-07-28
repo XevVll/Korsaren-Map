@@ -147,14 +147,14 @@
   #charRail {
     position: fixed; top: 0; right: 0; height: 100vh;
     display: flex; flex-direction: column; justify-content: center; align-items: stretch;
-    gap: 10px; padding: 16px 14px;
+    gap: clamp(8px, 1vh, 16px); padding: clamp(12px, 1.5vw, 24px);
     z-index: 150;
     pointer-events: none; /* nur die Karten selbst sollen interaktiv wirken, nicht der Leerraum */
   }
   .char-card {
     position: relative;
-    width: 108px;
-    max-height: 180px;
+    width: clamp(108px, 8vw, 220px);
+    max-height: clamp(170px, 22vh, 340px);
     flex: 1 1 0;
     min-height: 0;
     border-radius: 6px;
@@ -171,7 +171,7 @@
     position: absolute; left: 0; right: 0; bottom: 0;
     background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
     color: var(--ink);
-    font-size: 11px;
+    font-size: clamp(11px, 0.9vw, 15px);
     text-align: center;
     padding: 12px 4px 5px;
     line-height: 1.2;
