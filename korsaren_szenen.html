@@ -398,20 +398,40 @@
       });
     }
 
+    // Liefert per Callback das tatsächlich anzuzeigende Bild für einen
+    // Marker: normalerweise einfach marker.img, aber falls der Marker
+    // "variants" definiert, wird zuerst in Firebase nachgesehen, welche
+    // Variante der SL aktuell aktiv geschaltet hat (markerVariant/<id>).
+    // Ist nichts gesetzt oder keine Firebase-Verbindung vorhanden, fällt
+    // es auf marker.img zurück (= Ausgangszustand, unverändertes Verhalten).
+    function resolveMarkerImage(marker, callback) {
+      if (!marker.variants || !db) { callback(marker.img); return; }
+      db.ref('markerVariant/' + fbKey(marker.id)).once('value').then(function (snap) {
+        const activeKey = snap.val();
+        const variant = activeKey && marker.variants[activeKey];
+        callback(variant ? variant.img : marker.img);
+      }).catch(function () {
+        callback(marker.img);
+      });
+    }
+
     function openOverlay(marker) {
       overlayTitle.textContent = marker.title || '';
       overlayDesc.textContent = marker.desc || '';
-      if (marker.img) {
-        overlayImgWrap.classList.remove('empty');
-        overlayImg.style.display = '';
-        overlayImg.src = marker.img;
-        overlayImg.alt = marker.title || '';
-      } else {
-        overlayImgWrap.classList.add('empty');
-        overlayImg.style.display = 'none';
-        overlayImgWrap.textContent = 'Kein Bild hinterlegt.';
-      }
       overlayEl.classList.add('open');
+
+      resolveMarkerImage(marker, function (imgSrc) {
+        if (imgSrc) {
+          overlayImgWrap.classList.remove('empty');
+          overlayImg.style.display = '';
+          overlayImg.src = imgSrc;
+          overlayImg.alt = marker.title || '';
+        } else {
+          overlayImgWrap.classList.add('empty');
+          overlayImg.style.display = 'none';
+          overlayImgWrap.textContent = 'Kein Bild hinterlegt.';
+        }
+      });
     }
 
     function closeOverlay() {

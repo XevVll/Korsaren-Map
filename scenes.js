@@ -14,6 +14,12 @@
 //   title  - Überschrift im Tooltip/Overlay
 //   desc   - Beschreibungstext im Tooltip/Overlay
 //   img    - Dateiname des Innenraumbilds (liegt im selben Ordner)
+//   variants (optional) - mehrere benannte Bildzustände für denselben
+//            Ort, z.B. { standard: {label, img}, leer: {label, img} }.
+//            Die aktive Variante wird im Admin-Panel manuell umgeschaltet
+//            und wirkt sich sofort auf die Spieler-Ansicht aus - unabhängig
+//            von Szenen und vom (admin-only) Trigger-System. Fehlt das
+//            Feld, verhält sich der Marker exakt wie bisher.
 //
 // Szenen-Feld "background":
 //   Dateiname des Kartenbilds, auf dem die Marker dieser Szene liegen.

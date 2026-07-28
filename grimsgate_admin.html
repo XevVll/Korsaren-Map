@@ -165,6 +165,20 @@
   .ort-detail-head h2 { font-weight: 400; font-size: 21px; margin: 0 0 4px; color: var(--gold); }
   .ort-detail-head .personen-line { font-size: 12px; color: var(--ink-dim); }
 
+  .ort-variant-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
+  .variant-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+  .variant-btn {
+    font-family: inherit; font-size: 12px;
+    background: var(--panel); border: 1px solid var(--line);
+    color: var(--ink-dim); border-radius: 3px;
+    padding: 6px 11px; cursor: pointer;
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .variant-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .variant-btn.active { border-color: var(--gold); color: var(--gold); background: var(--panel-2); }
+  .variant-hint { font-size: 10.5px; color: var(--ink-faint); margin-top: 6px; min-height: 14px; }
+  .variant-hint.saved { color: var(--live); }
+
   .ort-notiz-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
   .ort-hinweis {
     margin: 14px 24px 0; padding: 11px 14px;
@@ -443,6 +457,13 @@
           '<div class="personen-line">' + (ort.personen || '') + '</div>' +
         '</div>' +
         (ort.ortHinweis ? '<div class="ort-hinweis"><span class="ort-hinweis-label">Hinweis (Regie-Referenz)</span>' + ort.ortHinweis + '</div>' : '') +
+        (markerInfo.variants ?
+          '<div class="ort-variant-block">' +
+            '<label>Aktives Bild (unabhängig von Szene/Trigger)</label>' +
+            '<div class="variant-buttons" id="variant-buttons"></div>' +
+            '<div class="variant-hint" id="variant-hint"></div>' +
+          '</div>'
+        : '') +
         '<div class="ort-notiz-block">' +
           '<label>Notizen zum Ort (übergeordnet)</label>' +
           '<textarea id="ort-notiz" placeholder="z.B. allgemeine Stimmung, Vorfälle ohne Bezug zu einer einzelnen Interaktion…"></textarea>' +
@@ -457,6 +478,10 @@
       // damit die Spalte auch ohne/bei langsamer Firebase-Verbindung nie leer bleibt.
       document.getElementById('ort-notiz').value = '';
       renderInteraktionen(ort, iaKeys, {});
+
+      if (markerInfo.variants) {
+        renderVariantButtons(markerInfo);
+      }
 
       document.getElementById('ort-notiz').addEventListener('input', debounce(function (e) {
         saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
@@ -555,6 +580,58 @@
         });
 
         listEl.appendChild(wrap);
+      });
+    }
+
+    // Rendert die Bild-Varianten-Buttons für einen Marker (z.B. Frachtraum
+    // "Standard" / "Leer"). Unabhängig vom Trigger-System: der aktive Wert
+    // liegt unter markerVariant/<markerId> und wirkt sich direkt auf das
+    // Bild aus, das Spieler auf der Karte sehen (siehe korsaren_szenen.html).
+    function renderVariantButtons(markerInfo) {
+      const wrap = document.getElementById('variant-buttons');
+      const hint = document.getElementById('variant-hint');
+      if (!wrap) return;
+
+      const variantKeys = Object.keys(markerInfo.variants);
+      // Fallback, falls in Firebase noch nichts gesetzt ist: die Variante
+      // nehmen, deren Bild dem aktuellen Basis-/Override-Bild entspricht.
+      const implicitDefault = variantKeys.find(function (k) {
+        return markerInfo.variants[k].img === markerInfo.img;
+      }) || variantKeys[0];
+
+      function draw(activeKey) {
+        wrap.innerHTML = '';
+        variantKeys.forEach(function (key) {
+          const variant = markerInfo.variants[key];
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'variant-btn' + (key === activeKey ? ' active' : '');
+          btn.textContent = variant.label || key;
+          btn.onclick = function () {
+            if (!db) { alert('Keine Verbindung zu Firebase — firebase-config.js prüfen.'); return; }
+            const path = 'markerVariant/' + fbKey(markerInfo.id);
+            db.ref(path).set(key).then(function () {
+              draw(key);
+              hint.className = 'variant-hint saved';
+              hint.textContent = 'gespeichert — Spieler sehen jetzt „' + (variant.label || key) + '“';
+              setTimeout(function () { hint.textContent = ''; hint.className = 'variant-hint'; }, 2000);
+            }).catch(function (err) {
+              console.error('Fehler beim Speichern von', path, err);
+              hint.style.color = '#c76a5a';
+              hint.textContent = 'NICHT gespeichert — ' + err.message;
+            });
+          };
+          wrap.appendChild(btn);
+        });
+      }
+
+      draw(implicitDefault); // sofort mit sinnvollem Default zeichnen
+      if (!db) return;
+      db.ref('markerVariant/' + fbKey(markerInfo.id)).once('value').then(function (snap) {
+        const saved = snap.val();
+        if (saved && markerInfo.variants[saved]) draw(saved);
+      }).catch(function (err) {
+        console.error('Fehler beim Laden der aktiven Variante', err);
       });
     }
 

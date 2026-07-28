@@ -91,7 +91,17 @@ const GOLDEN_LION_MARKERS_BASE = {
     top: 70, left: 82,
     title: "Frachtraum / Laderaum",
     desc: "Fässer, Kisten, aufgerolltes Tauwerk.",
-    img: "interior_frachtraum.png"
+    img: "interior_frachtraum.png",
+    // Optionales Feld "variants": mehrere benannte Bildzustände für
+    // denselben Ort, unabhängig von der Szene/Trigger-Logik. Die aktive
+    // Variante wird im Admin-Panel manuell umgeschaltet und in Firebase
+    // unter markerVariant/<markerId> gespeichert (nicht unter regie/,
+    // da sie - anders als Trigger - direkt das Spieler-Bild beeinflusst).
+    // Fehlt "variants" bei einem Marker, ändert sich am Verhalten nichts.
+    variants: {
+      standard: { label: "Standard (versteckt)", img: "interior_frachtraum.png" },
+      leer: { label: "Leer (Junge weg/gefunden)", img: "interior_frachtraum_leer.png" }
+    }
   },
   kombuese: {
     top: 76, left: 52,
@@ -160,7 +170,8 @@ function getGoldenLionMarkers(sceneId) {
       left: base.left,
       title: base.title,
       desc: descOverrides[id] || base.desc,
-      img: imgOverrides[id] || base.img
+      img: imgOverrides[id] || base.img,
+      variants: base.variants || null
     };
   });
 }
