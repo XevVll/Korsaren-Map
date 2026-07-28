@@ -23,12 +23,14 @@
 //   neue Spieler-Seite korsaren_szenen.html liest dieses Feld pro Szene
 //   aus und lädt automatisch das passende Bild.
 
-// Szenen-Feld "sound" (optional):
-//   YouTube-Video-ID (nicht die volle URL, nur die ID nach "v=" bzw. nach
-//   "youtu.be/") eines Videos, dessen TON als Hintergrundgeräusch für diese
-//   Szene läuft - das Video selbst wird nirgends angezeigt, nur der Ton.
-//   Fehlt das Feld, läuft für diese Szene kein Ton.
-//   Beispiel: sound: "dQw4w9WgXcQ"
+// Szenen-Feld "soundFile" (optional):
+//   Dateiname einer selbst gehosteten Audiodatei (mp3/ogg/wav/m4a/aac,
+//   liegt im selben Ordner wie diese Datei), die als Hintergrundgeräusch
+//   für diese Szene läuft. Dient nur als Fallback/Standardwert - im
+//   Admin-Panel gesetzte Werte (Firebase) haben Vorrang und übersteuern
+//   dieses Feld, ohne dass die Datei hier geändert werden muss.
+//   Fehlt das Feld UND ist im Admin-Panel nichts gesetzt, läuft kein Ton.
+//   Beispiel: soundFile: "hafen_ambience.mp3"
 
 const SCENES = {
   "1.1": {
