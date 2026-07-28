@@ -14,10 +14,19 @@
 //   title  - Überschrift im Tooltip/Overlay
 //   desc   - Beschreibungstext im Tooltip/Overlay
 //   img    - Dateiname des Innenraumbilds (liegt im selben Ordner)
+//
+// Szenen-Feld "background":
+//   Dateiname des Kartenbilds, auf dem die Marker dieser Szene liegen.
+//   Grimsgate-Szenen (1.1/1.2) nutzen beide dieselbe Stadtkarte
+//   (grimsgate_map.png). Andere Karten (z.B. das Golden-Lion-Schiff,
+//   siehe golden_lion_scenes.js) haben eigene Hintergrundbilder - die
+//   neue Spieler-Seite korsaren_szenen.html liest dieses Feld pro Szene
+//   aus und lädt automatisch das passende Bild.
 
 const SCENES = {
   "1.1": {
     label: "1.1 – Grimsgate (Start)",
+    background: "grimsgate_map.png",
     markers: [
       {
         id: "heuer",
@@ -66,6 +75,7 @@ const SCENES = {
 
   "1.2": {
     label: "1.2 – Golden Lion sichtbar",
+    background: "grimsgate_map.png",
     // Alle Marker aus 1.1 plus den neuen Golden-Lion-Marker.
     // Position ist ein Platzhalter (top/left) - wird noch final festgelegt.
     markers: [
