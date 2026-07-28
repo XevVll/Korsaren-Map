@@ -272,9 +272,30 @@
       return meta && meta.raw.background ? meta.raw.background : null;
     }
 
-    function getSoundForScene(sceneId) {
+    function getStaticSoundForScene(sceneId) {
       const meta = findSceneMeta(sceneId);
       return meta && meta.raw.sound ? meta.raw.sound : null;
+    }
+
+    // Liefert den Sound für eine Szene per Callback, da der Firebase-Wert
+    // (vom Admin-Panel gesetzt) Vorrang vor dem statischen "sound"-Feld aus
+    // der jeweiligen *_scenes.js-Datei hat. Fällt still auf das statische
+    // Feld zurück, falls Firebase nichts liefert oder nicht erreichbar ist.
+    function resolveSoundForScene(sceneId, callback) {
+      const fallback = getStaticSoundForScene(sceneId);
+      if (!db) { callback(fallback); return; }
+      db.ref('sceneSound/' + fbKey(sceneId)).once('value').then(function (snap) {
+        const fromFirebase = snap.val();
+        callback(fromFirebase || fallback);
+      }).catch(function () {
+        callback(fallback);
+      });
+    }
+
+    // Firebase-Keys dürfen keinen Punkt enthalten (Szenen-IDs wie "1.1" tun
+    // das) - gleiche Sanitisierung wie im Admin-Panel.
+    function fbKey(str) {
+      return String(str).replace(/[.#$\[\]]/g, '-');
     }
 
     function getFallbackDefaultScene() {
@@ -490,8 +511,9 @@
     };
 
     // Erwartet die YouTube-Video-ID (oder null) als Parameter, nicht die
-    // Szenen-ID - Aufrufer übergibt bereits das Ergebnis von
-    // getSoundForScene(sceneId).
+    // Szenen-ID - wird als Callback an resolveSoundForScene(sceneId, ...)
+    // übergeben, da die Auflösung (Firebase-Override vs. statisches Feld)
+    // asynchron läuft.
     function syncAudioForScene(soundId) {
       if (!ytReady) { pendingSoundId = soundId; return; }
       if (soundId === currentSoundId) return; // schon richtig, nichts zu tun
@@ -519,7 +541,7 @@
         statusEl.className = 'connected';
         setTimeout(function () { statusEl.classList.add('hidden'); }, 1200);
         renderScene(sceneId);
-        syncAudioForScene(getSoundForScene(sceneId));
+        resolveSoundForScene(sceneId, syncAudioForScene);
       }, function (err) {
         statusEl.textContent = 'Verbindungsfehler: ' + err.message;
         statusEl.className = 'error';
@@ -528,7 +550,7 @@
       statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft.';
       statusEl.className = 'error';
       renderScene(getFallbackDefaultScene());
-      syncAudioForScene(getSoundForScene(getFallbackDefaultScene()));
+      resolveSoundForScene(getFallbackDefaultScene(), syncAudioForScene);
     }
   </script>
 
