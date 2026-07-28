@@ -534,11 +534,21 @@
     // CHARAKTERLEISTE: welche Portraits sind in der aktuellen Szene aktiv
     // ==========================================================
     const charRailEl = document.getElementById('charRail');
+    let charRailRef = null;      // aktuell aktiver Firebase-Ref (zum sauberen Abhängen)
+    let charRailListener = null; // zugehöriger on('value')-Handler
 
     function renderCharacterRail(sceneId) {
-      if (typeof CHARACTERS === 'undefined' || !db) { charRailEl.innerHTML = ''; return; }
+      // Alten Live-Listener abhängen, falls Szene sich ändert - sonst
+      // würden mehrere Listener gleichzeitig laufen und sich überlagern.
+      if (charRailRef && charRailListener) {
+        charRailRef.off('value', charRailListener);
+      }
+      charRailEl.innerHTML = '';
 
-      db.ref('sceneCharacters/' + fbKey(sceneId)).once('value').then(function (snap) {
+      if (typeof CHARACTERS === 'undefined' || !db) return;
+
+      charRailRef = db.ref('sceneCharacters/' + fbKey(sceneId));
+      charRailListener = charRailRef.on('value', function (snap) {
         const active = snap.val() || {};
         const activeChars = CHARACTERS.filter(function (ch) { return !!active[ch.id]; });
 
@@ -551,7 +561,7 @@
             '<div class="char-name">' + ch.name + '</div>';
           charRailEl.appendChild(card);
         });
-      }).catch(function () {
+      }, function () {
         charRailEl.innerHTML = '';
       });
     }
