@@ -107,18 +107,17 @@ const GOLDEN_LION_SCENES = {
     background: "golden_lion_cutaway.png",
     imgOverrides: {}      // nutzt für alle Marker einfach die img aus BASE
     // descOverrides: {}  // optional, falls in einer Szene auch Texte abweichen sollen
+  },
+
+  "3.1": {
+    label: "3.1 – Golden Lion im Sturm",
+    background: "golden_lion_cutaway_sturm.png",
+    imgOverrides: {
+      achterdeck: "interior_achterdeck_sturm.png"
+    }
   }
 
   // Beispiel für später, zum Reinkopieren und Anpassen:
-  //
-  // "3.1": {
-  //   label: "3.1 – Golden Lion im Sturm",
-  //   background: "golden_lion_cutaway_sturm.png",
-  //   imgOverrides: {
-  //     oberdeck: "interior_oberdeck_sturm.png",
-  //     achterdeck: "interior_achterdeck_sturm.png"
-  //   }
-  // },
   //
   // "4.1": {
   //   label: "4.1 – Golden Lion in der Karibik",
