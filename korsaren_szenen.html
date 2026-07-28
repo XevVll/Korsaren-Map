@@ -163,12 +163,6 @@
     width: 90px; accent-color: var(--gold);
     cursor: pointer;
   }
-  /* Player selbst bleibt unsichtbar, nur Ton wird genutzt */
-  #ytPlayerHost {
-    position: fixed; bottom: 0; right: 0;
-    width: 1px; height: 1px; overflow: hidden;
-    opacity: 0; pointer-events: none;
-  }
 </style>
 </head>
 <body>
@@ -197,7 +191,7 @@
     <button id="muteBtn" title="Ton an/aus">🔇</button>
     <input type="range" id="volumeSlider" min="0" max="100" value="50">
   </div>
-  <div id="ytPlayerHost"><div id="ytPlayer"></div></div>
+  <audio id="bgAudio" loop preload="auto"></audio>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -274,17 +268,18 @@
 
     function getStaticSoundForScene(sceneId) {
       const meta = findSceneMeta(sceneId);
-      return meta && meta.raw.sound ? meta.raw.sound : null;
+      return meta && meta.raw.soundFile ? meta.raw.soundFile : null;
     }
 
-    // Liefert den Sound für eine Szene per Callback, da der Firebase-Wert
-    // (vom Admin-Panel gesetzt) Vorrang vor dem statischen "sound"-Feld aus
-    // der jeweiligen *_scenes.js-Datei hat. Fällt still auf das statische
-    // Feld zurück, falls Firebase nichts liefert oder nicht erreichbar ist.
+    // Liefert den Sound-Dateinamen für eine Szene per Callback, da der
+    // Firebase-Wert (vom Admin-Panel gesetzt) Vorrang vor dem statischen
+    // "soundFile"-Feld aus der jeweiligen *_scenes.js-Datei hat. Fällt
+    // still auf das statische Feld zurück, falls Firebase nichts liefert
+    // oder nicht erreichbar ist.
     function resolveSoundForScene(sceneId, callback) {
       const fallback = getStaticSoundForScene(sceneId);
       if (!db) { callback(fallback); return; }
-      db.ref('sceneSound/' + fbKey(sceneId)).once('value').then(function (snap) {
+      db.ref('sceneAudioFile/' + fbKey(sceneId)).once('value').then(function (snap) {
         const fromFirebase = snap.val();
         callback(fromFirebase || fallback);
       }).catch(function () {
@@ -409,12 +404,11 @@
     }
 
     // ==========================================================
-    // AUDIO: YouTube-Ton pro Szene, Video selbst unsichtbar
+    // AUDIO: eigene Audiodatei pro Szene, per <audio>-Element
     // ==========================================================
-    let ytPlayer = null;
-    let ytReady = false;
-    let currentSoundId = null;      // aktuell geladene YouTube-Video-ID
-    let pendingSoundId = undefined; // falls Szene wechselt, bevor der Player bereit ist
+    const bgAudio = document.getElementById('bgAudio');
+    let currentAudioFile = null; // aktuell geladene Datei (Dateiname)
+    let pendingAudioFile = undefined; // Szene kam, bevor das erste Mal reagiert werden konnte
 
     // Lautstärke/Stumm-Zustand pro Browser merken
     let savedVolume = parseInt(localStorage.getItem('korsaren_volume'), 10);
@@ -431,11 +425,13 @@
     }
 
     function applyAudioState() {
-      if (!ytPlayer || !ytReady) return;
-      try {
-        ytPlayer.setVolume(savedVolume);
-        if (isMuted) ytPlayer.mute(); else ytPlayer.unMute();
-      } catch (e) { /* Player evtl. noch nicht ganz bereit */ }
+      bgAudio.volume = savedVolume / 100;
+      bgAudio.muted = isMuted;
+      // Manche Browser pausieren <audio>, wenn es (noch) stummgeschaltet
+      // erstellt wurde - sicherheitshalber erneut abspielen versuchen.
+      if (currentAudioFile && bgAudio.paused) {
+        bgAudio.play().catch(function () { /* Autoplay evtl. weiterhin blockiert, ignorieren */ });
+      }
     }
 
     muteBtn.addEventListener('click', function () {
@@ -477,54 +473,25 @@
       document.addEventListener('keydown', unlockOnFirstInteraction, { once: true });
     }
 
-    // YouTube IFrame API asynchron laden
-    const ytScript = document.createElement('script');
-    ytScript.src = 'https://www.youtube.com/iframe_api';
-    document.head.appendChild(ytScript);
+    // Erwartet den Dateinamen der Audiodatei (oder null) als Parameter -
+    // wird als Callback an resolveSoundForScene(sceneId, ...) übergeben,
+    // da die Auflösung (Firebase-Override vs. statisches Feld) asynchron läuft.
+    function syncAudioForScene(audioFile) {
+      if (audioFile === currentAudioFile) return; // schon richtig, nichts zu tun
+      currentAudioFile = audioFile;
 
-    window.onYouTubeIframeAPIReady = function () {
-      ytPlayer = new YT.Player('ytPlayer', {
-        height: '1', width: '1',
-        playerVars: {
-          autoplay: 1, controls: 0, disablekb: 1, modestbranding: 1,
-          fs: 0, iv_load_policy: 3, playsinline: 1
-        },
-        events: {
-          onReady: function () {
-            ytReady = true;
-            applyAudioState();
-            if (pendingSoundId !== undefined) {
-              syncAudioForScene(pendingSoundId);
-              pendingSoundId = undefined;
-            }
-          },
-          onStateChange: function (e) {
-            // Loop: Video am Ende neu starten (kein sichtbares Video, daher
-            // reicht ein einfacher Replay statt einer echten Playlist)
-            if (e.data === YT.PlayerState.ENDED && currentSoundId) {
-              ytPlayer.seekTo(0);
-              ytPlayer.playVideo();
-            }
-          }
-        }
-      });
-    };
-
-    // Erwartet die YouTube-Video-ID (oder null) als Parameter, nicht die
-    // Szenen-ID - wird als Callback an resolveSoundForScene(sceneId, ...)
-    // übergeben, da die Auflösung (Firebase-Override vs. statisches Feld)
-    // asynchron läuft.
-    function syncAudioForScene(soundId) {
-      if (!ytReady) { pendingSoundId = soundId; return; }
-      if (soundId === currentSoundId) return; // schon richtig, nichts zu tun
-
-      currentSoundId = soundId;
-      if (!soundId) {
-        ytPlayer.stopVideo();
+      if (!audioFile) {
+        bgAudio.pause();
+        bgAudio.removeAttribute('src');
         return;
       }
-      ytPlayer.loadVideoById(soundId);
+      bgAudio.src = audioFile;
       applyAudioState();
+      bgAudio.play().catch(function () {
+        // Blockiertes Autoplay ist normal, solange isMuted=true nichts
+        // Falsches signalisiert - sobald freigeschaltet wird, greift
+        // applyAudioState() erneut und startet die Wiedergabe.
+      });
     }
 
     // ==========================================================
