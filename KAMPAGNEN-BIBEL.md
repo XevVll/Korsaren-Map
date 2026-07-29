@@ -890,7 +890,8 @@ er bei allem Übernatürlichen den Tod nicht bezwingen kann.
 | `js/regie.js` | Spielleiter-Inhalte: Interaktionen, Trigger, Hinweise, Notizen — flache Struktur, ein Eintrag pro Ort-ID |
 | `js/characters.js` | Charakterdaten und Portraitpfade |
 | `js/firebase-config.js` | Firebase-Zugangsdaten |
-| `images/` | Alle Karten-, Innenraum- und Portraitbilder |
+| `images/` | Alle Karten-, Innenraum- und Portraitbilder (WebP, siehe 13.1a) |
+| `tools/optimize_images.py` | Skript zum Verkleinern/Konvertieren neuer Bilder vor dem Commit |
 | `*.mp3` (Hauptordner) | Szenen-Hintergrundtöne, Zuordnung läuft über das Admin-Panel/Firebase |
 | `grimsgate_admin.html` · `korsaren_szenen.html` · `crew_manifest.html` | Nur noch Weiterleitungs-Stubs auf die neuen Seitennamen |
 
@@ -906,6 +907,35 @@ bleibt erhalten, falls doch nochmal gebraucht):
   anderen Datei mehr referenziert.
 - `interior_offiziersquartie.png` — verwaister Tippfehler-Duplikat von
   `interior_offiziersquartier.png` (fehlendes „r"), nirgends referenziert.
+
+### 13.1a Bildoptimierung (Juli 2026)
+
+**Auslöser:** Spürbare Lags/Ladezeiten auf der Karte. Ursache: `images/` lag bei
+**132 MB** — einzelne PNGs (v. a. `interior_batteriedeck*`, `interior_frachtraum*`,
+`interior_werkstatt`, `interior_oberdeck_sturm`, `interior_kapitaenskajuete_sturm`,
+`interior_unterdeck`, `interior_offiziersquartier`, `Josiah_Pryce`) lagen bei 7-9 MB,
+teils mit doppelt so hoher Auflösung wie vergleichbare Bilder (2816×1536 statt 1408×768) —
+vermutlich ein Gemini-Generierungsartefakt, keine bewusste Entscheidung. Zusätzlich trugen
+alle Bilder einen vollständig deckenden (also nutzlosen) Alpha-Kanal, was verlustfreie
+PNG-Kompression zusätzlich erschwert.
+
+**Maßnahme:** Alle Bilder zu **WebP** konvertiert (Qualität 82, `method=6`), Alpha-Kanal
+entfernt (war überall zu 100 % deckend) und auf sinnvolle Kantenlänge gedeckelt, orientiert
+an der tatsächlichen Darstellungsgröße:
+- Portraits (Charakterleiste, max. ~220 CSS-px breit): Kappung 900px
+- Innenraum-/Ortsbilder (Overlay-Karte, max. 720px breit): Kappung 1600px
+- Kartenbilder Stadt/Schiff (ggf. bildschirmfüllend): Kappung 1920px
+
+**Ergebnis:** 132 MB → 4,5 MB (**-96,6 %**), keine sichtbaren Kompressionsartefakte
+(stichprobenartig geprüft, u. a. `Josiah_Pryce` und `interior_unterdeck`, die stärksten
+Reduktionen mit -99 %).
+
+**Für neue Bilder (wichtig, sonst wächst images/ wieder zu):** Jedes neu von Gemini
+generierte Bild vor dem Commit durch `python3 tools/optimize_images.py` schicken (verkleinert
++ konvertiert alle PNGs in `images/` zu WebP), das Ergebnis sichten, dann PNG löschen und den
+neuen `.webp`-Dateinamen in `js/scenes.js`/`js/golden_lion_scenes.js`/`js/characters.js`
+eintragen. Das Skript löscht die PNGs bewusst nicht automatisch, damit vor dem Löschen visuell
+geprüft werden kann.
 
 ### 13.2 Architektur-Entscheidungen
 
@@ -979,11 +1009,13 @@ Wege verzweigt, würden im Code hinterlegte Zeitpunkte Fehler produzieren.
 warme gealterte Töne. Durchgängig für **alle** Innenraum- und Portraitbilder.
 
 **Werkzeug:** Gemini. Claude schreibt die Prompts, Hendrik generiert und lädt zurück, dann
-gemeinsame Bewertung und iterative Korrektur.
+gemeinsame Bewertung und iterative Korrektur. **Danach zwingend durch
+`tools/optimize_images.py` schicken** (WebP-Konvertierung + Größenkappung, siehe 13.1a),
+bevor das Bild committet wird — Gemini liefert unnötig große PNGs.
 
 ### 14.1 Standardbausteine für Innenraum-Prompts
 
-- Cutaway-Bild (`golden_lion_cutaway.png`) als Stil- und Konstruktionsreferenz mitgeben
+- Cutaway-Bild (`images/golden_lion_cutaway.webp`) als Stil- und Konstruktionsreferenz mitgeben
 - Kadrierung: enge Innenansicht, ca. 85–90 % der Leinwand füllend, wenig Leerraum
 - „no modern elements, no text or labels anywhere in the image"
 - Ausschließlich Schiffsholz; **Ziegel nur** an der Kombüsen-Feuerstelle
@@ -992,8 +1024,9 @@ gemeinsame Bewertung und iterative Korrektur.
 
 ### 14.2 Portraits
 
-Dateinamenkonvention: voller Name mit Unterstrichen, z. B. `Walter_Wat_Crozier.png`,
-`Cormac_Daly.png`, `Josiah_Pryce.png`.
+Dateinamenkonvention: voller Name mit Unterstrichen, z. B. `Walter_Wat_Crozier.webp`,
+`Cormac_Daly.webp`, `Josiah_Pryce.webp` (ursprünglich von Gemini als PNG geliefert, vor dem
+Commit per `tools/optimize_images.py` nach WebP konvertiert, siehe 13.1a).
 
 ### 14.3 Bekannte Artefakte
 

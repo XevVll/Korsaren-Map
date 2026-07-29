@@ -12,11 +12,11 @@
 //   img  - Pfad des Portraits, relativ zur HTML-Seite (images/-Ordner)
 
 const CHARACTERS = [
-  { id: "harwick", name: "James Harwick", img: "images/James_Harwick.png" },
-  { id: "cormac", name: "Cormac Daly", img: "images/Cormac_Daly.png" },
-  { id: "tom", name: "Tom Fletcher", img: "images/Tom_Fletcher.png" },
-  { id: "dirk", name: "Dirk van Hoorn", img: "images/Dirk_van_Hoorn.png" },
-  { id: "francesco", name: "Francesco Almeida", img: "images/Francesco_Benedetto_Almeida.png" },
-  { id: "wat", name: "Walter „Wat“ Crozier", img: "images/Walter_Wat_Crozier.png" },
-  { id: "josiah", name: "Josiah Pryce", img: "images/Josiah_Pryce.png" }
+  { id: "harwick", name: "James Harwick", img: "images/James_Harwick.webp" },
+  { id: "cormac", name: "Cormac Daly", img: "images/Cormac_Daly.webp" },
+  { id: "tom", name: "Tom Fletcher", img: "images/Tom_Fletcher.webp" },
+  { id: "dirk", name: "Dirk van Hoorn", img: "images/Dirk_van_Hoorn.webp" },
+  { id: "francesco", name: "Francesco Almeida", img: "images/Francesco_Benedetto_Almeida.webp" },
+  { id: "wat", name: "Walter „Wat“ Crozier", img: "images/Walter_Wat_Crozier.webp" },
+  { id: "josiah", name: "Josiah Pryce", img: "images/Josiah_Pryce.webp" }
 ];

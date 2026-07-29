@@ -24,8 +24,8 @@
 //
 //     "3.1": {
 //       label: "3.1 - Golden Lion im Sturm",
-//       background: "images/golden_lion_cutaway_sturm.png",
-//       imgOverrides: { oberdeck: "images/interior_oberdeck_sturm.png" }
+//       background: "images/golden_lion_cutaway_sturm.webp",
+//       imgOverrides: { oberdeck: "images/interior_oberdeck_sturm.webp" }
 //     }
 //
 //   Alle 10 Marker existieren automatisch weiter, an derselben Stelle,
@@ -43,55 +43,55 @@ const GOLDEN_LION_MARKERS_BASE = {
     top: 20, left: 83,
     title: "Bug / Vorschiff",
     desc: "Vorderster Teil des offenen Oberdecks, Bugspriet und vorderes Tauwerk.",
-    img: "images/interior_bug.png"
+    img: "images/interior_bug.webp"
   },
   oberdeck: {
     top: 24, left: 55,
     title: "Oberdeck",
     desc: "Offene Decksmitte um den Hauptmast, Taljen, arbeitende Crew.",
-    img: "images/interior_oberdeck.png"
+    img: "images/interior_oberdeck.webp"
   },
   achterdeck: {
     top: 22, left: 21,
     title: "Achterdeck",
     desc: "Erhöhtes Deck am Heck. Tom Fletcher hält lässig das Ruder — scheinbar mühelos auf Kurs.",
-    img: "images/interior_achterdeck.png"
+    img: "images/interior_achterdeck.webp"
   },
   kapitaenskajuete: {
     top: 41, left: 30,
     title: "Kapitänskajüte",
     desc: "Die Tür zur Kapitänskajüte ist verriegelt. Durch die Fenster daneben fällt warmes Lampenlicht — drinnen sitzt Harwick über Papieren am Schreibtisch, den Kopf gesenkt, konzentriert. Wer anklopft, bekommt keine Antwort.",
-    img: "images/interior_kapitaenskajuete.png"
+    img: "images/interior_kapitaenskajuete.webp"
   },
   offiziersquartier: {
     top: 54, left: 23,
     title: "Offiziersquartier",
     desc: "Zwei knapp geschnittene Kammern liegen Tür an Tür. Die eine ist geschlossen und verriegelt — schlicht, ohne Ornament, der Gang davor aufgeräumt. Die andere steht offen: eine Hängematte statt fester Koje, zerwühlte Decken, Würfel und Karten verstreut auf Tisch und Boden, ein paar leere Flaschen, ein achtlos weggekickter Stiefel. Über einem Hocker hängt ein blaues Halstuch.",
-    img: "images/interior_offiziersquartier.png"
+    img: "images/interior_offiziersquartier.webp"
   },
   batteriedeck: {
     top: 55, left: 60,
     title: "Batteriedeck",
     desc: "Durchgehende Kanonenreihe, aber wenig Ordnung — Werkzeug und Pulverreste liegen, wie sie zuletzt gebraucht wurden. So viele Kanonen für ein einfaches Begleitschiff?",
-    img: "images/interior_batteriedeck.png"
+    img: "images/interior_batteriedeck.webp"
   },
   unterdeck: {
     top: 66, left: 48,
     title: "Unterdeck (Mannschaft)",
     desc: "Enge Reihen fester Kojen, dicht an dicht eingebaut, Vorhänge davor für ein wenig Privatsphäre — mehr Komfort, als man auf einem Schiff erwarten würde. Es ist der einzige wirklich ruhige Ort auf dem ganzen Schiff: gedämpfte Stimmen, gleichmäßiges Atmen, irgendwo ein leises Schnarchen. Die Crew schläft in Schichten, rotierend — hier liegt immer irgendwer, während andere Wache stehen.",
-    img: "images/interior_unterdeck.png"
+    img: "images/interior_unterdeck.webp"
   },
   werkstatt: {
     top: 66, left: 68,
     title: "Werkstatt",
     desc: "Mehrere Männer bei der Arbeit — hier läuft es merklich ordentlicher als im Rest des Schiffs. Werkzeug hat seinen Platz, nichts liegt achtlos herum. Wer genau hinsieht (oder selbst etwas vom Handwerk versteht), erkennt: Das sind keine einfachen Matrosen, sondern gelernte Leute.",
-    img: "images/interior_werkstatt.png"
+    img: "images/interior_werkstatt.webp"
   },
   frachtraum: {
     top: 70, left: 82,
     title: "Frachtraum / Laderaum",
     desc: "Dunkel, still, vollgestopft: Fässer und Kisten dicht gestaut, Tauwerk und Segeltuch verzurrt. Kein offenes Feuer erlaubt — nur gedämpftes Licht, das durch eine Gitterluke von einem Deck darüber hereinfällt. Ein Ort, an dem sich niemand lange aufhält.",
-    img: "images/interior_frachtraum.png",
+    img: "images/interior_frachtraum.webp",
     // Optionales Feld "variants": mehrere benannte Bildzustände für
     // denselben Ort, unabhängig von der Szene/Trigger-Logik. Die aktive
     // Variante wird im Admin-Panel manuell umgeschaltet und in Firebase
@@ -107,17 +107,17 @@ const GOLDEN_LION_MARKERS_BASE = {
     variants: {
       standard: {
         label: "Standard (versteckt)",
-        img: "images/interior_frachtraum.png",
+        img: "images/interior_frachtraum.webp",
         desc: "Dunkel, still, vollgestopft: Fässer und Kisten dicht gestaut, Tauwerk und Segeltuch verzurrt. Kein offenes Feuer erlaubt — nur gedämpftes Licht, das durch eine Gitterluke von einem Deck darüber hereinfällt. Ein Ort, an dem sich niemand lange aufhält.\n\nHabe ich da gerade etwas gehört? Bestimmt nur das Schiff."
       },
-      leer: { label: "Leer (Junge weg/gefunden)", img: "images/interior_frachtraum_leer.png" }
+      leer: { label: "Leer (Junge weg/gefunden)", img: "images/interior_frachtraum_leer.webp" }
     }
   },
   kombuese: {
     top: 76, left: 52,
     title: "Kombüse",
     desc: "Ein freundlicher, wie es sich für einen guten Koch gehört etwas rundlicher Mann mit Lachfalten steht am Herd und summt leise vor sich hin. Es duftet fantastisch.",
-    img: "images/interior_kombuese.png"
+    img: "images/interior_kombuese.webp"
   }
 };
 
@@ -130,7 +130,7 @@ const GOLDEN_LION_MARKERS_BASE = {
 const GOLDEN_LION_SCENES = {
   "2.1": {
     label: "2.1 – Golden Lion (Basis)",
-    background: "images/golden_lion_cutaway.png",
+    background: "images/golden_lion_cutaway.webp",
     imgOverrides: {}      // nutzt für alle Marker einfach die img aus BASE
     // descOverrides: {}  // optional, falls in einer Szene auch Texte abweichen sollen
     // soundFile: "meeresrauschen.mp3"
@@ -138,16 +138,16 @@ const GOLDEN_LION_SCENES = {
 
   "3.1": {
     label: "3.1 – Golden Lion im Sturm",
-    background: "images/golden_lion_cutaway_sturm.png",
+    background: "images/golden_lion_cutaway_sturm.webp",
     // Bug, Offiziersquartier, Unterdeck, Werkstatt und Kombüse spielen in
     // dieser Szene nicht mit - dort passiert nichts Sturmrelevantes.
     hiddenMarkers: ["bug", "offiziersquartier", "unterdeck", "werkstatt", "kombuese"],
     imgOverrides: {
-      oberdeck: "images/interior_oberdeck_sturm.png",
-      achterdeck: "images/interior_achterdeck_sturm.png",
-      kapitaenskajuete: "images/interior_kapitaenskajuete_sturm.png",
-      batteriedeck: "images/interior_batteriedeck_sturm.png",
-      frachtraum: "images/interior_frachtraum_sturm.png"
+      oberdeck: "images/interior_oberdeck_sturm.webp",
+      achterdeck: "images/interior_achterdeck_sturm.webp",
+      kapitaenskajuete: "images/interior_kapitaenskajuete_sturm.webp",
+      batteriedeck: "images/interior_batteriedeck_sturm.webp",
+      frachtraum: "images/interior_frachtraum_sturm.webp"
     },
     descOverrides: {
       oberdeck: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Männer hängen in den Wanten, kämpfen mit den Segeln — eines hat sich bereits losgerissen und flattert zerfetzt im Wind. Andere ziehen mit vereinten Kräften an nassen Leinen, während wieder andere sich nur noch am Deck festkrallen, von der letzten Welle niedergeworfen.",
@@ -163,9 +163,9 @@ const GOLDEN_LION_SCENES = {
   //
   // "4.1": {
   //   label: "4.1 – Golden Lion in der Karibik",
-  //   background: "images/golden_lion_cutaway_karibik.png",
+  //   background: "images/golden_lion_cutaway_karibik.webp",
   //   imgOverrides: {
-  //     oberdeck: "images/interior_oberdeck_karibik.png"
+  //     oberdeck: "images/interior_oberdeck_karibik.webp"
   //   }
   // }
 };
