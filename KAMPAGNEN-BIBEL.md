@@ -1053,6 +1053,13 @@ schicken (Details und die Firebase-Falle siehe Docstring im Skript).
   (siehe Korrektur in 10.11) — jetzt pro Ort optional `szenenUeberschreibungen: { "3.1": {...} }`,
   aufgelöst über `resolveOrtForScene()` in `regie.html`. `interaktionen` bleibt davon unberührt
   und weiterhin über `nurSzenen`/`nichtInSzenen` gesteuert
+- **Dritte Kartenquelle (neu, Juli 2026):** `js/schatzinsel_scenes.js` (`SCHATZINSEL_SCENES`,
+  Szene `3.2`) folgt dem flachen `scenes.js`-Muster (nicht Basis/Override wie Golden Lion), da
+  bisher nur ein einziger Szenen-Zustand existiert. Über `MAP_REGISTRY` (`karte.html`) bzw.
+  `getAllSceneEntries()`/`getSceneLabel()`/`getMarkersForScene()` (`regie.html`) als dritte
+  Quelle angehängt — genau wie in den bestehenden Code-Kommentaren als Beispiel vorgesehen.
+  Bisher nur ein Marker (`schiffswrack`, die gestrandete Golden Lion) — weitere Orte der Insel
+  (Höhle, knorriger Baum, Felsformationen) folgen erst in einem späteren Schritt
 - **Varianten + imgOverride zusammen:** Überschreibt eine Szene das Bild eines Markers, der in
   BASE ein `variants`-Feld hat (z. B. Frachtraum), werden die Varianten für diese Szene
   automatisch deaktiviert (`variants: null`). Sonst könnte eine in einer ANDEREN Szene aktiv
