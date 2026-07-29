@@ -261,5 +261,83 @@ const ORTE = {
         ]
       }
     }
+  },
+
+  "werkstatt": {
+    personen: "Schiffszimmermann · weitere Handwerker (namenlos)",
+    kurz: "Ordentlicher als der Rest des Schiffs. Erster Spieler im Raum wird direkt eingespannt — Mechanik-Probe, nur die Extreme wirken sich auf den Ruf aus.",
+    ortHinweis: "Mehrere gelernte Handwerker bei der Arbeit, spürbar ordentlicher als sonst auf dem Schiff. Gute Wahrnehmung oder Mechanik erkennt: keine einfachen Matrosen, sondern Leute vom Fach. Namenlose Crewmitglieder — bewusst kein Wiedererkennungs-Bogen, kein späterer Zahltag (anders als bei Dirk auf dem Batteriedeck).",
+    interaktionen: {
+      "eingespannt": {
+        title: "Erster Spieler im Raum — direkt eingespannt",
+        kurz: "Nur der erste Spieler, der den Raum betritt. Mechanik-Probe: Guter Erfolg = Ruf-Plus, Misserfolg = Ruf-Malus, beide mittleren Bänder neutral.",
+        details: "Der erste Spieler, der die Werkstatt betritt, wird ohne Umschweife eingespannt:\n\n„Schnapp dir den Fuchsschwanz und gib mir das auf 30 Zoll raus.“\n\n(Fuchsschwanz = Handsäge, benannt nach der spitz zulaufenden Blattform.) Der Mann am Tisch reicht ein Kanthol, schaut kaum auf, bleibt bei seiner eigenen Arbeit.\n\nMechanik-Probe:\n— Guter Erfolg: Schnitt exakt auf Maß, kurzes Nicken → Ruf-Gewinn\n— Normaler Erfolg: brauchbar, kein Kommentar → neutral\n— Schlechter Erfolg: sichtbar daneben, wortlos beiseitegelegt → neutral\n— Misserfolg: Kanthol splittert oder grob falsches Maß — einziger Moment, in dem er wirklich aufsieht → Ruf-Malus\n\nNachkommende Spieler bekommen keine eigene Aufgabe. Auf Nachfrage: „Wir kommen zurecht, geh zu Cormac, wenn du Arbeit suchst.“",
+        trigger: [
+          { id: "erster_eingespannt", label: "Erster Spieler eingespannt" },
+          { id: "guter_erfolg", label: "Guter Erfolg → Ruf-Plus" },
+          { id: "normaler_erfolg", label: "Normaler Erfolg → neutral" },
+          { id: "schlechter_erfolg", label: "Schlechter Erfolg → neutral" },
+          { id: "misserfolg", label: "Misserfolg → Ruf-Malus" }
+        ]
+      }
+    }
+  },
+
+  "unterdeck": {
+    personen: "Crew (namenlos, rotierend schlafend)",
+    kurz: "Der einzige ruhige Ort auf dem Schiff — als Falle angelegt. Durchqueren verlangt Geschick-/Geheim-Probe, Misserfolg kostet Ruf bei allen Anwesenden.",
+    ortHinweis: "Enge Reihen fester Kojen (bewusst KEINE Hängematten), Vorhänge für ein wenig Privatsphäre — mehr Komfort, als man auf einem Schiff erwarten würde. Crew schläft in Schichten, rotierend, während andere Wache stehen. Wirkt wie ein Fettnäpfchen-Ort, ist aber außer im Misserfolgsfall folgenlos.",
+    interaktionen: {
+      "durchqueren": {
+        title: "Durchqueren des Unterdecks",
+        kurz: "Geschick- oder Geheim-Probe. Erfolg = nichts passiert, Misserfolg = Gemecker + Ruf-Malus für alle anwesenden Spieler.",
+        details: "Spieler, die das Unterdeck durchqueren, während dort geschlafen wird, würfeln auf Geschick oder Geheim.\n\n— Erfolg: nichts, unauffällig durch\n— Misserfolg: Gemecker von den Gestörten, Ruf-Malus für alle anwesenden Spieler (nicht nur für den Verursacher)",
+        trigger: [
+          { id: "erfolg", label: "Erfolg → unauffällig durch" },
+          { id: "misserfolg", label: "Misserfolg → Gemecker, Ruf-Malus für alle Anwesenden" }
+        ]
+      }
+    }
+  },
+
+  "frachtraum": {
+    personen: "Der blinde Passagier (Waisenjunge, situativ) · Wat (situativ, bei Pfad B)",
+    kurz: "Kein dauerhafter Aufenthaltsort, nur sporadisch besucht. Zentral für den blinden Passagier (Abschnitt 11) und Toms Knoten-Streich (Achterdeck).",
+    ortHinweis: "Dunkel, still, vollgestopft — kein offenes Feuer erlaubt (Tauwerk, Segeltuch, trockener Proviant), nur gedämpftes Lukenlicht von oben. Zwei Bildvarianten: \"Standard\" (Hände hinter einer Kiste sichtbar, blinder Passagier versteckt, inkl. Zusatzsatz \"Habe ich da gerade etwas gehört? Bestimmt nur das Schiff.\") und \"Leer\" (Junge weg/gefunden, reiner Basistext). Umschaltung manuell im Admin-Panel unter Bildvarianten — wirkt sich sowohl auf das Spieler-Bild als auch auf den angezeigten Hinweistext aus.",
+    interaktionen: {
+      "blinder_passagier": {
+        title: "Der blinde Passagier — Fund im Frachtraum (Abschnitt 11, Pfad A)",
+        kurz: "Kein Wurf nötig — aktive Suche bei Variante \"Standard\" findet ihn automatisch. Vier mögliche Folgen je nach Spielerverhalten danach.",
+        details: "Ist die Bildvariante \"Standard\" aktiv und durchsucht ein Spieler gezielt den Raum (z.B. „ich durchsuche den Raum“), wird der Junge ohne Probe gefunden.\n\nDanach, drei mögliche Verläufe:\n— Spieler holen ihn aus dem Frachtraum heraus → Wat bekommt es mit, die Konfrontationsszene an Deck (Pfad B) startet\n— Spieler lassen ihn dort, gehen aber vor T+30 direkt zu Josiah, Francesco, Cormac oder Tom → Wat findet ihn nicht\n— Spieler lassen ihn dort, unternehmen lange Zeit nichts → er findet irgendwann aus Hunger von selbst zu Josiah\n\nSL-Ermessen: Ob und wie hart Pfad B (Wat-Konfrontation) tatsächlich ausfällt, liegt im Spielraum des Spielleiters — abhängig z.B. davon, ob die Gruppe Wat schon kennengelernt hat, ob eine härtere Version gerade der Charakterbildung nützt, oder ob die Gruppe ohnehin aggressiv gestimmt ist und eskalieren würde. Keine feste Regel, reine Spielleiter-Freiheit (vgl. Design-Prinzip \"Gutes Rollenspiel schlägt Mechanik\").",
+        trigger: [
+          { id: "gefunden", label: "Junge im Frachtraum gefunden" },
+          { id: "rausgeholt", label: "Spieler holen ihn raus → Wat bemerkt es, Pfad B startet" },
+          { id: "vertrauensperson", label: "Josiah/Francesco/Cormac/Tom vor T+30 informiert → Wat findet ihn nicht" },
+          { id: "untaetig", label: "Spieler bleiben untätig → Junge findet von selbst zu Josiah" }
+        ]
+      },
+      "knoten_streich": {
+        title: "Knoten-Streich — Anlaufpunkt (ausgelöst vom Achterdeck)",
+        kurz: "Wer wegen Toms Streich in den Frachtraum läuft, trifft je nach aktiver Bildvariante auf den versteckten Jungen oder einen leeren Raum.",
+        details: "Siehe Achterdeck-Interaktion „Knoten-Streich“: Tom schickt den Spieler mit dem niedrigsten Seefahrt-Wert in den Frachtraum, um „ein paar Knoten mehr“ zu holen. Trifft der Spieler dort ein, hängt der Zustand von der aktiven Bildvariante ab — versteckter Junge (Standard) oder leerer Raum (Leer).",
+        trigger: [
+          { id: "angekommen", label: "Spieler wegen Knoten-Streich im Frachtraum angekommen" }
+        ]
+      }
+    }
+  },
+
+  "kombuese": {
+    personen: "Josiah Pryce",
+    kurz: "Herzlicher Empfang für jeden, unabhängig vom Ruf. Bewusst kein aktiver Wunsch, keine Ruf-Mechanik — reiner Charakter zum Spielen.",
+    ortHinweis: "Anlaufstelle für den blinden Passagier (siehe Frachtraum-Interaktion „Der blinde Passagier“ und Abschnitt 11).",
+    interaktionen: {
+      "standardverhalten": {
+        title: "Josiah — Herzlicher Empfang (kein aktiver Wunsch)",
+        kurz: "Begrüßt jeden herzlich, unabhängig vom Ruf oder davon, ob der Spieler freiwillig/gepresst an Bord ist. Bewusst keine Ruf-Mechanik, kein Trigger-Automat.",
+        details: "Josiah begrüßt jeden, der die Kombüse betritt, herzlich — unabhängig vom Ruf, unabhängig davon, ob der Spieler freiwillig oder durch Erpressung/Gewalt an Bord ist. Bietet von sich aus etwas zu essen oder Ähnliches an. Beantwortet Fragen offen und ehrlich.\n\nSieht in jedem das Gute — redet über niemanden schlecht, egal wer gerade Zielscheibe ist. Lästern Spieler vor ihm über irgendjemanden an Bord, widerspricht er warm und automatisch, nie belehrend, einfach weil er es so empfindet.\n\nBewusst kein aktiver Wunsch und keine Ruf-Mechanik hier — anders als Tom, Dirk oder die Werkstatt. Reiner Charakter zum Spielen, kein Trigger-Automat.\n\nSein großer Moment: die Wat-Konfrontationsszene (Frachtraum-Interaktion „Der blinde Passagier“, Pfad B) — kommt schwer atmend an Deck (die Kombüse liegt tief unten, er ist kein schneller Mann) und hält Wat auf.",
+        trigger: []
+      }
+    }
   }
 };

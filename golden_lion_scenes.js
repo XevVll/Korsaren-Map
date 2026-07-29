@@ -60,13 +60,13 @@ const GOLDEN_LION_MARKERS_BASE = {
   kapitaenskajuete: {
     top: 41, left: 30,
     title: "Kapitänskajüte",
-    desc: "Großzügiger Raum mit hohen Fenstern unter dem Achterdeck, eigener Zugang über einen Niedergang.",
+    desc: "Die Tür zur Kapitänskajüte ist verriegelt. Durch die Fenster daneben fällt warmes Lampenlicht — drinnen sitzt Harwick über Papieren am Schreibtisch, den Kopf gesenkt, konzentriert. Wer anklopft, bekommt keine Antwort.",
     img: "interior_kapitaenskajuete.png"
   },
   offiziersquartier: {
     top: 54, left: 23,
     title: "Offiziersquartier",
-    desc: "Kleiner, schlichter eingerichteter Raum mit fester Koje, neben der Kapitänskajüte.",
+    desc: "Zwei knapp geschnittene Kammern liegen Tür an Tür. Die eine ist geschlossen und verriegelt — schlicht, ohne Ornament, der Gang davor aufgeräumt. Die andere steht offen: eine Hängematte statt fester Koje, zerwühlte Decken, Würfel und Karten verstreut auf Tisch und Boden, ein paar leere Flaschen, ein achtlos weggekickter Stiefel. Über einem Hocker hängt ein blaues Halstuch.",
     img: "interior_offiziersquartier.png"
   },
   batteriedeck: {
@@ -78,19 +78,19 @@ const GOLDEN_LION_MARKERS_BASE = {
   unterdeck: {
     top: 66, left: 48,
     title: "Unterdeck (Mannschaft)",
-    desc: "Hängematten über mehrere Bereiche verteilt, Alltag der einfachen Crew.",
+    desc: "Enge Reihen fester Kojen, dicht an dicht eingebaut, Vorhänge davor für ein wenig Privatsphäre — mehr Komfort, als man auf einem Schiff erwarten würde. Es ist der einzige wirklich ruhige Ort auf dem ganzen Schiff: gedämpfte Stimmen, gleichmäßiges Atmen, irgendwo ein leises Schnarchen. Die Crew schläft in Schichten, rotierend — hier liegt immer irgendwer, während andere Wache stehen.",
     img: "interior_unterdeck.png"
   },
   werkstatt: {
     top: 66, left: 68,
     title: "Werkstatt",
-    desc: "Werkbank und Werkzeug des Schiffszimmermanns.",
+    desc: "Mehrere Männer bei der Arbeit — hier läuft es merklich ordentlicher als im Rest des Schiffs. Werkzeug hat seinen Platz, nichts liegt achtlos herum. Wer genau hinsieht (oder selbst etwas vom Handwerk versteht), erkennt: Das sind keine einfachen Matrosen, sondern gelernte Leute.",
     img: "interior_werkstatt.png"
   },
   frachtraum: {
     top: 70, left: 82,
     title: "Frachtraum / Laderaum",
-    desc: "Fässer, Kisten, aufgerolltes Tauwerk.",
+    desc: "Dunkel, still, vollgestopft: Fässer und Kisten dicht gestaut, Tauwerk und Segeltuch verzurrt. Kein offenes Feuer erlaubt — nur gedämpftes Licht, das durch eine Gitterluke von einem Deck darüber hereinfällt. Ein Ort, an dem sich niemand lange aufhält.",
     img: "interior_frachtraum.png",
     // Optionales Feld "variants": mehrere benannte Bildzustände für
     // denselben Ort, unabhängig von der Szene/Trigger-Logik. Die aktive
@@ -98,15 +98,25 @@ const GOLDEN_LION_MARKERS_BASE = {
     // unter markerVariant/<markerId> gespeichert (nicht unter regie/,
     // da sie - anders als Trigger - direkt das Spieler-Bild beeinflusst).
     // Fehlt "variants" bei einem Marker, ändert sich am Verhalten nichts.
+    //
+    // Varianten können optional ein eigenes "desc" mitbringen (zusätzlich
+    // zum img). Ist bei der aktiven Variante kein "desc" gesetzt, wird
+    // der Basistext oben (marker.desc) angezeigt - siehe korsaren_szenen.html,
+    // openOverlay(). So kann z.B. "Standard" einen Zusatzsatz zeigen, den
+    // "Leer" bewusst nicht hat, ohne den Basistext zu duplizieren.
     variants: {
-      standard: { label: "Standard (versteckt)", img: "interior_frachtraum.png" },
+      standard: {
+        label: "Standard (versteckt)",
+        img: "interior_frachtraum.png",
+        desc: "Dunkel, still, vollgestopft: Fässer und Kisten dicht gestaut, Tauwerk und Segeltuch verzurrt. Kein offenes Feuer erlaubt — nur gedämpftes Licht, das durch eine Gitterluke von einem Deck darüber hereinfällt. Ein Ort, an dem sich niemand lange aufhält.\n\nHabe ich da gerade etwas gehört? Bestimmt nur das Schiff."
+      },
       leer: { label: "Leer (Junge weg/gefunden)", img: "interior_frachtraum_leer.png" }
     }
   },
   kombuese: {
     top: 76, left: 52,
     title: "Kombüse",
-    desc: "Ziegelherd, tief im Rumpf, über dem Ballast erbaut, Koch bei der Arbeit.",
+    desc: "Ein freundlicher, wie es sich für einen guten Koch gehört etwas rundlicher Mann mit Lachfalten steht am Herd und summt leise vor sich hin. Es duftet fantastisch.",
     img: "interior_kombuese.png"
   }
 };
