@@ -192,6 +192,7 @@ const ORTE = {
       "knoten_streich": {
         title: "Tom Fletcher — Der Knoten-Streich",
         kurz: "Schickt den Spieler mit dem niedrigsten Seefahrt-Wert los, um \"mehr Knoten\" aus dem Frachtraum zu holen. Reaktion entscheidet über Ruf.",
+        nichtInSzenen: ["3.1"], // setzt voraus, dass Tom entspannt am Ruder steht - im Sturm kämpft er laut Szenentext mit dem Ruder
         details: "Tom hält Kurs, wirkt dabei kaum bei der Sache. Er liest die Gruppe schnell und wendet sich beiläufig an den Spieler mit dem niedrigsten Seefahrt-Wert (objektiver Vergleich der Charakterbögen, kein Bauchgefühl).\n\n„Wir sind zu langsam. Lauf runter in den Frachtraum, hol mir ein paar Knoten mehr.“\n\nSpielt mit dem echten Fachbegriff (Geschwindigkeit wird per Logleine mit Knoten gemessen) — kein erfundener Unsinn, sondern Fachjargon als Falle. Ein erfahrener Seemann würde sofort erkennen, dass man Geschwindigkeit nicht „nachfüllen“ kann.\n\nReaktion des angesprochenen Spielers entscheidet:\n— Durchschaut den Witz, reagiert locker/witzig → kleiner Ruf-Plus bei Tom\n— Durchschaut, reagiert genervt/vorwurfsvoll → neutral\n— Ignoriert/geht nicht drauf ein → neutral\n— Läuft tatsächlich los, um Knoten zu holen → kleiner Ruf-Minus bei Tom\n\nVerbindung: Läuft der Spieler tatsächlich in den Frachtraum, trifft er dort je nach Timer-Stand entweder auf die versteckten Hände des Jungen oder einen leeren Raum (siehe Frachtraum-Bildvariante).",
         trigger: [
           { id: "streich_ausgeloest", label: "Streich ausgelöst" },
@@ -203,6 +204,7 @@ const ORTE = {
       "ruder_halten": {
         title: "Tom Fletcher — Ruder kurz halten",
         kurz: "Bittet einen zufälligen verbleibenden Spieler, das Ruder zu übernehmen, wenn jemand losläuft. Seefahrt-Probe entscheidet über Ruf.",
+        nichtInSzenen: ["3.1"], // im Sturm hält Tom das Ruder selbst mit beiden Händen fest - er gibt es nicht kurz ab
         details: "Läuft ein Spieler los (z.B. wegen des Knoten-Streichs) und bleiben andere zurück, bittet Tom beiläufig einen zufälligen der Verbliebenen, kurz zu übernehmen — und verschwindet dann selbst.\n\n„Halt mal kurz, ja? Nur geradeaus. Bin gleich wieder da.“\n\n— Greift sofort zu, Seefahrt-Probe gelingt (bei Körper ≤2 zusätzlich Körper-Probe nötig, beide müssen gelingen) → Ruf-Plus bei Tom\n— Greift zu, Probe(n) misslingen, Kontrolle verloren (Ruder schlägt aus o.ä.) → Ruf-Minus bei Tom\n— Lehnt ab / zögert → neutral, kein Risiko",
         trigger: [
           { id: "angefragt", label: "Tom fragt nach Ruder-Übernahme" },
@@ -222,6 +224,7 @@ const ORTE = {
       "einschaetzungen": {
         title: "Francesco — Ehrliche Einschätzungen",
         kurz: "Auf direkte Frage nach anderen Personen: ehrliche, nie proaktiv genannte Meinung. Kein Trigger/Ruf-Effekt, reine Charakterinfo.",
+        nichtInSzenen: ["3.1"], // Ruhiges Gespräch - passt nicht zum Sturm, in dem laut Szenentext alle mit den Segeln kämpfen
         details: "Fragt man Francesco gezielt nach jemandem, gibt er seine ehrliche Einschätzung — nie von sich aus, nur auf Nachfrage.\n\n— Harwick: warm, respektvoll, fast bewundernd\n— Cormac: freundlich-distanziert, \"zu streng\"\n— Wat: reserviert, spürbares Unbehagen, hält nicht viel von ihm\n— Tom: \"Der ehrlichste Betrüger, den er kennt\" — durchschaut ihn, mag ihn trotzdem\n— Josiah: \"Eine gute Seele\" — schlägt vor, ihn in der Kombüse zu besuchen, falls die Spieler ihn noch nicht kennen (organische Weiterleitung)\n— Dirk: \"Fast mit dem Schiff verwachsen\", lieber in Gesellschaft von Kanonen/Werkzeug als Menschen — bester Ansprechpartner bei Reparaturen, beeilt sich dabei nur, um die Spieler wieder loszuwerden",
         trigger: [
           { id: "gefragt_harwick", label: "Nach Harwick gefragt" },
@@ -284,6 +287,7 @@ const ORTE = {
       "trewin_kater": {
         title: "Trewin-Zwillinge — Nachwehen des Trinkwettbewerbs",
         kurz: "Reaktion hängt vom Ausgang des Trinkwettbewerbs in der Taverne ab (gewonnen / verloren / nie angetreten).",
+        nichtInSzenen: ["3.1"], // Kater-Szene passt nicht zum Sturm-Chaos mit der losgerissenen Kanone am selben Ort
         details: "Die Trewin-Zwillinge sind hier anzutreffen, ihr Zustand hängt vom Ausgang des Trinkspiels in der Taverne ab:\n\n— Gewonnen (Spieler hat sie unter den Tisch gesoffen): über Kreuz übereinander in einer Hängematte verkeilt, stöhnen vor Übelkeit, zanken sich gegenseitig an, dass der andere Platz machen soll — können sich kaum bewegen\n— Verloren: triumphierend, spöttisch gegenüber dem Spieler\n— Nie angetreten: neutral, ignorieren den Spieler weitgehend",
         trigger: [
           { id: "gewonnen", label: "Spieler hat Zwillinge besiegt → Kater-Szene" },
