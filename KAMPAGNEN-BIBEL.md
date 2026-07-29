@@ -881,7 +881,7 @@ er bei allem Übernatürlichen den Tod nicht bezwingen kann.
 
 | Datei/Ordner | Funktion |
 |---|---|
-| `index.html` | Neue Startseite mit Links zu Karte, Regie, Besatzung und dieser Bibel |
+| `index.html` | Reine Weiterleitung auf `karte.html` — bewusst ohne sichtbare Links zu `regie.html`/`besatzung.html`, damit Spieler auf der Wurzel-URL nie versehentlich das Spielleiter-Panel zu sehen bekommen |
 | `karte.html` | Vereinheitlichte Spieler-Kartenseite (war `korsaren_szenen.html`) |
 | `regie.html` | Admin-/Spielleiter-Panel (war `grimsgate_admin.html`) |
 | `besatzung.html` | Filterbare NPC-Karten (war `crew_manifest.html`) |
