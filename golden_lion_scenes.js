@@ -139,8 +139,22 @@ const GOLDEN_LION_SCENES = {
   "3.1": {
     label: "3.1 – Golden Lion im Sturm",
     background: "golden_lion_cutaway_sturm.png",
+    // Bug, Offiziersquartier, Unterdeck, Werkstatt und Kombüse spielen in
+    // dieser Szene nicht mit - dort passiert nichts Sturmrelevantes.
+    hiddenMarkers: ["bug", "offiziersquartier", "unterdeck", "werkstatt", "kombuese"],
     imgOverrides: {
-      achterdeck: "interior_achterdeck_sturm.png"
+      oberdeck: "interior_oberdeck_sturm.png",
+      achterdeck: "interior_achterdeck_sturm.png",
+      kapitaenskajuete: "interior_kapitaenskajuete_sturm.png",
+      batteriedeck: "interior_batteriedeck_sturm.png",
+      frachtraum: "interior_frachtraum_sturm.png"
+    },
+    descOverrides: {
+      oberdeck: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Männer hängen in den Wanten, kämpfen mit den Segeln — eines hat sich bereits losgerissen und flattert zerfetzt im Wind. Andere ziehen mit vereinten Kräften an nassen Leinen, während wieder andere sich nur noch am Deck festkrallen, von der letzten Welle niedergeworfen.",
+      achterdeck: "Tom kämpft mit dem Ruder, beide Hände fest um die Speichen, Muskeln sichtbar angespannt — von der lässigen Mühelosigkeit sonst keine Spur. Jede Welle versucht, ihm das Ruder aus der Hand zu reißen.",
+      kapitaenskajuete: "Trotz des tobenden Sturms sitzt Harwick unbewegt über Karte und Kompass, den Blick auf den Kurs gerichtet, während das Schiff um ihn herum ächzt und schlingert. Regenwasser läuft in Bahnen die Fenster herab, ein Blitz zuckt durch die Scheiben — er scheint es kaum zu bemerken.",
+      batteriedeck: "Wasser strömt in Schwällen von oben herein, das Deck liegt unter einer rutschigen Wasserschicht. Eine der Kanonen hat sich losgerissen und rollt bei jeder Welle bedrohlich hin und her. Lärm und Chaos, so weit man hört.",
+      frachtraum: "Der Frachtraum steht knöcheltief unter Wasser — bei jeder Welle schwappt es zwischen den Fässern hin und her. Irgendwo dringt Wasser ein, das hier nicht hingehört. Wenn niemand bald etwas unternimmt, wird es mehr."
     },
     soundFile: "sturm.mp3" // Platzhalter - echte Datei in den Ordner legen bzw. Namen anpassen
   }
@@ -165,23 +179,45 @@ const DEFAULT_GOLDEN_LION_SCENE = "2.1";
 // bisher direkt geliefert hat - damit ist die Kartenseite/Admin-Seite
 // unverändert nutzbar, sie muss nur diese Funktion statt eines direkten
 // Feldzugriffs aufrufen.
+//
+// Szenen-Feld "hiddenMarkers" (optional, z.B. bei "3.1" - Sturm genutzt):
+//   Liste von Marker-IDs, die in DIESER Szene nicht auftauchen sollen
+//   (z.B. Kombüse/Werkstatt/Unterdeck/Offiziersquartier/Bug im Sturm -
+//   dort spielt in dieser Szene nichts). Fehlt das Feld, sind wie bisher
+//   alle Marker aus GOLDEN_LION_MARKERS_BASE sichtbar.
+//
+// Sonderfall Varianten + imgOverride zusammen (z.B. Frachtraum):
+//   Hat ein Marker in BASE ein "variants"-Feld (Frachtraum: Standard/Leer
+//   für den blinden Passagier) UND überschreibt die aktuelle Szene sein
+//   Bild zusätzlich per imgOverrides (z.B. Sturm-Bild), würden sonst die
+//   BASE-Varianten weiter aktiv bleiben - inklusive einer evtl. in
+//   Firebase gespeicherten Variantenwahl aus einer ANDEREN Szene. Das
+//   Sturm-Bild würde dann von der (für den Sturm gar nicht mehr
+//   relevanten) Varianten-Auswahl überschrieben. Deshalb: Hat eine Szene
+//   für einen Marker ein eigenes imgOverride gesetzt, gilt das als
+//   bewusste Festlegung auf GENAU dieses eine Bild - die Varianten dieses
+//   Markers werden für diese Szene deaktiviert (variants: null).
 function getGoldenLionMarkers(sceneId) {
   const scene = GOLDEN_LION_SCENES[sceneId];
   if (!scene) return [];
 
   const imgOverrides = scene.imgOverrides || {};
   const descOverrides = scene.descOverrides || {};
+  const hiddenMarkers = scene.hiddenMarkers || [];
 
-  return Object.keys(GOLDEN_LION_MARKERS_BASE).map(function (id) {
-    const base = GOLDEN_LION_MARKERS_BASE[id];
-    return {
-      id: id,
-      top: base.top,
-      left: base.left,
-      title: base.title,
-      desc: descOverrides[id] || base.desc,
-      img: imgOverrides[id] || base.img,
-      variants: base.variants || null
-    };
-  });
+  return Object.keys(GOLDEN_LION_MARKERS_BASE)
+    .filter(function (id) { return hiddenMarkers.indexOf(id) === -1; })
+    .map(function (id) {
+      const base = GOLDEN_LION_MARKERS_BASE[id];
+      const hasImgOverride = Object.prototype.hasOwnProperty.call(imgOverrides, id);
+      return {
+        id: id,
+        top: base.top,
+        left: base.left,
+        title: base.title,
+        desc: descOverrides[id] || base.desc,
+        img: imgOverrides[id] || base.img,
+        variants: hasImgOverride ? null : (base.variants || null)
+      };
+    });
 }
