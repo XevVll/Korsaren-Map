@@ -243,11 +243,22 @@ const ORTE = {
     interaktionen: {
       "dirk_vertrauen": {
         title: "Dirk van Hoorn — Vertrauen durch Fachkenntnis",
-        kurz: "Arbeitet allein, will nicht gestört werden. Nur echte Mechanik-/Handwerks-Probe oder kaputtes Objekt weckt Interesse — mit Payoff in der Sturm-Szene.",
-        details: "Dirk arbeitet für sich an Kanonen und Werkzeug, einsilbig und abweisend bei reinem Small Talk.\n\nAuslöser: eine echte Mechanik-/Handwerks-Probe oder ein konkretes kaputtes Objekt, das der Spieler mitbringt oder anspricht — reines fachlich klingendes Gerede reicht nicht.\n\nBei Erfolg taut er kurz auf, einigermaßen interessiert — und merkt sich den Spieler intern. Kein sofortiger großer Lohn: Erst später, in der Sturm-Szene, kommt Dirk mit einem kniffligen mechanischen Problem auf genau diesen Spieler zu — dort besteht dann die Chance auf einen großen Ruf-Gewinn.",
+        kurz: "Arbeitet allein, will nicht gestört werden. Nur echte Mechanik-/Handwerks-Probe oder kaputtes Objekt weckt Interesse — mit Payoff NACH der Sturm-Szene.",
+        details: "Dirk arbeitet für sich an Kanonen und Werkzeug, einsilbig und abweisend bei reinem Small Talk.\n\nAuslöser: eine echte Mechanik-/Handwerks-Probe oder ein konkretes kaputtes Objekt, das der Spieler mitbringt oder anspricht — reines fachlich klingendes Gerede reicht nicht.\n\nBei Erfolg taut er kurz auf, einigermaßen interessiert — und merkt sich den Spieler intern. Kein sofortiger großer Lohn: Erst später, NACH der Sturm-Szene (eigener, noch auszuarbeitender Programmpunkt), kommt Dirk mit einem kniffligen mechanischen Problem auf genau diesen Spieler zu — dort besteht dann die Chance auf einen großen Ruf-Gewinn.\n\n> Korrektur (Juli 2026): Ursprünglich stand hier \"in der Sturm-Szene\" — Dirks Payoff liegt aber NACH dem Sturm, nicht während. Die Kanonen-Szene während des Sturms selbst (siehe Interaktion \"kanone_sturm\" unten) bleibt bewusst anonym, ohne Dirk namentlich zu erwähnen.",
         trigger: [
           { id: "ausloeser_erfolgreich", label: "Mechanik-Probe/kaputtes Objekt erfolgreich → Dirk merkt sich Spieler" },
-          { id: "sturm_payoff", label: "Sturm-Szene: Dirk kommt auf Spieler zu → große Ruf-Chance" }
+          { id: "sturm_payoff", label: "NACH der Sturm-Szene: Dirk kommt auf Spieler zu → große Ruf-Chance" }
+        ]
+      },
+      "kanone_sturm": {
+        title: "Losgerissene Kanone (nur Sturm-Szene 3.1)",
+        kurz: "Nur relevant, wenn Szene 3.1 aktiv ist. Mind. 3 kumulative Körper-Erfolge, um die Kanone zurück auf den Sockel zu stemmen. Guter Erfolg zählt doppelt (Fluff). Misserfolg = 1 Schaden.",
+        details: "Nur relevant in der Sturm-Szene (3.1). Eine Kanone hat sich losgerissen und rollt bei jeder Welle bedrohlich hin und her (siehe Sturm-Flavortext des Batteriedecks).\n\nBewusst keine Namen, keine vorweggenommenen Handlungen im Flavortext — die Spieler wissen zu diesem Zeitpunkt nicht, wessen Position das ist oder wer die Aktion leitet. Dirk hilft zwar mit und ruft Anweisungen, wird aber nicht genannt.\n\nMehrere Spieler können gemeinsam beitragen, es muss nicht einer allein schaffen. Mindestens 3 kumulative erfolgreiche Körperproben nötig, um die Kanone zurück auf den Sockel zu stemmen.\n\n— Normaler oder Guter Erfolg zählt als ein Erfolg\n— Guter Erfolg zählt DOPPELT — reiner Fluff-Moment, keine mechanische Zusatzregel: Die Wucht beeindruckt sichtbar die umstehende Crew. Fällt irgendwann ein Guter Erfolg, braucht es danach nur noch einen weiteren normalen Erfolg\n— Misserfolg → 1 Schadenspunkt (von der Kanone gestreift / auf nassem Deck hingeschlagen)\n\nKein Ruf-Fokus — bleibt anonym im Chaos des Sturms.\n\nZukunfts-Notiz: Schaden aus dieser Szene bleibt bestehen und wirkt sich später auf der Schatzinsel aus — kann dort gefährlich werden oder einen Spieler ganz von der Schatzsuche ausschließen. Details folgen, wenn die Insel-Stationen ausgearbeitet werden.",
+        trigger: [
+          { id: "erfolg_gewertet", label: "Normaler/Guter Erfolg gewertet" },
+          { id: "erfolg_gut_doppelt", label: "Guter Erfolg → zählt doppelt (Fluff)" },
+          { id: "kanone_gesichert", label: "3 Erfolge erreicht → Kanone gesichert" },
+          { id: "misserfolg_schaden", label: "Misserfolg → 1 Schadenspunkt (wirkt sich später auf Schatzinsel aus)" }
         ]
       },
       "trewin_kater": {
@@ -322,6 +333,17 @@ const ORTE = {
         details: "Siehe Achterdeck-Interaktion „Knoten-Streich“: Tom schickt den Spieler mit dem niedrigsten Seefahrt-Wert in den Frachtraum, um „ein paar Knoten mehr“ zu holen. Trifft der Spieler dort ein, hängt der Zustand von der aktiven Bildvariante ab — versteckter Junge (Standard) oder leerer Raum (Leer).",
         trigger: [
           { id: "angekommen", label: "Spieler wegen Knoten-Streich im Frachtraum angekommen" }
+        ]
+      },
+      "wassereinbruch_sturm": {
+        title: "Wassereinbruch (nur Sturm-Szene 3.1)",
+        kurz: "Nur relevant, wenn Szene 3.1 aktiv ist. Zwei nötige Schritte (Pumpen + Abdichten). Ruf nur bei Selbstorganisation, kein Malus bei Misserfolg.",
+        details: "Nur relevant in der Sturm-Szene (3.1) — löst die Frachtraum-Varianten (Standard/Leer) für diese Szene ab, der blinde Passagier ist zu diesem Zeitpunkt kein Thema mehr im Raum. Der Frachtraum steht knöcheltief unter Wasser, sofort sichtbar beim Betreten (kein Wurf).\n\nZwei nötige Schritte, um das Problem zu lösen:\n1. Pumpen — Spieler mit Seefahrt-Wissen wissen sofort, wo die schiffseigene Pumpe sitzt und wie man sie bedient (kein Wurf, reines Fachwissen). Das Pumpen selbst ist eine Körper-Probe. Hält den Wasserstand nur im Zaum, dichtet aber nichts ab.\n2. Abdichten — jemand muss aktiv in der Werkstatt nach Planken fragen (keine Probe, reine Handlung), dann Mechanik-Probe (alternativ Geschick), um das Leck zu stopfen.\n\nRuf hängt am WIE, nicht am WOHER der Lösung:\n— Selbstorganisiert (Spieler erkennen das Problem, bringen Pumpen + Planken von sich aus in Gang) → Ruf-Gewinn bei der Crew allgemein\n— Auf Anweisung von Cormac oder Dirk (falls Spieler nicht selbst aktiv werden) → neutral\n— Misserfolg bei Pumpen/Abdichten → kein Malus, geht im allgemeinen Chaos des Sturms unter\n\nDirks eigentlicher Sturm-Payoff (siehe Batteriedeck-Interaktion „dirk_vertrauen“) ist ein separates, späteres Ereignis NACH dem Sturm — nicht dieses hier.",
+        trigger: [
+          { id: "erkannt", label: "Wassereinbruch erkannt" },
+          { id: "selbstorganisiert", label: "Spieler organisieren sich selbst → Ruf-Gewinn Crew" },
+          { id: "auf_anweisung", label: "Auf Anweisung (Cormac/Dirk) → neutral" },
+          { id: "geloest", label: "Pumpen + Abdichten erfolgreich → Problem gelöst" }
         ]
       }
     }
