@@ -206,11 +206,22 @@ const ORTE = {
     szenenUeberschreibungen: {
       "3.1": {
         personen: "Tom Fletcher (kämpft mit dem Ruder)",
-        kurz: "Tom kämpft mit dem Ruder, sichtlich angestrengt — keine Interaktionen in dieser Szene.",
-        ortHinweis: "Tom kämpft mit dem Ruder, beide Hände fest um die Speichen, Muskeln sichtbar angespannt — von der lässigen Mühelosigkeit sonst keine Spur. Jede Welle versucht, ihm das Ruder aus der Hand zu reißen.\n\nKein Auftrag, kein Small Talk — Tom ist vollständig mit dem Ruder beschäftigt. Knoten-Streich und Ruder-Bitte setzen beide voraus, dass er entspannt bei der Sache ist, und sind für diese Szene deshalb ausgesetzt."
+        kurz: "Tom kämpft mit dem Ruder, sichtlich angestrengt — hat aber trotzdem einen Spruch auf den Lippen und lotst Spieler weiter, wo sie gebraucht werden.",
+        ortHinweis: "Tom kämpft mit dem Ruder, beide Hände fest um die Speichen, Muskeln sichtbar angespannt — von der lässigen Mühelosigkeit sonst keine Spur. Jede Welle versucht, ihm das Ruder aus der Hand zu reißen.\n\nKein Auftrag, kein Small Talk im bisherigen Sinn — Tom ist vollständig mit dem Ruder beschäftigt und verlässt seinen Posten nicht (Harwick verlässt sich blind auf ihn). Knoten-Streich und Ruder-Bitte setzen beide voraus, dass er entspannt bei der Sache ist, und sind für diese Szene deshalb ausgesetzt. Stattdessen: reiner Charaktermoment, siehe Interaktion \"Am Ruder, mit losem Mundwerk\"."
       }
     },
     interaktionen: {
+      "tom_lotse_sturm": {
+        title: "Tom — Am Ruder, mit losem Mundwerk (nur Sturm-Szene 3.1)",
+        kurz: "Reiner Rollenspiel-Moment, keine Probe. Lockerer Spruch, ggf. Callback auf den Knoten-Streich, schickt Spieler weiter zu einer Sturm-Stelle, die Hilfe braucht.",
+        nurSzenen: ["3.1"],
+        details: "Tom bleibt fest am Ruder — er kann und wird seinen Posten nicht verlassen, Harwick verlässt sich blind auf ihn. Kommen Spieler trotzdem in seine Nähe, hat er selbst jetzt noch einen lockeren Spruch auf den Lippen:\n\n„Halt dich fest, ich spring für dich bestimmt nicht ins Wasser!“\n\nCallback: Kam der Knoten-Streich (siehe Interaktion \"Der Knoten-Streich\") bei diesem Spieler gut an (Trigger \"durchschaut_witzig\" war gesetzt), spielt Tom zusätzlich darauf an.\n\nDa er selbst nicht vom Ruder weg kann, schickt er die Spieler stattdessen dorthin, wo gerade tatsächlich Hilfe gebraucht wird — er hat als Steuermann den besten Überblick übers Deck. Welche Stelle er nennt (Cormacs Segel-Notlage am Oberdeck, die losgerissene Kanone am Batteriedeck, oder der Wassereinbruch im Frachtraum), liegt im Ermessen des Spielleiters, z.B. je nachdem, was gerade noch ungelöst ist (vgl. Design-Prinzip \"Gutes Rollenspiel schlägt Mechanik\").\n\nBewusst keine Probe und kein Ruf-Effekt — reiner Charaktermoment, ähnlich wie Josiah in der Kombüse.",
+        trigger: [
+          { id: "ausgeloest", label: "Moment ausgelöst (Spieler in Toms Nähe)" },
+          { id: "callback_gebracht", label: "Callback auf Knoten-Streich gebracht (falls zutreffend)" },
+          { id: "weitergeschickt", label: "Spieler zu einer Sturm-Stelle weitergeschickt" }
+        ]
+      },
       "knoten_streich": {
         title: "Tom Fletcher — Der Knoten-Streich",
         kurz: "Schickt den Spieler mit dem niedrigsten Seefahrt-Wert los, um \"mehr Knoten\" aus dem Frachtraum zu holen. Reaktion entscheidet über Ruf.",
