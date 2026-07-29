@@ -212,7 +212,7 @@ const ORTE = {
     },
     interaktionen: {
       "tom_lotse_sturm": {
-        title: "Tom — Am Ruder, mit losem Mundwerk (nur Sturm-Szene 3.1)",
+        title: "Tom — Am Ruder, mit losem Mundwerk",
         kurz: "Reiner Rollenspiel-Moment, keine Probe. Lockerer Spruch, ggf. Callback auf den Knoten-Streich, schickt Spieler weiter zu einer Sturm-Stelle, die Hilfe braucht.",
         nurSzenen: ["3.1"],
         details: "Tom bleibt fest am Ruder — er kann und wird seinen Posten nicht verlassen, Harwick verlässt sich blind auf ihn. Kommen Spieler trotzdem in seine Nähe, hat er selbst jetzt noch einen lockeren Spruch auf den Lippen:\n\n„Halt dich fest, ich spring für dich bestimmt nicht ins Wasser!“\n\nCallback: Kam der Knoten-Streich (siehe Interaktion \"Der Knoten-Streich\") bei diesem Spieler gut an (Trigger \"durchschaut_witzig\" war gesetzt), spielt Tom zusätzlich darauf an.\n\nDa er selbst nicht vom Ruder weg kann, schickt er die Spieler stattdessen dorthin, wo gerade tatsächlich Hilfe gebraucht wird — er hat als Steuermann den besten Überblick übers Deck. Welche Stelle er nennt (Cormacs Segel-Notlage am Oberdeck, die losgerissene Kanone am Batteriedeck, oder der Wassereinbruch im Frachtraum), liegt im Ermessen des Spielleiters, z.B. je nachdem, was gerade noch ungelöst ist (vgl. Design-Prinzip \"Gutes Rollenspiel schlägt Mechanik\").\n\nBewusst keine Probe und kein Ruf-Effekt — reiner Charaktermoment, ähnlich wie Josiah in der Kombüse.",
@@ -265,7 +265,7 @@ const ORTE = {
     },
     interaktionen: {
       "sturm_hoehepunkt_tom": {
-        title: "Der Höhepunkt des Sturms — Toms großer Moment (nur Sturm-Szene 3.1)",
+        title: "Der Höhepunkt des Sturms — Toms großer Moment",
         kurz: "Ein paar Minuten in den Sturm hinein: Mast reißt trotz eingezogener Segel, Ruder klemmt, Tom kommt aufs Oberdeck und steuert das Schiff per Anker auf eine Insel zu. Reiner Erzählmoment, kein Wurf.",
         nurSzenen: ["3.1"],
         details: "Ein paar Minuten in den Sturm hinein (Zeitpunkt liegt im Ermessen des Spielleiters) eskaliert die Lage weiter: Der Mast reißt — obwohl die Segel eingezogen wurden (siehe Interaktion \"Cormac — Segel einschnüren\"), reicht das gegen die Wucht des Sturms nicht. Gleichzeitig verzieht sich irgendetwas am Achterdeck so, dass das Ruder klemmt (siehe Achterdeck) — Tom kann dort nichts mehr ausrichten und kommt aufs Oberdeck. Praktisch die gesamte wichtige Crew versammelt sich dort.\n\nJetzt zeigt sich, was wirklich in Tom steckt — er ist kaum wiederzuerkennen: Er springt übers Deck, schaut immer wieder auf seinen kleinen Kompass, zieht Seile über verschiedene Winden und bringt sie richtig zum Bug. Er lehnt sich über die Reling, zählt leise in sich hinein, checkt wieder den Kompass. Irgendwie hält er so den Kurs — durch gezieltes Anker lassen rechts oder links steuert er das Schiff auf eine tropische Insel zu.\n\nBewusst kein Wurf, keine Spieler-Aufgabe — das ist Toms Moment, den die Spieler nur miterleben.\n\nAuflösung: Irgendwann lichtet sich der Sturm. Die übrigen Segel werden gehisst, Tom und Cormac dirigieren die Crew wie ein Orchester.\n\nZukunfts-Notiz: Fast alle an Bord denken, sie seien einfach gestrandet — tatsächlich war das genau der Ort, den Harwick über Tom ansteuern ließ. Der Reveal ist Teil der noch auszuarbeitenden Schatzinsel-Inhalte, nicht dieser Interaktion.",
@@ -277,7 +277,7 @@ const ORTE = {
         ]
       },
       "harwick_blicke_sturm": {
-        title: "Vielsagende Blicke — Harwick und seine Offiziere (nur Sturm-Szene 3.1)",
+        title: "Vielsagende Blicke — Harwick und seine Offiziere",
         kurz: "Optionale Wahrnehmungs-Probe (keine Erschwernis). Harwick bleibt über seinen Karten, tauscht ernste Blicke mit seinen Offizieren — Vorahnung auf den späteren Reveal.",
         nurSzenen: ["3.1"],
         details: "Während an Deck der Höhepunkt des Sturms tobt, bleibt Harwick über seinen Karten in der Kapitänskajüte (siehe dortiger Sturm-Flavortext). Er schaut ernst hinaus.\n\nNur wahrnehmbar, wenn ein Spieler aktiv genau hinsieht (nicht automatisch). Probe: Wahrnehmung, keine Erschwernis.\n\nBei Erfolg bemerkt der Spieler vielsagende Blicke zwischen Harwick und seinen Offizieren — eine stille Verständigung, die andeutet, dass hier mehr im Gange ist, als es scheint. Kein Dialog, keine Erklärung an dieser Stelle, reine Vorahnung auf den späteren Reveal (dass die \"gestrandete\" Insel in Wahrheit Harwicks Ziel war).",
@@ -288,7 +288,7 @@ const ORTE = {
         ]
       },
       "cormac_segel_sturm": {
-        title: "Cormac — Segel einschnüren (nur Sturm-Szene 3.1)",
+        title: "Cormac — Segel einschnüren",
         kurz: "Cormac schickt die 2 Spieler mit dem höchsten Geschick-Wert in die Takelage. Geschick+10-Probe, um das Segel oben einzuschnüren. Guter Erfolg beeindruckt Cormac.",
         nurSzenen: ["3.1"],
         details: "Cormac steht an Deck und ruft Befehle — die Segel sind noch zu weit draußen, der Mast droht abgerissen zu werden, wenn sie nicht bald eingeschnürt werden. Kommen Spieler in seine Nähe, schickt er die zwei mit dem höchsten Geschick-Wert hoch in die Takelage (objektiver Vergleich der Charakterbögen).\n\nDer Aufstieg in der Takelage ist bei diesem Wetter gefährlich — Regen und Wind reißen an den Spielern, während oben das Segel eingeschnürt werden muss.\n\nProbe: Geschick+10.\n\n— Guter Erfolg: beeindruckt Cormac sichtbar\n— Normaler/Schlechter Erfolg: geschafft, kein besonderer Kommentar → neutral\n— Misserfolg: [OFFEN] Konsequenz noch nicht festgelegt\n\nGleichzeitig würfeln die übrigen Spieler an Deck Körper-Proben, um sich festzuhalten.",
@@ -301,7 +301,7 @@ const ORTE = {
         ]
       },
       "ned_sturz_sturm": {
-        title: "Ned — Rutscht über das Deck (nur Sturm-Szene 3.1)",
+        title: "Ned — Rutscht über das Deck",
         kurz: "Ned rutscht vorne am Bug aus und wird übers ganze Deck geschliffen. Auffangen möglich → Freund fürs Leben.",
         nurSzenen: ["3.1"],
         details: "Ned Sharpe rutscht vorne am Bug aus und wird übers ganze Deck geschliffen. Spieler können versuchen, ihn aufzufangen (Probe: Körper oder Geschick, [OFFEN] welche genau bzw. ob wahlweise).\n\n— Aufgefangen: Ned hat einen Freund fürs Leben gewonnen — großer, dauerhafter Ruf-Gewinn bei Ned\n— Nicht aufgefangen: [OFFEN] Konsequenz noch nicht festgelegt",
@@ -374,7 +374,7 @@ const ORTE = {
         ]
       },
       "kanone_sturm": {
-        title: "Losgerissene Kanone (nur Sturm-Szene 3.1)",
+        title: "Losgerissene Kanone",
         kurz: "Nur relevant, wenn Szene 3.1 aktiv ist. Mind. 3 kumulative Körper-Erfolge, um die Kanone zurück auf den Sockel zu stemmen. Guter Erfolg zählt doppelt (Fluff). Misserfolg = 1 Schaden.",
         nurSzenen: ["3.1"],
         details: "Nur relevant in der Sturm-Szene (3.1). Eine Kanone hat sich losgerissen und rollt bei jeder Welle bedrohlich hin und her (siehe Sturm-Flavortext des Batteriedecks).\n\nBewusst keine Namen, keine vorweggenommenen Handlungen im Flavortext — die Spieler wissen zu diesem Zeitpunkt nicht, wessen Position das ist oder wer die Aktion leitet. Dirk hilft zwar mit und ruft Anweisungen, wird aber nicht genannt.\n\nMehrere Spieler können gemeinsam beitragen, es muss nicht einer allein schaffen. Mindestens 3 kumulative erfolgreiche Körperproben nötig, um die Kanone zurück auf den Sockel zu stemmen.\n\n— Normaler oder Guter Erfolg zählt als ein Erfolg\n— Guter Erfolg zählt DOPPELT — reiner Fluff-Moment, keine mechanische Zusatzregel: Die Wucht beeindruckt sichtbar die umstehende Crew. Fällt irgendwann ein Guter Erfolg, braucht es danach nur noch einen weiteren normalen Erfolg\n— Misserfolg → 1 Schadenspunkt (von der Kanone gestreift / auf nassem Deck hingeschlagen)\n\nKein Ruf-Fokus — bleibt anonym im Chaos des Sturms.\n\nZukunfts-Notiz: Schaden aus dieser Szene bleibt bestehen und wirkt sich später auf der Schatzinsel aus — kann dort gefährlich werden oder einen Spieler ganz von der Schatzsuche ausschließen. Details folgen, wenn die Insel-Stationen ausgearbeitet werden.",
@@ -473,7 +473,7 @@ const ORTE = {
         ]
       },
       "wassereinbruch_sturm": {
-        title: "Wassereinbruch (nur Sturm-Szene 3.1)",
+        title: "Wassereinbruch",
         kurz: "Nur relevant, wenn Szene 3.1 aktiv ist. Zwei nötige Schritte (Pumpen + Abdichten). Ruf nur bei Selbstorganisation, kein Malus bei Misserfolg.",
         nurSzenen: ["3.1"],
         details: "Nur relevant in der Sturm-Szene (3.1) — löst die Frachtraum-Varianten (Standard/Leer) für diese Szene ab, der blinde Passagier ist zu diesem Zeitpunkt kein Thema mehr im Raum. Der Frachtraum steht knöcheltief unter Wasser, sofort sichtbar beim Betreten (kein Wurf).\n\nZwei nötige Schritte, um das Problem zu lösen:\n1. Pumpen — Spieler mit Seefahrt-Wissen wissen sofort, wo die schiffseigene Pumpe sitzt und wie man sie bedient (kein Wurf, reines Fachwissen). Das Pumpen selbst ist eine Körper-Probe. Hält den Wasserstand nur im Zaum, dichtet aber nichts ab.\n2. Abdichten — jemand muss aktiv in der Werkstatt nach Planken fragen (keine Probe, reine Handlung), dann Mechanik-Probe (alternativ Geschick), um das Leck zu stopfen.\n\nRuf hängt am WIE, nicht am WOHER der Lösung:\n— Selbstorganisiert (Spieler erkennen das Problem, bringen Pumpen + Planken von sich aus in Gang) → Ruf-Gewinn bei der Crew allgemein\n— Auf Anweisung von Cormac oder Dirk (falls Spieler nicht selbst aktiv werden) → neutral\n— Misserfolg bei Pumpen/Abdichten → kein Malus, geht im allgemeinen Chaos des Sturms unter\n\nDirks eigentlicher Sturm-Payoff (siehe Batteriedeck-Interaktion „dirk_vertrauen“) ist ein separates, späteres Ereignis NACH dem Sturm — nicht dieses hier.",
