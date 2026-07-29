@@ -873,11 +873,12 @@ er bei allem Übernatürlichen den Tod nicht bezwingen kann.
 > unter `images/`, die Daten-/Logik-Dateien unter `js/`. An den alten
 > Dateinamen (`grimsgate_admin.html`, `korsaren_szenen.html`,
 > `crew_manifest.html`) liegen dünne Weiterleitungs-Seiten, damit alte
-> Lesezeichen weiter funktionieren. Audiodateien (`*.mp3`) bleiben bewusst im
-> Hauptordner: Ihr Dateiname kann pro Szene live im Admin-Panel in Firebase
-> hinterlegt sein (`sceneAudioFile/{sceneId}`) — das ist von hier aus nicht
-> einsehbar oder migrierbar, ein Verschieben hätte lautlos bereits gesetzte
-> Szenen-Töne brechen können.
+> Lesezeichen weiter funktionieren. Audiodateien bleiben bewusst im
+> Hauptordner (nicht in einem Unterordner): Ihr Dateiname kann pro Szene live
+> im Admin-Panel in Firebase hinterlegt sein (`sceneAudioFile/{sceneId}`) —
+> das ist von hier aus nicht einsehbar oder migrierbar, ein Verschieben in
+> einen Unterordner hätte lautlos bereits gesetzte Szenen-Töne brechen
+> können. Das Dateiformat selbst wurde trotzdem geändert, siehe 13.1b.
 
 | Datei/Ordner | Funktion |
 |---|---|
@@ -892,7 +893,8 @@ er bei allem Übernatürlichen den Tod nicht bezwingen kann.
 | `js/firebase-config.js` | Firebase-Zugangsdaten |
 | `images/` | Alle Karten-, Innenraum- und Portraitbilder (WebP, siehe 13.1a) |
 | `tools/optimize_images.py` | Skript zum Verkleinern/Konvertieren neuer Bilder vor dem Commit |
-| `*.mp3` (Hauptordner) | Szenen-Hintergrundtöne, Zuordnung läuft über das Admin-Panel/Firebase |
+| `*.ogg` (Hauptordner) | Szenen-Hintergrundtöne (Opus, siehe 13.1b), Zuordnung läuft über das Admin-Panel/Firebase |
+| `tools/optimize_audio.py` | Skript zum Konvertieren neuer Audiodateien (mp3/wav/…) nach Opus/OGG vor dem Commit |
 | `grimsgate_admin.html` · `korsaren_szenen.html` · `crew_manifest.html` | Nur noch Weiterleitungs-Stubs auf die neuen Seitennamen |
 
 **[OFFEN]** `korsaren.html` (Charakterbogen / Charaktererstellung, localStorage-Persistenz)
@@ -936,6 +938,33 @@ generierte Bild vor dem Commit durch `python3 tools/optimize_images.py` schicken
 neuen `.webp`-Dateinamen in `js/scenes.js`/`js/golden_lion_scenes.js`/`js/characters.js`
 eintragen. Das Skript löscht die PNGs bewusst nicht automatisch, damit vor dem Löschen visuell
 geprüft werden kann.
+
+### 13.1b Audiooptimierung (Juli 2026)
+
+**Auslöser:** Dieselben Lags wie 13.1a. `Grimgate1.mp3`, `ship1.mp3` und `storm1.mp3` lagen
+zusammen bei **242 MB** (67–91 MB pro Datei, 149–192 kbps MP3, 60–83 Minuten lange
+Atmo-Loops) — für reine Hintergrundtöne unnötig hoch aufgelöst.
+
+**Maßnahme:** Alle drei nach **Opus** (in einer `.ogg`-Datei, 64 kbps, VBR) konvertiert,
+Metadaten/eingebettetes Cover-Art entfernt. Länge bewusst **nicht** gekürzt (`ffprobe`-Dauer
+vor/nach verglichen, exakt gleich).
+
+**Ergebnis:** 242 MB → 93 MB (**-61 %**) — geringer als bei den Bildern (-96,6 %), weil MP3 für
+Audio schon deutlich effizienter komprimiert als PNG für Bilder. Vor dem Einbau per
+Hörprobe geprüft (volle Länge an Hendrik geschickt, freigegeben).
+
+**Wichtige Nebenkorrektur:** `golden_lion_scenes.js` (Szene `"3.1"`) hatte als statisches
+`soundFile`-Fallback `"sturm.mp3"` eingetragen — das passte noch nie zur tatsächlich
+abgelegten Datei (`storm1.mp3`, jetzt `storm1.ogg`). Auf den korrekten Dateinamen korrigiert.
+
+> **[WICHTIG] Manueller Schritt nach diesem Umbau:** Ist für eine Szene bereits ein
+> Ton-Dateiname live im Admin-Panel (Sound-Leiste) in Firebase hinterlegt
+> (`sceneAudioFile/{sceneId}`), zeigt der noch auf den alten `.mp3`-Namen — Firebase weiß
+> nichts von der Umbenennung. Nach dem Deploy einmal jede Szene mit gesetztem Ton im
+> Admin-Panel öffnen und den Dateinamen auf die neue `.ogg`-Datei aktualisieren.
+
+**Für neue Audiodateien:** Vor dem Commit durch `python3 tools/optimize_audio.py <datei>`
+schicken (Details und die Firebase-Falle siehe Docstring im Skript).
 
 ### 13.2 Architektur-Entscheidungen
 

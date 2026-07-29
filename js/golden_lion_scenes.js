@@ -156,7 +156,7 @@ const GOLDEN_LION_SCENES = {
       batteriedeck: "Wasser strömt in Schwällen von oben herein, das Deck liegt unter einer rutschigen Wasserschicht. Eine der Kanonen hat sich losgerissen und rollt bei jeder Welle bedrohlich hin und her. Lärm und Chaos, so weit man hört.",
       frachtraum: "Der Frachtraum steht knöcheltief unter Wasser — bei jeder Welle schwappt es zwischen den Fässern hin und her. Irgendwo dringt Wasser ein, das hier nicht hingehört. Wenn niemand bald etwas unternimmt, wird es mehr."
     },
-    soundFile: "sturm.mp3" // Platzhalter - echte Datei in den Ordner legen bzw. Namen anpassen
+    soundFile: "storm1.ogg" // war "sturm.mp3" - passte nie zur tatsaechlich abgelegten Datei
   }
 
   // Beispiel für später, zum Reinkopieren und Anpassen:
