@@ -258,12 +258,35 @@ const ORTE = {
     // Cormac und Ned (Juli 2026, Inhalt von Hendrik).
     szenenUeberschreibungen: {
       "3.1": {
-        personen: "Cormac Daly · Ned Sharpe (situativ, stürzt)",
-        kurz: "Cormac ruft Befehle, schickt die geschicktesten Spieler zum Segel-Einschnüren hoch. Ned rutscht am Bug aus und wird übers Deck geschliffen — auffangbar.",
-        ortHinweis: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Cormac steht mitten im Chaos und ruft Befehle — die Segel sind noch zu weit draußen, es droht, den Mast abzureißen, wenn sie nicht bald eingeschnürt werden.\n\nKommen Spieler in seine Nähe, schickt er die zwei mit dem höchsten Geschick-Wert hoch in die Takelage (siehe Interaktion \"Segel einschnüren\")."
+        personen: "Cormac Daly · Ned Sharpe (situativ, stürzt) · Tom Fletcher (kommt später dazu)",
+        kurz: "Cormac ruft Befehle, schickt die geschicktesten Spieler zum Segel-Einschnüren hoch. Ned rutscht am Bug aus und wird übers Deck geschliffen — auffangbar. Später eskaliert es weiter: Mast reißt, Tom kommt vom Achterdeck dazu und steuert das Schiff per Anker auf eine Insel zu.",
+        ortHinweis: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Cormac steht mitten im Chaos und ruft Befehle — die Segel sind noch zu weit draußen, es droht, den Mast abzureißen, wenn sie nicht bald eingeschnürt werden.\n\nKommen Spieler in seine Nähe, schickt er die zwei mit dem höchsten Geschick-Wert hoch in die Takelage (siehe Interaktion \"Segel einschnüren\").\n\nEin paar Minuten später (SL-Ermessen) eskaliert die Lage weiter: Der Mast reißt trotzdem, das Ruder klemmt, und Tom kommt vom Achterdeck aufs Oberdeck — siehe Interaktion \"Der Höhepunkt des Sturms\"."
       }
     },
     interaktionen: {
+      "sturm_hoehepunkt_tom": {
+        title: "Der Höhepunkt des Sturms — Toms großer Moment (nur Sturm-Szene 3.1)",
+        kurz: "Ein paar Minuten in den Sturm hinein: Mast reißt trotz eingezogener Segel, Ruder klemmt, Tom kommt aufs Oberdeck und steuert das Schiff per Anker auf eine Insel zu. Reiner Erzählmoment, kein Wurf.",
+        nurSzenen: ["3.1"],
+        details: "Ein paar Minuten in den Sturm hinein (Zeitpunkt liegt im Ermessen des Spielleiters) eskaliert die Lage weiter: Der Mast reißt — obwohl die Segel eingezogen wurden (siehe Interaktion \"Cormac — Segel einschnüren\"), reicht das gegen die Wucht des Sturms nicht. Gleichzeitig verzieht sich irgendetwas am Achterdeck so, dass das Ruder klemmt (siehe Achterdeck) — Tom kann dort nichts mehr ausrichten und kommt aufs Oberdeck. Praktisch die gesamte wichtige Crew versammelt sich dort.\n\nJetzt zeigt sich, was wirklich in Tom steckt — er ist kaum wiederzuerkennen: Er springt übers Deck, schaut immer wieder auf seinen kleinen Kompass, zieht Seile über verschiedene Winden und bringt sie richtig zum Bug. Er lehnt sich über die Reling, zählt leise in sich hinein, checkt wieder den Kompass. Irgendwie hält er so den Kurs — durch gezieltes Anker lassen rechts oder links steuert er das Schiff auf eine tropische Insel zu.\n\nBewusst kein Wurf, keine Spieler-Aufgabe — das ist Toms Moment, den die Spieler nur miterleben.\n\nAuflösung: Irgendwann lichtet sich der Sturm. Die übrigen Segel werden gehisst, Tom und Cormac dirigieren die Crew wie ein Orchester.\n\nZukunfts-Notiz: Fast alle an Bord denken, sie seien einfach gestrandet — tatsächlich war das genau der Ort, den Harwick über Tom ansteuern ließ. Der Reveal ist Teil der noch auszuarbeitenden Schatzinsel-Inhalte, nicht dieser Interaktion.",
+        trigger: [
+          { id: "mast_gerissen", label: "Mast reißt trotz eingezogener Segel" },
+          { id: "ruder_klemmt", label: "Ruder klemmt, Tom kommt aufs Oberdeck" },
+          { id: "tom_highlight", label: "Toms Anker-Manöver gezeigt (kein Wurf)" },
+          { id: "sturm_endet", label: "Sturm lichtet sich, Tom & Cormac dirigieren die Crew" }
+        ]
+      },
+      "harwick_blicke_sturm": {
+        title: "Vielsagende Blicke — Harwick und seine Offiziere (nur Sturm-Szene 3.1)",
+        kurz: "Optionale Wahrnehmungs-Probe (keine Erschwernis). Harwick bleibt über seinen Karten, tauscht ernste Blicke mit seinen Offizieren — Vorahnung auf den späteren Reveal.",
+        nurSzenen: ["3.1"],
+        details: "Während an Deck der Höhepunkt des Sturms tobt, bleibt Harwick über seinen Karten in der Kapitänskajüte (siehe dortiger Sturm-Flavortext). Er schaut ernst hinaus.\n\nNur wahrnehmbar, wenn ein Spieler aktiv genau hinsieht (nicht automatisch). Probe: Wahrnehmung, keine Erschwernis.\n\nBei Erfolg bemerkt der Spieler vielsagende Blicke zwischen Harwick und seinen Offizieren — eine stille Verständigung, die andeutet, dass hier mehr im Gange ist, als es scheint. Kein Dialog, keine Erklärung an dieser Stelle, reine Vorahnung auf den späteren Reveal (dass die \"gestrandete\" Insel in Wahrheit Harwicks Ziel war).",
+        trigger: [
+          { id: "probe_versucht", label: "Wahrnehmungsprobe versucht" },
+          { id: "erfolg_blicke", label: "Erfolg — vielsagende Blicke bemerkt" },
+          { id: "ignoriert", label: "Spieler ignoriert die Szene / würfelt nicht" }
+        ]
+      },
       "cormac_segel_sturm": {
         title: "Cormac — Segel einschnüren (nur Sturm-Szene 3.1)",
         kurz: "Cormac schickt die 2 Spieler mit dem höchsten Geschick-Wert in die Takelage. Geschick+10-Probe, um das Segel oben einzuschnüren. Guter Erfolg beeindruckt Cormac.",

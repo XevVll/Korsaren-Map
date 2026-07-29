@@ -752,6 +752,29 @@ Geschick, welche genau bzw. ob wahlweise ist noch nicht entschieden).
   Ruf-Gewinn bei Ned
 - **Nicht aufgefangen [OFFEN]** (Konsequenz noch nicht festgelegt)
 
+**Oberdeck — Der Höhepunkt des Sturms:** Ein paar Minuten in den Sturm hinein (SL-Ermessen)
+eskaliert die Lage weiter: Der Mast reißt — obwohl die Segel eingezogen wurden, reicht das
+gegen die Wucht des Sturms nicht. Das Ruder klemmt (Achterdeck), Tom kann dort nichts mehr
+ausrichten und kommt aufs Oberdeck. Praktisch die gesamte wichtige Crew versammelt sich dort.
+
+Jetzt zeigt sich, was wirklich in Tom steckt — **reiner Erzählmoment, bewusst kein Wurf,
+keine Spieler-Aufgabe:** Er springt übers Deck, checkt immer wieder seinen kleinen Kompass,
+zieht Seile über verschiedene Winden zum Bug, lehnt sich über die Reling, zählt leise, checkt
+wieder den Kompass — und hält so durch gezieltes Anker lassen (rechts/links) den Kurs auf
+eine tropische Insel.
+
+Auflösung: Der Sturm lichtet sich, die übrigen Segel werden gehisst, Tom und Cormac dirigieren
+die Crew wie ein Orchester.
+
+**Vielsagende Blicke (optional):** Während dessen bleibt Harwick über seinen Karten in der
+Kapitänskajüte, schaut ernst hinaus. Optionale Wahrnehmungs-Probe (keine Erschwernis, analog
+zur Lagerhäuser-Beobachtung in Grimsgate) — bei Erfolg bemerkt ein aufmerksamer Spieler
+vielsagende Blicke zwischen Harwick und seinen Offizieren.
+
+> **Zukunfts-Notiz:** Fast alle an Bord denken, sie seien einfach gestrandet — tatsächlich
+> war das genau der Ort, den Harwick über Tom ansteuern ließ. Dieser Reveal ist noch nicht
+> ausformuliert und Teil der Schatzinsel-Ausarbeitung (siehe Abschnitt 16).
+
 **Achterdeck — Toms loses Mundwerk:** Tom ist Steuermann und kann/wird seinen Posten während
 des Sturms **nicht verlassen** — Harwick verlässt sich blind auf ihn. Trotzdem bleibt er er
 selbst: Kommen Spieler in seine Nähe, hat er noch einen lockeren Spruch auf den Lippen —
@@ -1147,6 +1170,9 @@ dafür, dass die **künstliche Verknappung** (30 Minuten bis Wat, 60 Minuten bis
 - Schicksal des niedergemetzelten Schmugglerschiffs: versenkt oder als treibendes Totenschiff
   wiederkehrend?
 - Ob die Tochter tatsächlich wiederbelebt wird
+- Reveal, dass die vermeintlich zufällige Strandungs-Insel nach dem Sturm in Wahrheit
+  Harwicks über Tom angesteuertes Ziel war (siehe 10.11, Oberdeck-Höhepunkt) — hängt an der
+  noch auszuarbeitenden Schatzinsel
 
 ### Inhalte
 - Ausformulierung der Hafenmeisterei-Szene (blockiert nichts mehr, Schiffskarte ist fertig)
