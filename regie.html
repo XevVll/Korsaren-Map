@@ -505,6 +505,26 @@
       });
     }
 
+    // Optionales Ort-Feld "szenenUeberschreibungen" (z.B. bei "achterdeck"
+    // für Szene "3.1" genutzt): { [sceneId]: { personen?, kurz?, ortHinweis? } }.
+    // Ein Ort ist zwar weiterhin FLACH definiert (ein Eintrag pro Ort-ID,
+    // siehe Datei-Kopf), aber personen/kurz/ortHinweis beschreiben oft nur
+    // den ruhigen Grundzustand - in einer inhaltlich komplett anderen Szene
+    // (z.B. der Sturm) wäre es irreführend, dieselbe Zusammenfassung zu
+    // zeigen. Ist für die aktuelle Szene ein Override gesetzt, überschreibt
+    // er NUR die angegebenen Felder; fehlende Felder fallen auf den
+    // Basiswert des Ortes zurück. "interaktionen" ist davon unabhängig und
+    // bleibt weiterhin über nurSzenen/nichtInSzenen gesteuert (s.o.).
+    function resolveOrtForScene(ort, sceneId) {
+      const override = (ort.szenenUeberschreibungen && ort.szenenUeberschreibungen[sceneId]) || {};
+      return {
+        personen: override.personen !== undefined ? override.personen : ort.personen,
+        kurz: override.kurz !== undefined ? override.kurz : ort.kurz,
+        ortHinweis: override.ortHinweis !== undefined ? override.ortHinweis : ort.ortHinweis,
+        interaktionen: ort.interaktionen
+      };
+    }
+
     function renderOrte() {
       const col = document.getElementById('col-orte');
       col.innerHTML = '<div class="col-head">Orte</div>';
@@ -514,7 +534,8 @@
         return;
       }
       markers.forEach(function (marker) {
-        const ort = ORTE[marker.id] || {};
+        const ortRaw = ORTE[marker.id] || {};
+        const ort = resolveOrtForScene(ortRaw, viewState.szene);
         const hatInhalt = getSceneInteraktionen(ort, viewState.szene).length > 0;
         const card = document.createElement('div');
         card.className = 'ort-card' + (viewState.ort === marker.id ? ' active' : '') + (hatInhalt ? '' : ' leer');
@@ -543,7 +564,8 @@
         return;
       }
 
-      const ort = ORTE[viewState.ort] || { personen: '', kurz: '', interaktionen: {}, ortHinweis: '' };
+      const ortRaw = ORTE[viewState.ort] || { personen: '', kurz: '', interaktionen: {}, ortHinweis: '' };
+      const ort = resolveOrtForScene(ortRaw, viewState.szene);
       const dynPath = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort);
 
       col.innerHTML =

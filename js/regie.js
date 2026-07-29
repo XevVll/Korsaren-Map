@@ -38,6 +38,18 @@
 // (siehe "kanone_sturm") und daher während "3.1" nicht für seine normale
 // Fachkenntnis-Prüfung ansprechbar - in jeder anderen Szene (auch
 // zukünftigen) aber schon, ohne dass die Liste dafür gepflegt werden muss.
+//
+// Ort-Feld "szenenUeberschreibungen" (optional, Juli 2026, z.B. bei
+// "achterdeck"/"oberdeck"/"batteriedeck"/"frachtraum" für Szene "3.1"
+// genutzt): { [sceneId]: { personen?, kurz?, ortHinweis? } }. Ein Ort
+// bleibt zwar weiterhin FLACH definiert (s.o.), aber personen/kurz/
+// ortHinweis beschreiben oft nur den ruhigen Grundzustand - in einer
+// inhaltlich komplett anderen Szene (z.B. dem Sturm) wäre es irreführend,
+// dieselbe Zusammenfassung weiter anzuzeigen. Ist für die aktuelle Szene
+// ein Override gesetzt, ersetzt er NUR die angegebenen Felder (gefiltert
+// in regie.html über resolveOrtForScene()); fehlende Felder fallen auf
+// den Basiswert zurück. "interaktionen" ist davon unabhängig und bleibt
+// weiterhin über nurSzenen/nichtInSzenen gesteuert.
 
 const ORTE = {
   "heuer": {
@@ -188,6 +200,16 @@ const ORTE = {
     personen: "Tom Fletcher",
     kurz: "Tom am Ruder, wirkt nebenbei, hält aber mühelos Kurs. Zwei NPC-Wünsche statt fester Trigger.",
     ortHinweis: "Kein Auftrag im klassischen Sinn — Tom initiiert selbst, wenn Spieler in seiner Nähe herumstehen. Wunsch 1 (Knoten-Streich) funktioniert unabhängig von Wunsch 2 (Ruder halten) und kann beide in derselben Szene auftreten, wenn ein Spieler wegen des Streichs losläuft und Tom sich daraufhin an die übrigen wendet.",
+    // 3.1 (Sturm): komplett eigener Zustand statt der ruhigen 2.1-Beschreibung -
+    // Tom kämpft mit dem Ruder, keine der beiden Wunsch-Interaktionen passt hierher
+    // (siehe nichtInSzenen bei "knoten_streich"/"ruder_halten" unten).
+    szenenUeberschreibungen: {
+      "3.1": {
+        personen: "Tom Fletcher (kämpft mit dem Ruder)",
+        kurz: "Tom kämpft mit dem Ruder, sichtlich angestrengt — keine Interaktionen in dieser Szene.",
+        ortHinweis: "Tom kämpft mit dem Ruder, beide Hände fest um die Speichen, Muskeln sichtbar angespannt — von der lässigen Mühelosigkeit sonst keine Spur. Jede Welle versucht, ihm das Ruder aus der Hand zu reißen.\n\nKein Auftrag, kein Small Talk — Tom ist vollständig mit dem Ruder beschäftigt. Knoten-Streich und Ruder-Bitte setzen beide voraus, dass er entspannt bei der Sache ist, und sind für diese Szene deshalb ausgesetzt."
+      }
+    },
     interaktionen: {
       "knoten_streich": {
         title: "Tom Fletcher — Der Knoten-Streich",
@@ -220,6 +242,17 @@ const ORTE = {
     personen: "Francesco Almeida",
     kurz: "Francesco lehnt an der Reeling, faulenzt statt zu beaufsichtigen. Kein Auftrag — freundliche Präsenz, ehrliche Einschätzungen auf Nachfrage.",
     ortHinweis: "Francesco hängt sich bei Spielern ein, die hier herumstehen, macht aber von sich aus nicht viel. Ohne Ansprache sehnt er sich hörbar nach Sonne und warmer Luft — \"nicht wie hier in diesem traurigen, grauen England\". Zahlt sich später aus, sobald die Golden Lion in der Karibik ankommt (deutliche Kontraständerung in seinem Auftreten möglich).",
+    // 3.1 (Sturm): bewusst OHNE Francesco - im Sturm-Flavortext ist die Crew an Deck
+    // absichtlich anonym (vgl. Design-Prinzip "keine Namen im Sturm-Chaos", siehe
+    // Batteriedeck/"kanone_sturm"). Francescos Einschätzungen-Interaktion ist ohnehin
+    // per nichtInSzenen ausgesetzt.
+    szenenUeberschreibungen: {
+      "3.1": {
+        personen: "Anonyme Crew (keine benannte Figur)",
+        kurz: "Chaotische Segelarbeit im Sturm, keine benannte Figur — keine Interaktion in dieser Szene.",
+        ortHinweis: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Männer hängen in den Wanten, kämpfen mit den Segeln — eines hat sich bereits losgerissen und flattert zerfetzt im Wind. Andere ziehen mit vereinten Kräften an nassen Leinen, während wieder andere sich nur noch am Deck festkrallen, von der letzten Welle niedergeworfen.\n\nBewusst ohne Francesco oder andere benannte Figuren — reines Chaos-Bild."
+      }
+    },
     interaktionen: {
       "einschaetzungen": {
         title: "Francesco — Ehrliche Einschätzungen",
@@ -261,6 +294,17 @@ const ORTE = {
     personen: "Dirk van Hoorn · Trewin-Zwillinge",
     kurz: "Dirk nur bei echter Mechanik-Probe/kaputtem Objekt zugänglich, mit Payoff in der Sturm-Szene. Trewin-Zwillinge reagieren auf den Trinkwettbewerb-Ausgang.",
     ortHinweis: "Durchgehende Kanonenreihe, wenig Ordnung — passt zum Marker-Hinweis \"so viele Kanonen für ein einfaches Begleitschiff?\".",
+    // 3.1 (Sturm): bewusst OHNE Dirk/Trewin-Zwillinge namentlich - siehe
+    // "kanone_sturm" unten ("Bewusst keine Namen... Dirk hilft zwar mit, wird
+    // aber nicht genannt"). Dirks Vertrauens-Interaktion und der Zwillinge-Kater
+    // sind ohnehin per nichtInSzenen ausgesetzt.
+    szenenUeberschreibungen: {
+      "3.1": {
+        personen: "Anonyme Crew (keine benannte Figur, siehe Hinweis)",
+        kurz: "Losgerissene Kanone im Sturmchaos — anonyme Crew, keine benannten Figuren.",
+        ortHinweis: "Wasser strömt in Schwällen von oben herein, das Deck liegt unter einer rutschigen Wasserschicht. Eine der Kanonen hat sich losgerissen und rollt bei jeder Welle bedrohlich hin und her. Lärm und Chaos, so weit man hört.\n\nBewusst keine Namen im Flavortext - Dirk hilft zwar mit und ruft Anweisungen, wird aber nicht genannt (siehe Interaktion \"Losgerissene Kanone\")."
+      }
+    },
     interaktionen: {
       "dirk_vertrauen": {
         title: "Dirk van Hoorn — Vertrauen durch Fachkenntnis",
@@ -339,6 +383,16 @@ const ORTE = {
     personen: "Der blinde Passagier (Waisenjunge, situativ) · Wat (situativ, bei Pfad B)",
     kurz: "Kein dauerhafter Aufenthaltsort, nur sporadisch besucht. Zentral für den blinden Passagier (Abschnitt 11) und Toms Knoten-Streich (Achterdeck).",
     ortHinweis: "Dunkel, still, vollgestopft — kein offenes Feuer erlaubt (Tauwerk, Segeltuch, trockener Proviant), nur gedämpftes Lukenlicht von oben. Zwei Bildvarianten: \"Standard\" (Hände hinter einer Kiste sichtbar, blinder Passagier versteckt, inkl. Zusatzsatz \"Habe ich da gerade etwas gehört? Bestimmt nur das Schiff.\") und \"Leer\" (Junge weg/gefunden, reiner Basistext). Umschaltung manuell im Admin-Panel unter Bildvarianten — wirkt sich sowohl auf das Spieler-Bild als auch auf den angezeigten Hinweistext aus.",
+    // 3.1 (Sturm): löst das Varianten-System (Standard/Leer, blinder Passagier)
+    // komplett ab - der Junge ist laut "wassereinbruch_sturm" kein Thema mehr im
+    // Raum. Personen/kurz/ortHinweis daher komplett unabhängig vom Basiszustand.
+    szenenUeberschreibungen: {
+      "3.1": {
+        personen: "–",
+        kurz: "Wassereinbruch im Sturm — kein Bezug mehr zum blinden Passagier. Zwei Schritte nötig (Pumpen + Abdichten).",
+        ortHinweis: "Der Frachtraum steht knöcheltief unter Wasser — bei jeder Welle schwappt es zwischen den Fässern hin und her. Irgendwo dringt Wasser ein, das hier nicht hingehört. Wenn niemand bald etwas unternimmt, wird es mehr.\n\nDie Bildvarianten (Standard/Leer) und der blinde Passagier spielen hier keine Rolle mehr, siehe Interaktion \"Wassereinbruch\"."
+      }
+    },
     interaktionen: {
       "blinder_passagier": {
         title: "Der blinde Passagier — Fund im Frachtraum (Abschnitt 11, Pfad A)",

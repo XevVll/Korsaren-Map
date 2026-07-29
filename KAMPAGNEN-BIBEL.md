@@ -694,6 +694,18 @@ Technisch umgesetzt über ein neues Szenen-Feld `hiddenMarkers` (Liste von Marke
 dieser Szene nicht erscheinen) — Erweiterung des Basis/Override-Prinzips aus 13.3, ohne die
 Grundarchitektur anzutasten.
 
+> **Korrektur (Juli 2026):** Das `descOverrides`-Prinzip (s. u.) galt bisher nur für den
+> Spieler-Text. Im Admin-Panel (`regie.html`) zeigten die vier aktiven Orte mit hinterlegten
+> `personen`/`kurz`/`ortHinweis`-Feldern (Achterdeck, Oberdeck, Batteriedeck, Frachtraum) für
+> 3.1 weiterhin exakt dieselbe Zusammenfassung wie für 2.1 — obwohl 3.1 inhaltlich eine
+> komplett andere Szene ist und außer dem Ortsnamen selbst nichts übernommen werden sollte.
+> Behoben über ein neues, analoges Feld `szenenUeberschreibungen` in `regie.js` (siehe 13.2),
+> mit eigenständigem Text für alle vier Orte. Dabei bewusst konsistent mit dem Design-Prinzip
+> „keine Namen im Sturm-Chaos" (s. u., Batteriedeck): Oberdeck, Batteriedeck und Frachtraum
+> nennen für 3.1 keine Figur mehr namentlich (Francesco/Dirk/Trewin-Zwillinge/blinder
+> Passagier fehlen dort bewusst), nur Achterdeck behält Tom, da er im Flavortext selbst
+> namentlich auftaucht.
+
 **Finale Flavortexte (alle fünf Orte mit eigenem `_sturm`-Bild):**
 
 > **Oberdeck:** Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel.
@@ -981,6 +993,12 @@ schicken (Details und die Firebase-Falle siehe Docstring im Skript).
   dieser einen Szene nicht auftauchen sollen (z. B. Kombüse/Werkstatt/Unterdeck/
   Offiziersquartier/Bug in der Sturm-Szene 3.1, siehe 10.11). Bleibt konsistent mit dem
   Basis/Override-Prinzip — keine Wiederholung der übrigen Marker-Daten nötig
+- **`szenenUeberschreibungen`** (neu, Juli 2026, in `regie.js`): dasselbe Override-Prinzip wie
+  `descOverrides`, aber für die admin-seitigen `personen`/`kurz`/`ortHinweis`-Felder eines
+  Ortes. Ohne dieses Feld zeigte das Admin-Panel für 3.1 weiterhin die 2.1-Zusammenfassung an
+  (siehe Korrektur in 10.11) — jetzt pro Ort optional `szenenUeberschreibungen: { "3.1": {...} }`,
+  aufgelöst über `resolveOrtForScene()` in `regie.html`. `interaktionen` bleibt davon unberührt
+  und weiterhin über `nurSzenen`/`nichtInSzenen` gesteuert
 - **Varianten + imgOverride zusammen:** Überschreibt eine Szene das Bild eines Markers, der in
   BASE ein `variants`-Feld hat (z. B. Frachtraum), werden die Varianten für diese Szene
   automatisch deaktiviert (`variants: null`). Sonst könnte eine in einer ANDEREN Szene aktiv
