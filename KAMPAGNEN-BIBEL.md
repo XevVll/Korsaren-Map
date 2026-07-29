@@ -752,6 +752,18 @@ Geschick, welche genau bzw. ob wahlweise ist noch nicht entschieden).
   Ruf-Gewinn bei Ned
 - **Nicht aufgefangen [OFFEN]** (Konsequenz noch nicht festgelegt)
 
+**Achterdeck — Toms loses Mundwerk:** Tom ist Steuermann und kann/wird seinen Posten während
+des Sturms **nicht verlassen** — Harwick verlässt sich blind auf ihn. Trotzdem bleibt er er
+selbst: Kommen Spieler in seine Nähe, hat er noch einen lockeren Spruch auf den Lippen —
+„Halt dich fest, ich spring für dich bestimmt nicht ins Wasser!“ Kam der Knoten-Streich (2.1)
+bei diesem Spieler gut an, spielt er zusätzlich darauf an.
+
+Da er selbst nicht vom Ruder weg kann, lotst er die Spieler stattdessen dorthin, wo Hilfe
+gebraucht wird (Oberdeck/Cormac, Batteriedeck/Kanone oder Frachtraum/Wassereinbruch) — welche
+Stelle er nennt, liegt im **Ermessen des Spielleiters**. Bewusst **keine Probe, kein
+Ruf-Effekt** — reiner Charaktermoment (vgl. Josiah in der Kombüse), passend zum
+Design-Prinzip „Gutes Rollenspiel schlägt Mechanik" (2.6).
+
 **Batteriedeck — Losgerissene Kanone:** Bewusst **keine Namen, keine vorweggenommenen
 Handlungen** im Flavortext — Dirk hilft zwar mit und ruft Anweisungen, wird aber nicht genannt
 (die Spieler kennen zu diesem Zeitpunkt seine Position nicht). Mechanik:
