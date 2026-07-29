@@ -398,29 +398,37 @@
       });
     }
 
-    // Liefert per Callback das tatsächlich anzuzeigende Bild für einen
-    // Marker: normalerweise einfach marker.img, aber falls der Marker
-    // "variants" definiert, wird zuerst in Firebase nachgesehen, welche
-    // Variante der SL aktuell aktiv geschaltet hat (markerVariant/<id>).
-    // Ist nichts gesetzt oder keine Firebase-Verbindung vorhanden, fällt
-    // es auf marker.img zurück (= Ausgangszustand, unverändertes Verhalten).
-    function resolveMarkerImage(marker, callback) {
-      if (!marker.variants || !db) { callback(marker.img); return; }
+    // Liefert per Callback die aktive Variante (das ganze Objekt, nicht
+    // nur das Bild) für einen Marker: null, falls der Marker keine
+    // "variants" definiert, keine Firebase-Verbindung besteht, oder in
+    // Firebase noch nichts gesetzt ist (markerVariant/<id>) - in all
+    // diesen Fällen greifen die Basiswerte des Markers (img/desc)
+    // unverändert wie bisher.
+    function resolveActiveVariant(marker, callback) {
+      if (!marker.variants || !db) { callback(null); return; }
       db.ref('markerVariant/' + fbKey(marker.id)).once('value').then(function (snap) {
         const activeKey = snap.val();
-        const variant = activeKey && marker.variants[activeKey];
-        callback(variant ? variant.img : marker.img);
+        callback(activeKey && marker.variants[activeKey] || null);
       }).catch(function () {
-        callback(marker.img);
+        callback(null);
       });
     }
 
     function openOverlay(marker) {
       overlayTitle.textContent = marker.title || '';
-      overlayDesc.textContent = marker.desc || '';
       overlayEl.classList.add('open');
 
-      resolveMarkerImage(marker, function (imgSrc) {
+      resolveActiveVariant(marker, function (variant) {
+        // Eine Variante kann "img" und/oder "desc" überschreiben. Fehlt
+        // eines der beiden Felder bei der aktiven Variante (oder gibt es
+        // gar keine aktive Variante), wird auf den Basiswert des Markers
+        // zurückgefallen - siehe golden_lion_scenes.js für ein Beispiel
+        // (Frachtraum: "standard" hat einen Zusatzsatz, "leer" nicht).
+        const imgSrc = (variant && variant.img) || marker.img;
+        const descText = (variant && variant.desc) || marker.desc || '';
+
+        overlayDesc.textContent = descText;
+
         if (imgSrc) {
           overlayImgWrap.classList.remove('empty');
           overlayImg.style.display = '';
