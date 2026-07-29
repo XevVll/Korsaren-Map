@@ -150,7 +150,7 @@ const GOLDEN_LION_SCENES = {
       frachtraum: "images/interior_frachtraum_sturm.webp"
     },
     descOverrides: {
-      oberdeck: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Männer hängen in den Wanten, kämpfen mit den Segeln — eines hat sich bereits losgerissen und flattert zerfetzt im Wind. Andere ziehen mit vereinten Kräften an nassen Leinen, während wieder andere sich nur noch am Deck festkrallen, von der letzten Welle niedergeworfen.",
+      oberdeck: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Cormac steht mitten im Chaos und ruft Befehle — die Segel sind noch zu weit draußen, und wenn sie nicht bald eingeschnürt werden, droht der Mast abzureißen. Männer hängen in den Wanten, kämpfen mit den nassen Leinen, während andere sich nur noch am Deck festkrallen, von der letzten Welle niedergeworfen.",
       achterdeck: "Tom kämpft mit dem Ruder, beide Hände fest um die Speichen, Muskeln sichtbar angespannt — von der lässigen Mühelosigkeit sonst keine Spur. Jede Welle versucht, ihm das Ruder aus der Hand zu reißen.",
       kapitaenskajuete: "Trotz des tobenden Sturms sitzt Harwick unbewegt über Karte und Kompass, den Blick auf den Kurs gerichtet, während das Schiff um ihn herum ächzt und schlingert. Regenwasser läuft in Bahnen die Fenster herab, ein Blitz zuckt durch die Scheiben — er scheint es kaum zu bemerken.",
       batteriedeck: "Wasser strömt in Schwällen von oben herein, das Deck liegt unter einer rutschigen Wasserschicht. Eine der Kanonen hat sich losgerissen und rollt bei jeder Welle bedrohlich hin und her. Lärm und Chaos, so weit man hört.",
