@@ -352,6 +352,7 @@
   <script src="js/firebase-config.js"></script>
   <script src="js/scenes.js"></script>
   <script src="js/golden_lion_scenes.js"></script>
+  <script src="js/schatzinsel_scenes.js"></script>
   <script src="js/characters.js"></script>
   <script src="js/regie.js"></script>
 
@@ -426,6 +427,11 @@
           entries.push({ id: id, label: GOLDEN_LION_SCENES[id].label, source: 'ship' });
         });
       }
+      if (typeof SCHATZINSEL_SCENES !== 'undefined') {
+        Object.keys(SCHATZINSEL_SCENES).forEach(function (id) {
+          entries.push({ id: id, label: SCHATZINSEL_SCENES[id].label, source: 'island' });
+        });
+      }
       return entries;
     }
 
@@ -434,6 +440,9 @@
       if (typeof GOLDEN_LION_SCENES !== 'undefined' && GOLDEN_LION_SCENES[sceneId]) {
         return GOLDEN_LION_SCENES[sceneId].label;
       }
+      if (typeof SCHATZINSEL_SCENES !== 'undefined' && SCHATZINSEL_SCENES[sceneId]) {
+        return SCHATZINSEL_SCENES[sceneId].label;
+      }
       return sceneId;
     }
 
@@ -441,6 +450,9 @@
       if (SCENES[sceneId]) return SCENES[sceneId].markers;
       if (typeof getGoldenLionMarkers === 'function' && typeof GOLDEN_LION_SCENES !== 'undefined' && GOLDEN_LION_SCENES[sceneId]) {
         return getGoldenLionMarkers(sceneId);
+      }
+      if (typeof SCHATZINSEL_SCENES !== 'undefined' && SCHATZINSEL_SCENES[sceneId]) {
+        return SCHATZINSEL_SCENES[sceneId].markers;
       }
       return [];
     }
