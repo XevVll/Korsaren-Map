@@ -7,6 +7,12 @@
 // "bei Tag" / "bei Nacht" mit abweichenden Bildern pro Ort), kann sie bei
 // Bedarf auf das golden_lion_scenes.js-Muster umgebaut werden.
 //
+// Szenen-ID "4.1" (nicht "3.x"): "3.x" ist im Code bereits für Zustände
+// DES SCHIFFS reserviert (2.1 Basis, 3.1 Sturm) - die Schatzinsel ist aber
+// eine komplett neue Karte/Örtlichkeit, kein weiterer Schiffszustand.
+// Jede neue Örtlichkeit bekommt daher eine neue führende Ziffer, genau wie
+// beim Sprung von Grimsgate (1.x) zum Schiff (2.x).
+//
 // Marker-Felder: siehe scenes.js (id/top/left/title/desc/img/variants).
 //
 // Bewusst nur EIN Marker bisher (Schiffswrack) - weitere Orte der Insel
@@ -14,8 +20,8 @@
 // Schritt, auf ausdrücklichen Wunsch schrittweise statt auf einmal.
 
 const SCHATZINSEL_SCENES = {
-  "3.2": {
-    label: "3.2 – Schatzinsel (Strandung)",
+  "4.1": {
+    label: "4.1 – Schatzinsel (Strandung)",
     background: "images/schatzinsel.webp",
     soundFile: "island1.ogg",
     markers: [
@@ -23,10 +29,12 @@ const SCHATZINSEL_SCENES = {
         id: "schiffswrack",
         top: 70, left: 73,
         title: "Die gestrandete Golden Lion",
-        desc: "Die Golden Lion liegt zerzaust in einer sandigen Bucht auf der Seite, der Hauptmast gebrochen, der Rumpf übel zugerichtet. Tauwerk und Trümmer verteilen sich über den Strand. Für die meisten an Bord wirkt es wie reines Glück, hier überhaupt festen Boden unter den Füßen zu haben — dass Tom sie mit gezielten Ankermanövern genau hierher gesteuert hat, wissen nur die wenigsten."
-        // img bewusst weggelassen - noch kein eigenes Bild für diesen Ort.
-        // karte.html (openOverlay) zeigt in diesem Fall automatisch
-        // "Kein Bild hinterlegt." an, kein Sonderfall nötig.
+        desc: "Die Golden Lion liegt zerzaust in einer sandigen Bucht auf der Seite, der Hauptmast gebrochen, der Rumpf übel zugerichtet. Tauwerk und Trümmer verteilen sich über den Strand. Für die meisten an Bord wirkt es wie reines Glück, hier überhaupt festen Boden unter den Füßen zu haben — dass Tom sie mit gezielten Ankermanövern genau hierher gesteuert hat, wissen nur die wenigsten.",
+        // Noch kein eigenes Nahaufnahme-Bild für diesen Ort (wie z.B.
+        // interior_oberdeck.webp fürs Schiff) - bis eines existiert, wird
+        // hilfsweise dasselbe Insel-Bild wie der Kartenhintergrund gezeigt,
+        // statt "Kein Bild hinterlegt." anzuzeigen.
+        img: "images/schatzinsel.webp"
       }
     ]
   }
@@ -37,4 +45,4 @@ const SCHATZINSEL_SCENES = {
 // regie.html NICHT automatisch als globaler Fallback genutzt (das bleibt
 // DEFAULT_SCENE = "1.1", siehe karte.html) - dient hier nur als
 // Referenzwert für eine mögliche künftige Verwendung.
-const DEFAULT_SCHATZINSEL_SCENE = "3.2";
+const DEFAULT_SCHATZINSEL_SCENE = "4.1";
