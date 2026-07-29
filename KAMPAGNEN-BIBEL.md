@@ -873,11 +873,12 @@ er bei allem Übernatürlichen den Tod nicht bezwingen kann.
 > unter `images/`, die Daten-/Logik-Dateien unter `js/`. An den alten
 > Dateinamen (`grimsgate_admin.html`, `korsaren_szenen.html`,
 > `crew_manifest.html`) liegen dünne Weiterleitungs-Seiten, damit alte
-> Lesezeichen weiter funktionieren. Audiodateien (`*.mp3`) bleiben bewusst im
-> Hauptordner: Ihr Dateiname kann pro Szene live im Admin-Panel in Firebase
-> hinterlegt sein (`sceneAudioFile/{sceneId}`) — das ist von hier aus nicht
-> einsehbar oder migrierbar, ein Verschieben hätte lautlos bereits gesetzte
-> Szenen-Töne brechen können.
+> Lesezeichen weiter funktionieren. Audiodateien bleiben bewusst im
+> Hauptordner (nicht in einem Unterordner): Ihr Dateiname kann pro Szene live
+> im Admin-Panel in Firebase hinterlegt sein (`sceneAudioFile/{sceneId}`) —
+> das ist von hier aus nicht einsehbar oder migrierbar, ein Verschieben in
+> einen Unterordner hätte lautlos bereits gesetzte Szenen-Töne brechen
+> können. Das Dateiformat selbst wurde trotzdem geändert, siehe 13.1b.
 
 | Datei/Ordner | Funktion |
 |---|---|
@@ -890,8 +891,10 @@ er bei allem Übernatürlichen den Tod nicht bezwingen kann.
 | `js/regie.js` | Spielleiter-Inhalte: Interaktionen, Trigger, Hinweise, Notizen — flache Struktur, ein Eintrag pro Ort-ID |
 | `js/characters.js` | Charakterdaten und Portraitpfade |
 | `js/firebase-config.js` | Firebase-Zugangsdaten |
-| `images/` | Alle Karten-, Innenraum- und Portraitbilder |
-| `*.mp3` (Hauptordner) | Szenen-Hintergrundtöne, Zuordnung läuft über das Admin-Panel/Firebase |
+| `images/` | Alle Karten-, Innenraum- und Portraitbilder (WebP, siehe 13.1a) |
+| `tools/optimize_images.py` | Skript zum Verkleinern/Konvertieren neuer Bilder vor dem Commit |
+| `*.ogg` (Hauptordner) | Szenen-Hintergrundtöne (Opus, siehe 13.1b), Zuordnung läuft über das Admin-Panel/Firebase |
+| `tools/optimize_audio.py` | Skript zum Konvertieren neuer Audiodateien (mp3/wav/…) nach Opus/OGG vor dem Commit |
 | `grimsgate_admin.html` · `korsaren_szenen.html` · `crew_manifest.html` | Nur noch Weiterleitungs-Stubs auf die neuen Seitennamen |
 
 **[OFFEN]** `korsaren.html` (Charakterbogen / Charaktererstellung, localStorage-Persistenz)
@@ -906,6 +909,62 @@ bleibt erhalten, falls doch nochmal gebraucht):
   anderen Datei mehr referenziert.
 - `interior_offiziersquartie.png` — verwaister Tippfehler-Duplikat von
   `interior_offiziersquartier.png` (fehlendes „r"), nirgends referenziert.
+
+### 13.1a Bildoptimierung (Juli 2026)
+
+**Auslöser:** Spürbare Lags/Ladezeiten auf der Karte. Ursache: `images/` lag bei
+**132 MB** — einzelne PNGs (v. a. `interior_batteriedeck*`, `interior_frachtraum*`,
+`interior_werkstatt`, `interior_oberdeck_sturm`, `interior_kapitaenskajuete_sturm`,
+`interior_unterdeck`, `interior_offiziersquartier`, `Josiah_Pryce`) lagen bei 7-9 MB,
+teils mit doppelt so hoher Auflösung wie vergleichbare Bilder (2816×1536 statt 1408×768) —
+vermutlich ein Gemini-Generierungsartefakt, keine bewusste Entscheidung. Zusätzlich trugen
+alle Bilder einen vollständig deckenden (also nutzlosen) Alpha-Kanal, was verlustfreie
+PNG-Kompression zusätzlich erschwert.
+
+**Maßnahme:** Alle Bilder zu **WebP** konvertiert (Qualität 82, `method=6`), Alpha-Kanal
+entfernt (war überall zu 100 % deckend) und auf sinnvolle Kantenlänge gedeckelt, orientiert
+an der tatsächlichen Darstellungsgröße:
+- Portraits (Charakterleiste, max. ~220 CSS-px breit): Kappung 900px
+- Innenraum-/Ortsbilder (Overlay-Karte, max. 720px breit): Kappung 1600px
+- Kartenbilder Stadt/Schiff (ggf. bildschirmfüllend): Kappung 1920px
+
+**Ergebnis:** 132 MB → 4,5 MB (**-96,6 %**), keine sichtbaren Kompressionsartefakte
+(stichprobenartig geprüft, u. a. `Josiah_Pryce` und `interior_unterdeck`, die stärksten
+Reduktionen mit -99 %).
+
+**Für neue Bilder (wichtig, sonst wächst images/ wieder zu):** Jedes neu von Gemini
+generierte Bild vor dem Commit durch `python3 tools/optimize_images.py` schicken (verkleinert
++ konvertiert alle PNGs in `images/` zu WebP), das Ergebnis sichten, dann PNG löschen und den
+neuen `.webp`-Dateinamen in `js/scenes.js`/`js/golden_lion_scenes.js`/`js/characters.js`
+eintragen. Das Skript löscht die PNGs bewusst nicht automatisch, damit vor dem Löschen visuell
+geprüft werden kann.
+
+### 13.1b Audiooptimierung (Juli 2026)
+
+**Auslöser:** Dieselben Lags wie 13.1a. `Grimgate1.mp3`, `ship1.mp3` und `storm1.mp3` lagen
+zusammen bei **242 MB** (67–91 MB pro Datei, 149–192 kbps MP3, 60–83 Minuten lange
+Atmo-Loops) — für reine Hintergrundtöne unnötig hoch aufgelöst.
+
+**Maßnahme:** Alle drei nach **Opus** (in einer `.ogg`-Datei, 64 kbps, VBR) konvertiert,
+Metadaten/eingebettetes Cover-Art entfernt. Länge bewusst **nicht** gekürzt (`ffprobe`-Dauer
+vor/nach verglichen, exakt gleich).
+
+**Ergebnis:** 242 MB → 93 MB (**-61 %**) — geringer als bei den Bildern (-96,6 %), weil MP3 für
+Audio schon deutlich effizienter komprimiert als PNG für Bilder. Vor dem Einbau per
+Hörprobe geprüft (volle Länge an Hendrik geschickt, freigegeben).
+
+**Wichtige Nebenkorrektur:** `golden_lion_scenes.js` (Szene `"3.1"`) hatte als statisches
+`soundFile`-Fallback `"sturm.mp3"` eingetragen — das passte noch nie zur tatsächlich
+abgelegten Datei (`storm1.mp3`, jetzt `storm1.ogg`). Auf den korrekten Dateinamen korrigiert.
+
+> **[WICHTIG] Manueller Schritt nach diesem Umbau:** Ist für eine Szene bereits ein
+> Ton-Dateiname live im Admin-Panel (Sound-Leiste) in Firebase hinterlegt
+> (`sceneAudioFile/{sceneId}`), zeigt der noch auf den alten `.mp3`-Namen — Firebase weiß
+> nichts von der Umbenennung. Nach dem Deploy einmal jede Szene mit gesetztem Ton im
+> Admin-Panel öffnen und den Dateinamen auf die neue `.ogg`-Datei aktualisieren.
+
+**Für neue Audiodateien:** Vor dem Commit durch `python3 tools/optimize_audio.py <datei>`
+schicken (Details und die Firebase-Falle siehe Docstring im Skript).
 
 ### 13.2 Architektur-Entscheidungen
 
@@ -979,11 +1038,13 @@ Wege verzweigt, würden im Code hinterlegte Zeitpunkte Fehler produzieren.
 warme gealterte Töne. Durchgängig für **alle** Innenraum- und Portraitbilder.
 
 **Werkzeug:** Gemini. Claude schreibt die Prompts, Hendrik generiert und lädt zurück, dann
-gemeinsame Bewertung und iterative Korrektur.
+gemeinsame Bewertung und iterative Korrektur. **Danach zwingend durch
+`tools/optimize_images.py` schicken** (WebP-Konvertierung + Größenkappung, siehe 13.1a),
+bevor das Bild committet wird — Gemini liefert unnötig große PNGs.
 
 ### 14.1 Standardbausteine für Innenraum-Prompts
 
-- Cutaway-Bild (`golden_lion_cutaway.png`) als Stil- und Konstruktionsreferenz mitgeben
+- Cutaway-Bild (`images/golden_lion_cutaway.webp`) als Stil- und Konstruktionsreferenz mitgeben
 - Kadrierung: enge Innenansicht, ca. 85–90 % der Leinwand füllend, wenig Leerraum
 - „no modern elements, no text or labels anywhere in the image"
 - Ausschließlich Schiffsholz; **Ziegel nur** an der Kombüsen-Feuerstelle
@@ -992,8 +1053,9 @@ gemeinsame Bewertung und iterative Korrektur.
 
 ### 14.2 Portraits
 
-Dateinamenkonvention: voller Name mit Unterstrichen, z. B. `Walter_Wat_Crozier.png`,
-`Cormac_Daly.png`, `Josiah_Pryce.png`.
+Dateinamenkonvention: voller Name mit Unterstrichen, z. B. `Walter_Wat_Crozier.webp`,
+`Cormac_Daly.webp`, `Josiah_Pryce.webp` (ursprünglich von Gemini als PNG geliefert, vor dem
+Commit per `tools/optimize_images.py` nach WebP konvertiert, siehe 13.1a).
 
 ### 14.3 Bekannte Artefakte
 

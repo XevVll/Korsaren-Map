@@ -14,7 +14,7 @@
 //   title  - Überschrift im Tooltip/Overlay
 //   desc   - Beschreibungstext im Tooltip/Overlay
 //   img    - Pfad des Innenraumbilds, relativ zur HTML-Seite
-//            (liegt im images/-Ordner, z.B. "images/interior_heuer.png")
+//            (liegt im images/-Ordner, z.B. "images/interior_heuer.webp")
 //   variants (optional) - mehrere benannte Bildzustände für denselben
 //            Ort, z.B. { standard: {label, img}, leer: {label, img} }.
 //            Die aktive Variante wird im Admin-Panel manuell umgeschaltet
@@ -25,7 +25,7 @@
 // Szenen-Feld "background":
 //   Pfad des Kartenbilds, auf dem die Marker dieser Szene liegen, relativ
 //   zur HTML-Seite (images/-Ordner). Grimsgate-Szenen (1.1/1.2) nutzen
-//   beide dieselbe Stadtkarte (images/grimsgate_map.png). Andere Karten
+//   beide dieselbe Stadtkarte (images/grimsgate_map.webp). Andere Karten
 //   (z.B. das Golden-Lion-Schiff, siehe golden_lion_scenes.js) haben
 //   eigene Hintergrundbilder - die Spieler-Seite karte.html liest dieses
 //   Feld pro Szene aus und lädt automatisch das passende Bild.
@@ -42,56 +42,56 @@
 const SCENES = {
   "1.1": {
     label: "1.1 – Grimsgate (Start)",
-    background: "images/grimsgate_map.png",
+    background: "images/grimsgate_map.webp",
     markers: [
       {
         id: "heuer",
         top: 58.3, left: 40,
         title: "Zur letzten Heuer",
         desc: "Raue Hafenkneipe. Kaum Stammgäste — die meisten, die hier trinken, sieht man Jahre nicht wieder. Wer anheuern will, landet früher oder später hier.",
-        img: "images/interior_heuer.png"
+        img: "images/interior_heuer.webp"
       },
       {
         id: "hafenmeisterei",
         top: 27.5, left: 9.4,
         title: "Hafenmeisterei",
         desc: "Verwaltet Anlegerechte, Fracht und Papiere. Ordnungsmacht des Hafens.",
-        img: "images/interior_hafenmeisterei.png"
+        img: "images/interior_hafenmeisterei.webp"
       },
       {
         id: "lagerhaeuser",
         top: 26.7, left: 26.3,
         title: "Lagerhäuser",
         desc: "Von außen chaotisch, im Kern strikt organisiert. Hier läuft die Beladung des Konvois wie ein Uhrwerk.",
-        img: "images/interior_lagerhaeuser.png"
+        img: "images/interior_lagerhaeuser.webp"
       },
       {
         id: "markt",
         top: 74.6, left: 53.2,
         title: "Marktplatz",
         desc: "Handel, Menschenmengen, guter Ort für Gerüchte und Zufallsbegegnungen.",
-        img: "images/interior_markt.png"
+        img: "images/interior_markt.webp"
       },
       {
         id: "kraemerladen",
         top: 58.9, left: 49.8,
         title: "Krämerladen",
         desc: "Ausrüstung und Grundbedarf. Der Krämer hört viel — und vergisst wenig.",
-        img: "images/interior_kraemerladen.png"
+        img: "images/interior_kraemerladen.webp"
       },
       {
         id: "bordell",
         top: 50.5, left: 85.1,
         title: "Bordell",
         desc: "Etwas abseits der Stadt gelegen, unauffällig. Rote Fenster, wenig Fragen.",
-        img: "images/interior_bordell.png"
+        img: "images/interior_bordell.webp"
       }
     ]
   },
 
   "1.2": {
     label: "1.2 – Golden Lion sichtbar",
-    background: "images/grimsgate_map.png",
+    background: "images/grimsgate_map.webp",
     // Alle Marker aus 1.1 plus den neuen Golden-Lion-Marker.
     // Position ist ein Platzhalter (top/left) - wird noch final festgelegt.
     markers: [
@@ -100,49 +100,49 @@ const SCENES = {
         top: 58.3, left: 40,
         title: "Zur letzten Heuer",
         desc: "Raue Hafenkneipe. Kaum Stammgäste — die meisten, die hier trinken, sieht man Jahre nicht wieder. Wer anheuern will, landet früher oder später hier.",
-        img: "images/interior_heuer.png"
+        img: "images/interior_heuer.webp"
       },
       {
         id: "hafenmeisterei",
         top: 27.5, left: 9.4,
         title: "Hafenmeisterei",
         desc: "Verwaltet Anlegerechte, Fracht und Papiere. Ordnungsmacht des Hafens.",
-        img: "images/interior_hafenmeisterei.png"
+        img: "images/interior_hafenmeisterei.webp"
       },
       {
         id: "lagerhaeuser",
         top: 26.7, left: 26.3,
         title: "Lagerhäuser",
         desc: "Von außen chaotisch, im Kern strikt organisiert. Hier läuft die Beladung des Konvois wie ein Uhrwerk.",
-        img: "images/interior_lagerhaeuser.png"
+        img: "images/interior_lagerhaeuser.webp"
       },
       {
         id: "markt",
         top: 74.6, left: 53.2,
         title: "Marktplatz",
         desc: "Handel, Menschenmengen, guter Ort für Gerüchte und Zufallsbegegnungen.",
-        img: "images/interior_markt.png"
+        img: "images/interior_markt.webp"
       },
       {
         id: "kraemerladen",
         top: 58.9, left: 49.8,
         title: "Krämerladen",
         desc: "Ausrüstung und Grundbedarf. Der Krämer hört viel — und vergisst wenig.",
-        img: "images/interior_kraemerladen.png"
+        img: "images/interior_kraemerladen.webp"
       },
       {
         id: "bordell",
         top: 50.5, left: 85.1,
         title: "Bordell",
         desc: "Etwas abseits der Stadt gelegen, unauffällig. Rote Fenster, wenig Fragen.",
-        img: "images/interior_bordell.png"
+        img: "images/interior_bordell.webp"
       },
       {
         id: "golden_lion",
         top: 40, left: 15,   // PLATZHALTER - Position später anpassen
         title: "Golden Lion",
         desc: "Ein stolzes kleines Kriegsschiff, mitten im Konvoi vor Anker.",
-        img: "images/golden_lion.png"
+        img: "images/golden_lion.webp"
       }
     ]
   }
