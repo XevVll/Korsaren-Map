@@ -1101,8 +1101,8 @@ unverändert.
 Fehlt `desc` bei der aktiven Variante, greift der Basistext des Markers unverändert — so
 zeigt z. B. beim Frachtraum nur die Variante „Standard" den Zusatzsatz „Habe ich da gerade
 etwas gehört? Bestimmt nur das Schiff.", während „Leer" beim reinen Basistext bleibt. Umgesetzt
-in `korsaren_szenen.html` über `resolveActiveVariant()` (ersetzt die frühere
-`resolveMarkerImage()`, die nur Bilder auflöste).
+in `karte.html` (vor der Umbenennung im Zuge der Projekt-Reorg: `korsaren_szenen.html`) über
+`resolveActiveVariant()` (ersetzt die frühere `resolveMarkerImage()`, die nur Bilder auflöste).
 
 ### 13.5 Spielleiter-Stoppuhr
 
@@ -1182,14 +1182,17 @@ dafür, dass die **künstliche Verknappung** (30 Minuten bis Wat, 60 Minuten bis
   wiederkehrend?
 - Ob die Tochter tatsächlich wiederbelebt wird
 - Reveal, dass die vermeintlich zufällige Strandungs-Insel nach dem Sturm in Wahrheit
-  Harwicks über Tom angesteuertes Ziel war (siehe 10.11, Oberdeck-Höhepunkt) — hängt an der
-  noch auszuarbeitenden Schatzinsel
+  Harwicks über Tom angesteuertes Ziel war (siehe 10.11, Oberdeck-Höhepunkt) — die Schatzinsel
+  existiert jetzt als Szene (`4.1`, siehe 13.2) mit einem ersten Ort (Schiffswrack), aber noch
+  ohne diesen Reveal als Inhalt — hängt weiterhin an der Schatzinsel-Ausarbeitung
 
 ### Inhalte
 - Ausformulierung der Hafenmeisterei-Szene (blockiert nichts mehr, Schiffskarte ist fertig)
 - Der unqualifizierte Schiffs-„Medicus" als NPC
 - Dirks Payoff-Szene **nach** dem Sturm (Idee vorhanden, noch nicht ausformuliert)
-- Restliche Story-Knoten ausbauen: Schatzinsel, Artefaktbucht, Grabesinsel
+- Restliche Story-Knoten ausbauen: Schatzinsel (technischer Ort „Schiffswrack" existiert
+  bereits, siehe 13.2 — Höhle, knorriger Baum und Felsformationen sowie jeglicher GM-Inhalt
+  in `regie.js` fehlen noch), Artefaktbucht, Grabesinsel
 - Schaden aus der Kanonen-Szene (Sturm) muss auf der Schatzinsel noch konkret ausgestaltet
   werden (kann gefährlich werden oder von der Schatzsuche ausschließen — Details offen)
 
@@ -1201,10 +1204,24 @@ dafür, dass die **künstliche Verknappung** (30 Minuten bis Wat, 60 Minuten bis
 > Offiziersquartier passt jetzt zum Bild. Die Sturm-Szene (3.1) ist inhaltlich fertig (siehe
 > 10.11) — fünf Orte mit eigenen Sturm-Bildern/-Texten, Kanonen- und Wassereinbruch-Mechanik.
 > Dirks Payoff wurde von „in der Sturm-Szene" auf „nach der Sturm-Szene" korrigiert.
+>
+> **Erledigt (29.07.2026):** Admin-Panel-Duplikat zwischen Sturm-Szene (3.1) und Basis-Szene
+> (2.1) behoben (`szenenUeberschreibungen`, siehe 10.11-Korrektur/13.2). Projekt-Reorg
+> abgeschlossen: Ordnerstruktur, einheitliche Dateinamen, Redirect-Stubs auf alte URLs,
+> Admin-Panel gegen versehentlichen Spieler-Zugriff über die Root-URL abgesichert. Performance-
+> Problem (Lags/Ladezeiten) behoben: alle Bilder PNG→WebP (132 MB → 4,5 MB), alle Audiodateien
+> MP3→Opus/OGG (242 MB → 93 MB, volle Länge erhalten) über die wiederverwendbaren Skripte
+> `tools/optimize_images.py`/`tools/optimize_audio.py`. Sturm-Szene inhaltlich erweitert:
+> Oberdeck (Cormac & Segel, Ned stürzt, Sturm-Höhepunkt mit Mastbruch/Ruderklemme/Toms
+> Anker-Highlight/Harwicks vielsagenden Blicken), Achterdeck (Toms loses Mundwerk) — siehe
+> 10.11. Redundantes „(nur Sturm-Szene 3.1)" aus Interaktions-Titeln entfernt. Schatzinsel-
+> Referenzbild und `island1.ogg` eingebaut; neue Szene `4.1` mit erstem Ort (Schiffswrack)
+> angelegt (siehe 13.2) — zunächst versehentlich als `3.2` (Kollision mit der
+> Schiffs-Nummerierung), korrigiert auf `4.1`.
 
 ### Technik
-- Fehlerbehandlung für fehlende Bilder in `korsaren_szenen.html` (zeigt aktuell stumm nichts
-  an, anders als die alte `grimsgate_karte.html`)
+_(aktuell keine offenen Punkte — die frühere Lücke „Fehlerbehandlung für fehlende Bilder"
+ist erledigt, siehe Erledigt-Vermerk unten)_
 
 ---
 
