@@ -866,18 +866,46 @@ er bei allem Übernatürlichen den Tod nicht bezwingen kann.
 **GitHub Pages:** `https://xevvll.github.io/Korsaren-Map/`
 (Benutzername „xevvll" — zwei kleine L)
 
-| Datei | Funktion |
+> **Restrukturierung (Juli 2026):** Das Projekt lag bisher komplett flach im
+> Hauptordner mit uneinheitlichen Namen (u. a. `grimsgate_admin.html`, obwohl
+> die Seite längst beide Karten — Grimsgate UND Golden Lion — verwaltet).
+> Seiten liegen weiterhin im Hauptordner (stabile URLs), Bilder liegen jetzt
+> unter `images/`, die Daten-/Logik-Dateien unter `js/`. An den alten
+> Dateinamen (`grimsgate_admin.html`, `korsaren_szenen.html`,
+> `crew_manifest.html`) liegen dünne Weiterleitungs-Seiten, damit alte
+> Lesezeichen weiter funktionieren. Audiodateien (`*.mp3`) bleiben bewusst im
+> Hauptordner: Ihr Dateiname kann pro Szene live im Admin-Panel in Firebase
+> hinterlegt sein (`sceneAudioFile/{sceneId}`) — das ist von hier aus nicht
+> einsehbar oder migrierbar, ein Verschieben hätte lautlos bereits gesetzte
+> Szenen-Töne brechen können.
+
+| Datei/Ordner | Funktion |
 |---|---|
-| `korsaren_szenen.html` | Vereinheitlichte Spieler-Kartenseite (ersetzt `grimsgate_karte.html`) |
-| `grimsgate_admin.html` | Admin-/Spielleiter-Panel |
-| `scenes.js` | Szenendefinitionen Grimsgate |
-| `golden_lion_scenes.js` | Szenendefinitionen Schiff (Basis/Override-Architektur) |
-| `regie.js` | Spielleiter-Inhalte: Interaktionen, Trigger, Hinweise, Notizen — flache Struktur, ein Eintrag pro Ort-ID |
-| `characters.js` | Charakterdaten und Portraitpfade |
-| `firebase-config.js` | Firebase-Zugangsdaten |
-| `korsaren.html` | Charakterbogen / Charaktererstellung (localStorage-Persistenz) |
-| `crew_manifest.html` | Filterbare NPC-Karten |
-| `grimsgate_karte.html` | Ältere Grimsgate-Seite (durch `korsaren_szenen.html` abgelöst) |
+| `index.html` | Neue Startseite mit Links zu Karte, Regie, Besatzung und dieser Bibel |
+| `karte.html` | Vereinheitlichte Spieler-Kartenseite (war `korsaren_szenen.html`) |
+| `regie.html` | Admin-/Spielleiter-Panel (war `grimsgate_admin.html`) |
+| `besatzung.html` | Filterbare NPC-Karten (war `crew_manifest.html`) |
+| `js/scenes.js` | Szenendefinitionen Grimsgate |
+| `js/golden_lion_scenes.js` | Szenendefinitionen Schiff (Basis/Override-Architektur) |
+| `js/regie.js` | Spielleiter-Inhalte: Interaktionen, Trigger, Hinweise, Notizen — flache Struktur, ein Eintrag pro Ort-ID |
+| `js/characters.js` | Charakterdaten und Portraitpfade |
+| `js/firebase-config.js` | Firebase-Zugangsdaten |
+| `images/` | Alle Karten-, Innenraum- und Portraitbilder |
+| `*.mp3` (Hauptordner) | Szenen-Hintergrundtöne, Zuordnung läuft über das Admin-Panel/Firebase |
+| `grimsgate_admin.html` · `korsaren_szenen.html` · `crew_manifest.html` | Nur noch Weiterleitungs-Stubs auf die neuen Seitennamen |
+
+**[OFFEN]** `korsaren.html` (Charakterbogen / Charaktererstellung, localStorage-Persistenz)
+ist weiterhin nur geplant, aber noch nicht angelegt — bisher in keinem Stand des Repos
+vorhanden. Frühere Fassungen dieser Tabelle führten die Datei bereits, obwohl sie nie
+existierte; das bleibt hier als offener Punkt vermerkt statt stillschweigend entfernt.
+
+Zwei aufgeräumte Karteileichen wurden im Zuge der Restrukturierung entfernt (Git-Historie
+bleibt erhalten, falls doch nochmal gebraucht):
+- `grimsgate_karte.html` + `grimsgate_karte.png` — die ältere Grimsgate-Seite war laut dieser
+  Tabelle bereits durch `korsaren_szenen.html`/`karte.html` abgelöst und wurde von keiner
+  anderen Datei mehr referenziert.
+- `interior_offiziersquartie.png` — verwaister Tippfehler-Duplikat von
+  `interior_offiziersquartier.png` (fehlendes „r"), nirgends referenziert.
 
 ### 13.2 Architektur-Entscheidungen
 

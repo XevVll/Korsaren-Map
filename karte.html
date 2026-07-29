@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Korsaren – Karte</title>
+<style>
+  :root {
+    --bg: #0f0c08;
+    --ink: #e6ddc7;
+    --ink-dim: #a89d81;
+    --gold: #c9a24b;
+    --line: #3a2a18;
+    --panel: #1a130b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    background: var(--bg);
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  /* ---------- Status / Ladezustand ---------- */
+  #status {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 50;
+    font-size: 12px; color: var(--ink-dim);
+    background: rgba(15,12,8,0.7);
+    padding: 5px 14px; border-radius: 20px;
+    border: 1px solid var(--line);
+    letter-spacing: .04em;
+    pointer-events: none;
+    transition: opacity .4s ease;
+  }
+  #status.connected { color: #7fa87f; }
+  #status.error { color: #c76a5a; }
+  #status.hidden { opacity: 0; }
+
+  /* ---------- Bühne ---------- */
+  #stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #mapWrap {
+    position: relative;
+    max-width: 100%; max-height: 100%;
+    line-height: 0;
+  }
+  #mapImage {
+    display: block;
+    max-width: 100vw; max-height: 100vh;
+    width: auto; height: auto;
+    opacity: 0;
+    transition: opacity .6s ease;
+    user-select: none; -webkit-user-drag: none;
+  }
+  #mapImage.loaded { opacity: 1; }
+
+  /* ---------- Marker ---------- */
+  .marker {
+    position: absolute;
+    width: 26px; height: 26px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+  .marker .pin {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e8c876, var(--gold) 60%, #8a6a2a 100%);
+    border: 2px solid #1a1308;
+    box-shadow: 0 0 0 3px rgba(201,162,75,0.25), 0 2px 6px rgba(0,0,0,0.5);
+    animation: pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(201,162,75,0.25), 0 2px 6px rgba(0,0,0,0.5); }
+    50%      { box-shadow: 0 0 0 7px rgba(201,162,75,0.08), 0 2px 6px rgba(0,0,0,0.5); }
+  }
+  .marker:hover .pin { transform: scale(1.15); }
+  .marker .label {
+    position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+    white-space: nowrap;
+    background: rgba(15,12,8,0.9);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 16px;
+    padding: 5px 13px;
+    border-radius: 4px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .15s ease;
+  }
+  .marker:hover .label { opacity: 1; }
+
+  /* ---------- Overlay / Modal ---------- */
+  #overlay {
+    position: fixed; inset: 0;
+    background: rgba(8,6,4,0.86);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 30px;
+  }
+  #overlay.open { display: flex; }
+  #overlayCard {
+    max-width: 720px; width: 100%;
+    max-height: 88vh;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  #overlayImgWrap {
+    width: 100%;
+    background: #000;
+    line-height: 0;
+    max-height: 55vh;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #overlayImgWrap img {
+    width: 100%; height: auto; display: block;
+  }
+  #overlayImgWrap.empty {
+    padding: 40px; color: var(--ink-dim); font-style: italic; font-size: 13px;
+    text-align: center;
+  }
+  #overlayBody { padding: 22px 26px 26px; overflow-y: auto; }
+  #overlayTitle {
+    font-size: 22px; color: var(--gold); margin: 0 0 10px; font-weight: 400;
+  }
+  #overlayDesc { font-size: 14.5px; line-height: 1.6; color: var(--ink); margin: 0; }
+  #overlayClose {
+    position: absolute; top: 14px; right: 18px;
+    background: none; border: none; color: var(--ink-dim);
+    font-size: 22px; cursor: pointer; line-height: 1;
+  }
+  #overlayClose:hover { color: var(--ink); }
+
+  .empty-state {
+    color: var(--ink-dim); font-size: 14px; text-align: center; max-width: 400px;
+  }
+
+  /* ---------- Charakterleiste (rechter Rand) ---------- */
+  #charRail {
+    position: fixed; top: 0; right: 0; height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: stretch;
+    gap: clamp(8px, 1vh, 16px); padding: clamp(12px, 1.5vw, 24px);
+    z-index: 150;
+    pointer-events: none; /* nur die Karten selbst sollen interaktiv wirken, nicht der Leerraum */
+  }
+  .char-card {
+    position: relative;
+    width: clamp(108px, 8vw, 220px);
+    max-height: clamp(170px, 22vh, 340px);
+    flex: 1 1 0;
+    min-height: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(201,162,75,0.35);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    background: #000;
+    pointer-events: auto;
+  }
+  .char-card img {
+    width: 100%; height: 100%; object-fit: cover; object-position: top; display: block;
+  }
+  .char-card .char-name {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    color: var(--ink);
+    font-size: clamp(11px, 0.9vw, 15px);
+    text-align: center;
+    padding: 12px 4px 5px;
+    line-height: 1.2;
+  }
+
+  /* ---------- Audio-Steuerung ---------- */
+  #audioControl {
+    position: fixed; bottom: 16px; right: 16px; z-index: 60;
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(15,12,8,0.75);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 8px 14px 8px 10px;
+    backdrop-filter: blur(2px);
+  }
+  #muteBtn {
+    background: none; border: none; cursor: pointer;
+    font-size: 18px; line-height: 1; color: var(--ink);
+    padding: 2px; width: 24px; text-align: center;
+  }
+  #muteBtn:hover { color: var(--gold); }
+  #volumeSlider {
+    width: 90px; accent-color: var(--gold);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+  <div id="status">Verbinde …</div>
+
+  <div id="stage">
+    <div id="mapWrap">
+      <img id="mapImage" alt="Karte">
+      <!-- Marker werden hier per JS eingefügt -->
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div id="overlayCard" style="position:relative;">
+      <button id="overlayClose" aria-label="Schließen">✕</button>
+      <div id="overlayImgWrap"><img id="overlayImg" alt=""></div>
+      <div id="overlayBody">
+        <h2 id="overlayTitle"></h2>
+        <p id="overlayDesc"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="audioControl">
+    <button id="muteBtn" title="Ton an/aus">🔇</button>
+    <input type="range" id="volumeSlider" min="0" max="100" value="50">
+  </div>
+  <div id="charRail"></div>
+  <audio id="bgAudio" loop preload="auto"></audio>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+
+  <!--
+    ALLE Karten-Dateien hier eintragen (scenes.js für Grimsgate-Stadt,
+    golden_lion_scenes.js fürs Schiff, künftige Karten genauso anhängen).
+    Diese Seite selbst muss dafür NICHT verändert werden - sie erkennt
+    neue Karten automatisch über MAP_REGISTRY weiter unten, solange jede
+    Datei dem bestehenden Muster folgt (SCENES-artiges Objekt + Zugriff
+    auf label/background/markers, wahlweise über eine Marker-Funktion
+    wie bei Golden Lion).
+  -->
+  <script src="js/scenes.js"></script>
+  <script src="js/golden_lion_scenes.js"></script>
+  <script src="js/characters.js"></script>
+
+  <script>
+    // ==========================================================
+    // KARTEN-REGISTER
+    // ==========================================================
+    // Jeder Eintrag beschreibt eine Karten-Datenquelle: eine Funktion,
+    // die für eine Szenen-ID das rohe Szenen-Objekt liefert (für Label/
+    // Hintergrundbild), und eine Funktion, die die fertige Marker-Liste
+    // liefert - direkte Funktionsreferenzen statt String-Namen, damit es
+    // unabhängig davon funktioniert, ob eine Datei ihre Daten mit "var"
+    // oder "const" deklariert (const/let landen NICHT auf window, var
+    // schon - direkte Referenzen umgehen dieses Problem komplett).
+    //
+    // Neue Karte hinzufügen: einfach einen weiteren Eintrag in dieses
+    // Array aufnehmen, plus die passende <script src="..."> oben ergänzen.
+    // Diese Datei selbst braucht sonst keine Änderung mehr.
+    const MAP_REGISTRY = [
+      {
+        getScene: function (sceneId) {
+          return (typeof SCENES !== 'undefined') ? SCENES[sceneId] : undefined;
+        },
+        getMarkers: function (sceneId) {
+          return (typeof SCENES !== 'undefined' && SCENES[sceneId]) ? SCENES[sceneId].markers : null;
+        }
+      },
+      {
+        getScene: function (sceneId) {
+          return (typeof GOLDEN_LION_SCENES !== 'undefined') ? GOLDEN_LION_SCENES[sceneId] : undefined;
+        },
+        getMarkers: function (sceneId) {
+          if (typeof GOLDEN_LION_SCENES === 'undefined' || !GOLDEN_LION_SCENES[sceneId]) return null;
+          return (typeof getGoldenLionMarkers === 'function') ? getGoldenLionMarkers(sceneId) : [];
+        }
+      }
+    ];
+
+    function findSceneMeta(sceneId) {
+      for (const entry of MAP_REGISTRY) {
+        const raw = entry.getScene(sceneId);
+        if (raw) return { raw: raw, registryEntry: entry };
+      }
+      return null;
+    }
+
+    function getMarkersForScene(sceneId) {
+      const meta = findSceneMeta(sceneId);
+      if (!meta) return [];
+      const markers = meta.registryEntry.getMarkers(sceneId);
+      return markers || [];
+    }
+
+    function getBackgroundForScene(sceneId) {
+      const meta = findSceneMeta(sceneId);
+      return meta && meta.raw.background ? meta.raw.background : null;
+    }
+
+    function getStaticSoundForScene(sceneId) {
+      const meta = findSceneMeta(sceneId);
+      return meta && meta.raw.soundFile ? meta.raw.soundFile : null;
+    }
+
+    // Liefert den Sound-Dateinamen für eine Szene per Callback, da der
+    // Firebase-Wert (vom Admin-Panel gesetzt) Vorrang vor dem statischen
+    // "soundFile"-Feld aus der jeweiligen *_scenes.js-Datei hat. Fällt
+    // still auf das statische Feld zurück, falls Firebase nichts liefert
+    // oder nicht erreichbar ist.
+    function resolveSoundForScene(sceneId, callback) {
+      const fallback = getStaticSoundForScene(sceneId);
+      if (!db) { callback(fallback); return; }
+      db.ref('sceneAudioFile/' + fbKey(sceneId)).once('value').then(function (snap) {
+        const fromFirebase = snap.val();
+        callback(fromFirebase || fallback);
+      }).catch(function () {
+        callback(fallback);
+      });
+    }
+
+    // Firebase-Keys dürfen keinen Punkt enthalten (Szenen-IDs wie "1.1" tun
+    // das) - gleiche Sanitisierung wie im Admin-Panel.
+    function fbKey(str) {
+      return String(str).replace(/[.#$\[\]]/g, '-');
+    }
+
+    function getFallbackDefaultScene() {
+      // Erste verfügbare DEFAULT_*-Konstante nehmen, sonst "1.1"
+      if (typeof DEFAULT_SCENE !== 'undefined') return DEFAULT_SCENE;
+      if (typeof DEFAULT_GOLDEN_LION_SCENE !== 'undefined') return DEFAULT_GOLDEN_LION_SCENE;
+      return '1.1';
+    }
+
+    // ==========================================================
+    // RENDERING
+    // ==========================================================
+    const statusEl = document.getElementById('status');
+    const mapImageEl = document.getElementById('mapImage');
+    const mapWrapEl = document.getElementById('mapWrap');
+    const overlayEl = document.getElementById('overlay');
+    const overlayImgWrap = document.getElementById('overlayImgWrap');
+    const overlayImg = document.getElementById('overlayImg');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayDesc = document.getElementById('overlayDesc');
+
+    let currentRenderedScene = null;
+
+    function renderScene(sceneId) {
+      if (sceneId === currentRenderedScene) return; // nichts geändert, kein Neu-Rendern nötig
+      currentRenderedScene = sceneId;
+
+      const background = getBackgroundForScene(sceneId);
+      const markers = getMarkersForScene(sceneId);
+
+      if (!background) {
+        // Unbekannte Szene - Kartendaten fehlen (z.B. Tippfehler in
+        // Firebase oder eine Karte, deren Datei noch nicht eingebunden ist)
+        mapImageEl.classList.remove('loaded');
+        clearMarkers();
+        showEmptyState('Für diese Szene liegt noch keine Karte vor.');
+        return;
+      }
+      hideEmptyState();
+
+      // Sanftes Überblenden: erst ausblenden, dann neues Bild laden
+      mapImageEl.classList.remove('loaded');
+      const nextImg = new Image();
+      nextImg.onload = function () {
+        mapImageEl.src = background;
+        mapImageEl.classList.add('loaded');
+        renderMarkers(markers);
+      };
+      nextImg.onerror = function () {
+        showEmptyState('Kartenbild "' + background + '" konnte nicht geladen werden.');
+      };
+      nextImg.src = background;
+    }
+
+    function clearMarkers() {
+      mapWrapEl.querySelectorAll('.marker').forEach(function (el) { el.remove(); });
+    }
+
+    function renderMarkers(markers) {
+      clearMarkers();
+      markers.forEach(function (marker) {
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.top = marker.top + '%';
+        el.style.left = marker.left + '%';
+        el.innerHTML = '<div class="pin"></div><div class="label">' + marker.title + '</div>';
+        el.onclick = function () { openOverlay(marker); };
+        mapWrapEl.appendChild(el);
+      });
+    }
+
+    // Liefert per Callback die aktive Variante (das ganze Objekt, nicht
+    // nur das Bild) für einen Marker: null, falls der Marker keine
+    // "variants" definiert, keine Firebase-Verbindung besteht, oder in
+    // Firebase noch nichts gesetzt ist (markerVariant/<id>) - in all
+    // diesen Fällen greifen die Basiswerte des Markers (img/desc)
+    // unverändert wie bisher.
+    function resolveActiveVariant(marker, callback) {
+      if (!marker.variants || !db) { callback(null); return; }
+      db.ref('markerVariant/' + fbKey(marker.id)).once('value').then(function (snap) {
+        const activeKey = snap.val();
+        callback(activeKey && marker.variants[activeKey] || null);
+      }).catch(function () {
+        callback(null);
+      });
+    }
+
+    function openOverlay(marker) {
+      overlayTitle.textContent = marker.title || '';
+      overlayEl.classList.add('open');
+
+      resolveActiveVariant(marker, function (variant) {
+        // Eine Variante kann "img" und/oder "desc" überschreiben. Fehlt
+        // eines der beiden Felder bei der aktiven Variante (oder gibt es
+        // gar keine aktive Variante), wird auf den Basiswert des Markers
+        // zurückgefallen - siehe golden_lion_scenes.js für ein Beispiel
+        // (Frachtraum: "standard" hat einen Zusatzsatz, "leer" nicht).
+        const imgSrc = (variant && variant.img) || marker.img;
+        const descText = (variant && variant.desc) || marker.desc || '';
+
+        overlayDesc.textContent = descText;
+
+        if (imgSrc) {
+          overlayImgWrap.classList.remove('empty');
+          overlayImg.style.display = '';
+          overlayImg.src = imgSrc;
+          overlayImg.alt = marker.title || '';
+        } else {
+          overlayImgWrap.classList.add('empty');
+          overlayImg.style.display = 'none';
+          overlayImgWrap.textContent = 'Kein Bild hinterlegt.';
+        }
+      });
+    }
+
+    function closeOverlay() {
+      overlayEl.classList.remove('open');
+    }
+    document.getElementById('overlayClose').onclick = closeOverlay;
+    overlayEl.addEventListener('click', function (e) {
+      if (e.target === overlayEl) closeOverlay();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeOverlay();
+    });
+
+    let emptyStateEl = null;
+    function showEmptyState(text) {
+      if (!emptyStateEl) {
+        emptyStateEl = document.createElement('div');
+        emptyStateEl.className = 'empty-state';
+        document.getElementById('stage').appendChild(emptyStateEl);
+      }
+      emptyStateEl.textContent = text;
+      emptyStateEl.style.display = 'block';
+    }
+    function hideEmptyState() {
+      if (emptyStateEl) emptyStateEl.style.display = 'none';
+    }
+
+    // ==========================================================
+    // AUDIO: eigene Audiodatei pro Szene, per <audio>-Element
+    // ==========================================================
+    const bgAudio = document.getElementById('bgAudio');
+    let currentAudioFile = null; // aktuell geladene Datei (Dateiname)
+    let pendingAudioFile = undefined; // Szene kam, bevor das erste Mal reagiert werden konnte
+
+    // Lautstärke/Stumm-Zustand pro Browser merken
+    let savedVolume = parseInt(localStorage.getItem('korsaren_volume'), 10);
+    if (isNaN(savedVolume)) savedVolume = 50;
+    let isMuted = localStorage.getItem('korsaren_muted') !== 'false'; // Default: stumm, bis der Spieler selbst aktiviert
+
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    volumeSlider.value = savedVolume;
+    updateMuteBtnIcon();
+
+    function updateMuteBtnIcon() {
+      muteBtn.textContent = isMuted ? '🔇' : '🔊';
+    }
+
+    function applyAudioState() {
+      bgAudio.volume = savedVolume / 100;
+      bgAudio.muted = isMuted;
+      // Manche Browser pausieren <audio>, wenn es (noch) stummgeschaltet
+      // erstellt wurde - sicherheitshalber erneut abspielen versuchen.
+      if (currentAudioFile && bgAudio.paused) {
+        bgAudio.play().catch(function () { /* Autoplay evtl. weiterhin blockiert, ignorieren */ });
+      }
+    }
+
+    muteBtn.addEventListener('click', function () {
+      isMuted = !isMuted;
+      localStorage.setItem('korsaren_muted', isMuted ? 'true' : 'false');
+      updateMuteBtnIcon();
+      applyAudioState();
+    });
+    volumeSlider.addEventListener('input', function (e) {
+      savedVolume = parseInt(e.target.value, 10);
+      localStorage.setItem('korsaren_volume', String(savedVolume));
+      if (savedVolume > 0 && isMuted) {
+        isMuted = false;
+        localStorage.setItem('korsaren_muted', 'false');
+        updateMuteBtnIcon();
+      }
+      applyAudioState();
+    });
+
+    // Browser blockieren Autoplay MIT Ton grundsätzlich - das lässt sich
+    // nicht umgehen. Um es so nah wie möglich an "startet direkt mit Ton"
+    // heranzubringen: der allererste Klick/Tap irgendwo auf der Seite
+    // schaltet automatisch frei, nicht erst ein gezielter Klick auf den
+    // Lautsprecher-Button. Da Spieler ohnehin schnell auf einen Marker
+    // klicken, fühlt sich das in der Praxis fast nahtlos an.
+    // Wurde der Ton beim letzten Besuch bewusst stummgeschaltet
+    // (localStorage), respektieren wir das und schalten NICHT automatisch frei.
+    const wasExplicitlyMuted = localStorage.getItem('korsaren_muted') === 'true';
+    if (!wasExplicitlyMuted) {
+      const unlockOnFirstInteraction = function () {
+        if (!isMuted) return;
+        isMuted = false;
+        localStorage.setItem('korsaren_muted', 'false');
+        updateMuteBtnIcon();
+        applyAudioState();
+      };
+      document.addEventListener('click', unlockOnFirstInteraction, { once: true });
+      document.addEventListener('touchstart', unlockOnFirstInteraction, { once: true });
+      document.addEventListener('keydown', unlockOnFirstInteraction, { once: true });
+    }
+
+    // Erwartet den Dateinamen der Audiodatei (oder null) als Parameter -
+    // wird als Callback an resolveSoundForScene(sceneId, ...) übergeben,
+    // da die Auflösung (Firebase-Override vs. statisches Feld) asynchron läuft.
+    function syncAudioForScene(audioFile) {
+      if (audioFile === currentAudioFile) return; // schon richtig, nichts zu tun
+      currentAudioFile = audioFile;
+
+      if (!audioFile) {
+        bgAudio.pause();
+        bgAudio.removeAttribute('src');
+        return;
+      }
+      bgAudio.src = audioFile;
+      applyAudioState();
+      bgAudio.play().catch(function () {
+        // Blockiertes Autoplay ist normal, solange isMuted=true nichts
+        // Falsches signalisiert - sobald freigeschaltet wird, greift
+        // applyAudioState() erneut und startet die Wiedergabe.
+      });
+    }
+
+    // ==========================================================
+    // CHARAKTERLEISTE: welche Portraits sind in der aktuellen Szene aktiv
+    // ==========================================================
+    const charRailEl = document.getElementById('charRail');
+    let charRailRef = null;      // aktuell aktiver Firebase-Ref (zum sauberen Abhängen)
+    let charRailListener = null; // zugehöriger on('value')-Handler
+
+    function renderCharacterRail(sceneId) {
+      // Alten Live-Listener abhängen, falls Szene sich ändert - sonst
+      // würden mehrere Listener gleichzeitig laufen und sich überlagern.
+      if (charRailRef && charRailListener) {
+        charRailRef.off('value', charRailListener);
+      }
+      charRailEl.innerHTML = '';
+
+      if (typeof CHARACTERS === 'undefined' || !db) return;
+
+      charRailRef = db.ref('sceneCharacters/' + fbKey(sceneId));
+      charRailListener = charRailRef.on('value', function (snap) {
+        const active = snap.val() || {};
+        const activeChars = CHARACTERS.filter(function (ch) { return !!active[ch.id]; });
+
+        charRailEl.innerHTML = '';
+        activeChars.forEach(function (ch) {
+          const card = document.createElement('div');
+          card.className = 'char-card';
+          card.innerHTML =
+            '<img src="' + ch.img + '" alt="' + ch.name + '">' +
+            '<div class="char-name">' + ch.name + '</div>';
+          charRailEl.appendChild(card);
+        });
+      }, function () {
+        charRailEl.innerHTML = '';
+      });
+    }
+
+    // ==========================================================
+    // FIREBASE: live, ohne dass Spieler aktualisieren müssen
+    // ==========================================================
+    let db = null;
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+
+      db.ref('currentScene').on('value', function (snapshot) {
+        const sceneId = snapshot.val() || getFallbackDefaultScene();
+        statusEl.textContent = 'Verbunden';
+        statusEl.className = 'connected';
+        setTimeout(function () { statusEl.classList.add('hidden'); }, 1200);
+        renderScene(sceneId);
+        resolveSoundForScene(sceneId, syncAudioForScene);
+        renderCharacterRail(sceneId);
+      }, function (err) {
+        statusEl.textContent = 'Verbindungsfehler: ' + err.message;
+        statusEl.className = 'error';
+      });
+    } catch (e) {
+      statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft.';
+      statusEl.className = 'error';
+      renderScene(getFallbackDefaultScene());
+      resolveSoundForScene(getFallbackDefaultScene(), syncAudioForScene);
+      renderCharacterRail(getFallbackDefaultScene());
+    }
+  </script>
+
+</body>
+</html>

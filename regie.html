@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Grimsgate – Admin</title>
+<style>
+  :root {
+    --bg: #14100b;
+    --panel: #1a130b;
+    --panel-2: #221808;
+    --line: #3a2a18;
+    --ink: #cbb98f;
+    --ink-dim: #8a7a5c;
+    --ink-faint: #6b5d45;
+    --gold: #c9a24b;
+    --accent: #a8391e;
+    --live: #7fa87f;
+    --live-dim: #3a4a3a;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 20px 24px 14px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1 {
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 24px;
+    margin: 0 0 4px 0;
+  }
+
+  .subtitle {
+    color: var(--ink-dim);
+    font-style: italic;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .status {
+    font-size: 12.5px;
+    color: var(--ink-dim);
+  }
+
+  .status.connected { color: var(--live); }
+  .status.error { color: #c76a5a; }
+
+  /* ---------- Sound-Leiste ---------- */
+  #soundBar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    font-size: 13px;
+  }
+  #soundBarLabel { color: var(--gold); font-family: inherit; white-space: nowrap; }
+  .soundBarIcon { color: var(--ink-faint); }
+  #soundLinkInput {
+    flex: 1; max-width: 480px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 13px;
+    padding: 6px 10px;
+  }
+  #soundLinkInput:focus { outline: none; border-color: var(--gold); }
+  #soundLinkHint { font-size: 11px; color: var(--ink-faint); min-width: 140px; }
+  #soundLinkHint.saved { color: var(--live); }
+  #soundLinkHint.error { color: #c76a5a; }
+
+  /* ---------- Charakter-Leiste ---------- */
+  #charBar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    font-size: 13px;
+  }
+  #charBarLabel { color: var(--gold); white-space: nowrap; }
+  #charCheckboxes { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .char-toggle {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12.5px; color: var(--ink-dim);
+    cursor: pointer; user-select: none;
+  }
+  .char-toggle input { accent-color: var(--gold); cursor: pointer; }
+  .char-toggle.active { color: var(--ink); }
+
+  /* ---------- Stoppuhr ---------- */
+  #timerBar {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+    font-size: 13px;
+  }
+  #timerDisplay {
+    font-family: 'Georgia', serif; font-size: 20px; letter-spacing: 1px;
+    color: var(--gold); min-width: 84px;
+  }
+  .timer-btn {
+    font-family: inherit; font-size: 11.5px;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink-faint); border-radius: 3px;
+    padding: 5px 10px; cursor: pointer;
+    transition: border-color .12s, color .12s;
+  }
+  .timer-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .timer-btn.running { border-color: var(--live); color: var(--live); }
+  #timerMarkForm { display: flex; align-items: center; gap: 6px; }
+  #timerMarkLabel {
+    width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 8px;
+  }
+  #timerMarkMinutes {
+    width: 60px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 8px;
+  }
+  #timerMarkLabel:focus, #timerMarkMinutes:focus { outline: none; border-color: var(--gold); }
+  #timerMarks { display: flex; flex-wrap: wrap; gap: 6px; }
+  .timer-mark {
+    font-size: 11.5px; color: var(--ink-dim);
+    border: 1px solid var(--line); border-radius: 12px;
+    padding: 4px 10px; cursor: pointer; white-space: nowrap;
+  }
+  .timer-mark:hover { border-color: var(--accent); color: #e0a08e; }
+  .timer-mark.due {
+    border-color: var(--accent); color: #e0a08e; background: rgba(168,57,30,0.15);
+    animation: markPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes markPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(168,57,30,0.4); }
+    50% { box-shadow: 0 0 0 5px rgba(168,57,30,0); }
+  }
+
+  /* ---------- Board ---------- */
+  .board {
+    display: grid;
+    grid-template-columns: 260px 300px 1fr;
+    flex: 1;
+    min-height: 0;
+  }
+  .col { overflow-y: auto; border-right: 1px solid var(--line); }
+  .col:last-child { border-right: none; }
+  .col-head {
+    position: sticky; top: 0; z-index: 2;
+    padding: 10px 16px;
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-faint);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* ---------- Col 1: Szenen ---------- */
+  .scene-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px 10px 16px;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .scene-row:hover { background: var(--panel); }
+  .scene-row.selected {
+    background: var(--panel-2);
+    border-left-color: var(--gold);
+  }
+  .scene-row .label { font-size: 14px; display: flex; align-items: center; gap: 7px; }
+  .scene-row .live-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--live); flex: 0 0 auto;
+    box-shadow: 0 0 5px var(--live);
+  }
+  .live-btn {
+    font-family: inherit; font-size: 10.5px;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink-faint); border-radius: 3px;
+    padding: 3px 7px; cursor: pointer; white-space: nowrap;
+    transition: border-color .12s, color .12s;
+  }
+  .live-btn:hover { border-color: var(--accent); color: #e0a08e; }
+  .live-btn.is-live { border-color: var(--live); color: var(--live); }
+
+  /* ---------- Col 2: Orte ---------- */
+  .ort-card {
+    margin: 10px 12px; padding: 12px 13px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    cursor: pointer;
+    transition: border-color .12s, background .12s;
+  }
+  .ort-card:hover { border-color: var(--ink-faint); }
+  .ort-card.active { border-color: var(--gold); background: var(--panel-2); }
+  .ort-card .title { font-size: 15px; color: var(--ink); margin-bottom: 4px; }
+  .ort-card .personen { font-size: 11px; color: var(--gold); margin-bottom: 6px; }
+  .ort-card .kurz { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
+  .ort-card.leer .kurz { font-style: italic; }
+
+  /* ---------- Col 3: Detail ---------- */
+  .ort-detail-head { padding: 18px 24px 10px; border-bottom: 1px solid var(--line); }
+  .ort-detail-head h2 { font-weight: 400; font-size: 21px; margin: 0 0 4px; color: var(--gold); }
+  .ort-detail-head .personen-line { font-size: 12px; color: var(--ink-dim); }
+
+  .ort-variant-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
+  .variant-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+  .variant-btn {
+    font-family: inherit; font-size: 12px;
+    background: var(--panel); border: 1px solid var(--line);
+    color: var(--ink-dim); border-radius: 3px;
+    padding: 6px 11px; cursor: pointer;
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .variant-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .variant-btn.active { border-color: var(--gold); color: var(--gold); background: var(--panel-2); }
+  .variant-hint { font-size: 10.5px; color: var(--ink-faint); margin-top: 6px; min-height: 14px; }
+  .variant-hint.saved { color: var(--live); }
+
+  .ort-notiz-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
+  .ort-hinweis {
+    margin: 14px 24px 0; padding: 11px 14px;
+    background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--gold);
+    border-radius: 3px; font-size: 12.5px; line-height: 1.55; color: var(--ink-dim);
+  }
+  .ort-hinweis-label {
+    display: block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 5px;
+  }
+  .ort-notiz-block label,
+  .notiz-block label,
+  .trigger-label {
+    display: block; font-size: 10.5px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px;
+  }
+
+  textarea {
+    width: 100%; resize: vertical; min-height: 54px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 13px; padding: 8px 10px;
+    line-height: 1.5;
+  }
+  textarea:focus { outline: none; border-color: var(--gold); }
+
+  .save-hint { font-size: 10.5px; color: var(--ink-faint); margin-top: 4px; min-height: 14px; }
+  .save-hint.saved { color: var(--live); }
+
+  .interaktionen { padding: 14px 24px 40px; }
+  .interaktion {
+    border: 1px solid var(--line); border-radius: 4px; margin-bottom: 12px;
+    background: var(--panel); overflow: hidden;
+  }
+  .interaktion.open { border-color: var(--ink-faint); }
+  .interaktion-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; cursor: pointer;
+  }
+  .interaktion-head .title { font-size: 15px; color: var(--ink); }
+  .interaktion-head .kurz { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+  .chevron { color: var(--ink-faint); font-size: 12px; transition: transform .15s; }
+  .interaktion.open .chevron { transform: rotate(90deg); color: var(--gold); }
+  .interaktion-body { display: none; padding: 0 16px 16px; }
+  .interaktion.open .interaktion-body { display: block; }
+
+  .details-text {
+    font-size: 13px; line-height: 1.6; color: var(--ink-dim);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    padding: 12px 14px; margin-bottom: 14px; white-space: pre-line;
+  }
+
+  .trigger {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0; border-bottom: 1px solid var(--line);
+    cursor: pointer; user-select: none;
+  }
+  .trigger:last-of-type { border-bottom: none; }
+  .seal {
+    width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto;
+    border: 1.5px solid var(--ink-faint); position: relative;
+    transition: border-color .15s, background .15s;
+  }
+  .trigger.fired .seal { border-color: var(--live); background: var(--live-dim); }
+  .trigger.fired .seal::after {
+    content: "✓"; position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center; font-size: 10px; color: var(--live);
+  }
+  .trigger-text { font-size: 13px; color: var(--ink-dim); }
+  .trigger.fired .trigger-text { color: var(--ink); }
+
+  .notiz-block { margin-top: 14px; }
+
+  .empty-hint {
+    padding: 60px 24px; text-align: center; color: var(--ink-faint); font-size: 13.5px;
+  }
+
+  ::-webkit-scrollbar { width: 9px; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+
+  <header>
+    <h1>Grimsgate – Admin</h1>
+    <div class="subtitle">Links: Szene wählen &amp; live setzen · Mitte/Rechts: Regie-Notizen (nur hier sichtbar)</div>
+    <div class="status" id="status">Verbinde mit Firebase…</div>
+  </header>
+
+  <div id="soundBar">
+    <span id="soundBarLabel">Szene: –</span>
+    <span class="soundBarIcon">🎵</span>
+    <input type="text" id="soundLinkInput" placeholder="Dateiname der Audiodatei einfügen (z.B. sturm.mp3)…">
+    <span class="save-hint" id="soundLinkHint"></span>
+  </div>
+
+  <div id="timerBar">
+    <span id="timerDisplay">00:00:00</span>
+    <button class="timer-btn" id="timerStartPause">Start</button>
+    <button class="timer-btn" id="timerReset">Reset</button>
+    <form id="timerMarkForm">
+      <input type="text" id="timerMarkLabel" placeholder="Label, z.B. Junge/Wat">
+      <input type="number" id="timerMarkMinutes" placeholder="Min" min="0">
+      <button type="submit" class="timer-btn">+ Merker</button>
+    </form>
+    <div id="timerMarks"></div>
+  </div>
+
+  <div id="charBar">
+    <span id="charBarLabel">Charaktere in dieser Szene:</span>
+    <div id="charCheckboxes"></div>
+  </div>
+
+  <div class="board">
+    <div class="col" id="col-szenen"><div class="col-head">Szenen</div></div>
+    <div class="col" id="col-orte"><div class="col-head">Orte</div></div>
+    <div class="col" id="col-detail"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/scenes.js"></script>
+  <script src="js/golden_lion_scenes.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/regie.js"></script>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    let db = null;
+    let liveScene = null;       // aktuell für Spieler live gesetzte Szene (aus Firebase)
+    let viewState = { szene: null, ort: null }; // welche Szene/Ort gerade in der Regie-Ansicht angesehen wird
+
+    // Vorgezogen aus den Sound-/Charakter-Leisten-Abschnitten weiter unten:
+    // renderAll() kann synchron aus dem Firebase-Fallback (catch-Block direkt
+    // unten) heraus aufgerufen werden, noch bevor das Skript dort unten
+    // ankommt. Wären diese als let/const erst dort deklariert, würde das an
+    // einem "Cannot access before initialization"-Fehler (TDZ) scheitern.
+    const soundLinkInput = document.getElementById('soundLinkInput');
+    const soundLinkHint = document.getElementById('soundLinkHint');
+    const soundBarLabel = document.getElementById('soundBarLabel');
+    let soundBarScene = null; // welche Szene aktuell im Eingabefeld steht
+    const charCheckboxesEl = document.getElementById('charCheckboxes');
+    let charBarScene = null; // welche Szene aktuell die Checkboxen zeigen
+
+    // ---------- Firebase-Verbindung ----------
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.database();
+
+      db.ref('currentScene').on('value', function (snapshot) {
+        liveScene = snapshot.val() || DEFAULT_SCENE;
+        if (!viewState.szene) {
+          viewState.szene = liveScene;
+          viewState.ort = firstOrtOf(viewState.szene);
+        }
+        statusEl.textContent = 'Verbunden — live für Spieler: ' + getSceneLabel(liveScene);
+        statusEl.className = 'status connected';
+        renderAll();
+      }, function (err) {
+        statusEl.textContent = 'Fehler beim Verbinden: ' + err.message;
+        statusEl.className = 'status error';
+      });
+    } catch (e) {
+      statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft. Bitte js/firebase-config.js prüfen.';
+      statusEl.className = 'status error';
+      viewState.szene = DEFAULT_SCENE;
+      viewState.ort = firstOrtOf(viewState.szene);
+      renderAll();
+    }
+
+    function setLiveScene(sceneId) {
+      if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+      db.ref('currentScene').set(sceneId);
+    }
+
+    function firstOrtOf(sceneId) {
+      const markers = getMarkersForScene(sceneId);
+      if (!markers || markers.length === 0) return null;
+      return markers[0].id;
+    }
+
+    // Vereinheitlichte Sicht auf beide Kartenquellen (Grimsgate-Stadt aus
+    // scenes.js + Golden-Lion-Schiff aus golden_lion_scenes.js), damit der
+    // Rest der Seite nicht wissen muss, aus welcher Datei eine Szene kommt.
+    // Neue Karten (z.B. eine dritte Insel später) können auf dieselbe Art
+    // angehängt werden, ohne dass hier viel geändert werden muss.
+
+    function getAllSceneEntries() {
+      const entries = [];
+      Object.keys(SCENES).forEach(function (id) {
+        entries.push({ id: id, label: SCENES[id].label, source: 'town' });
+      });
+      if (typeof GOLDEN_LION_SCENES !== 'undefined') {
+        Object.keys(GOLDEN_LION_SCENES).forEach(function (id) {
+          entries.push({ id: id, label: GOLDEN_LION_SCENES[id].label, source: 'ship' });
+        });
+      }
+      return entries;
+    }
+
+    function getSceneLabel(sceneId) {
+      if (SCENES[sceneId]) return SCENES[sceneId].label;
+      if (typeof GOLDEN_LION_SCENES !== 'undefined' && GOLDEN_LION_SCENES[sceneId]) {
+        return GOLDEN_LION_SCENES[sceneId].label;
+      }
+      return sceneId;
+    }
+
+    function getMarkersForScene(sceneId) {
+      if (SCENES[sceneId]) return SCENES[sceneId].markers;
+      if (typeof getGoldenLionMarkers === 'function' && typeof GOLDEN_LION_SCENES !== 'undefined' && GOLDEN_LION_SCENES[sceneId]) {
+        return getGoldenLionMarkers(sceneId);
+      }
+      return [];
+    }
+
+    // Firebase-Realtime-DB-Keys dürfen u.a. keinen Punkt enthalten.
+    // Szenen-IDs wie "1.1" müssen für Pfade umgewandelt werden (nur für
+    // den Firebase-Pfad, Anzeige/Label bleibt unverändert).
+    function fbKey(str) {
+      return String(str).replace(/[.#$\[\]]/g, '-');
+    }
+
+    // ---------- Spalte 1: Szenen ----------
+    function renderSzenen() {
+      const col = document.getElementById('col-szenen');
+      col.innerHTML = '<div class="col-head">Szenen</div>';
+      getAllSceneEntries().forEach(function (entry) {
+        const sceneId = entry.id;
+        const row = document.createElement('div');
+        row.className = 'scene-row' + (viewState.szene === sceneId ? ' selected' : '');
+        row.innerHTML =
+          '<span class="label">' +
+            (sceneId === liveScene ? '<span class="live-dot" title="aktuell live"></span>' : '') +
+            entry.label +
+          '</span>' +
+          '<button class="live-btn' + (sceneId === liveScene ? ' is-live' : '') + '">' +
+            (sceneId === liveScene ? 'live' : 'live setzen') +
+          '</button>';
+        row.querySelector('.label').onclick = function () {
+          viewState.szene = sceneId;
+          viewState.ort = firstOrtOf(sceneId);
+          renderAll();
+        };
+        row.querySelector('.live-btn').onclick = function (e) {
+          e.stopPropagation();
+          setLiveScene(sceneId);
+        };
+        col.appendChild(row);
+      });
+    }
+
+    // ---------- Spalte 2: Orte ----------
+    // Filtert die Interaktionen eines Ortes auf die für eine bestimmte
+    // Szene relevanten. Zwei optionale, sich ergänzende Felder pro
+    // Interaktion:
+    //   nurSzenen: [id, ...]      - Positivliste. Erscheint NUR, wenn eine
+    //                               dieser Szenen aktiv ist (z.B. "kanone_sturm"
+    //                               mit nurSzenen: ["3.1"] - reiner Sturm-Inhalt).
+    //   nichtInSzenen: [id, ...]  - Negativliste. Erscheint in JEDER Szene
+    //                               AUSSER diesen (z.B. "dirk_vertrauen" mit
+    //                               nichtInSzenen: ["3.1"] - gilt normalerweise
+    //                               immer, ist aber während des Sturms ausgesetzt,
+    //                               weil Dirk dort mit anderem beschäftigt ist).
+    // Fehlen beide Felder, ist die Interaktion wie bisher in JEDER Szene
+    // sichtbar (abwärtskompatibel).
+    function getSceneInteraktionen(ort, sceneId) {
+      const all = ort.interaktionen || {};
+      return Object.keys(all).filter(function (iaId) {
+        const ia = all[iaId];
+        if (ia.nurSzenen && ia.nurSzenen.indexOf(sceneId) === -1) return false;
+        if (ia.nichtInSzenen && ia.nichtInSzenen.indexOf(sceneId) !== -1) return false;
+        return true;
+      });
+    }
+
+    function renderOrte() {
+      const col = document.getElementById('col-orte');
+      col.innerHTML = '<div class="col-head">Orte</div>';
+      const markers = getMarkersForScene(viewState.szene);
+      if (!markers || markers.length === 0) {
+        col.innerHTML += '<div class="empty-hint">Keine Orte in dieser Szene</div>';
+        return;
+      }
+      markers.forEach(function (marker) {
+        const ort = ORTE[marker.id] || {};
+        const hatInhalt = getSceneInteraktionen(ort, viewState.szene).length > 0;
+        const card = document.createElement('div');
+        card.className = 'ort-card' + (viewState.ort === marker.id ? ' active' : '') + (hatInhalt ? '' : ' leer');
+        card.innerHTML =
+          '<div class="title">' + marker.title + '</div>' +
+          (ort.personen ? '<div class="personen">' + ort.personen + '</div>' : '') +
+          '<div class="kurz">' + (ort.kurz || marker.desc) + '</div>';
+        card.onclick = function () { viewState.ort = marker.id; renderAll(); };
+        col.appendChild(card);
+      });
+    }
+
+    // ---------- Spalte 3: Detail ----------
+    function debounce(fn, ms) {
+      let t = null;
+      return function (...args) { clearTimeout(t); t = setTimeout(function () { fn.apply(null, args); }, ms); };
+    }
+
+    function renderDetail() {
+      const col = document.getElementById('col-detail');
+      const sceneMarkers = getMarkersForScene(viewState.szene);
+      const markerInfo = sceneMarkers.find(function (m) { return m.id === viewState.ort; });
+
+      if (!markerInfo) {
+        col.innerHTML = '<div class="empty-hint">Ort wählen, um Regie-Details zu sehen.</div>';
+        return;
+      }
+
+      const ort = ORTE[viewState.ort] || { personen: '', kurz: '', interaktionen: {}, ortHinweis: '' };
+      const dynPath = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort);
+
+      col.innerHTML =
+        '<div class="ort-detail-head"><h2>' + markerInfo.title + '</h2>' +
+          '<div class="personen-line">' + (ort.personen || '') + '</div>' +
+        '</div>' +
+        (ort.ortHinweis ? '<div class="ort-hinweis"><span class="ort-hinweis-label">Hinweis (Regie-Referenz)</span>' + ort.ortHinweis + '</div>' : '') +
+        (markerInfo.variants ?
+          '<div class="ort-variant-block">' +
+            '<label>Aktives Bild (unabhängig von Szene/Trigger)</label>' +
+            '<div class="variant-buttons" id="variant-buttons"></div>' +
+            '<div class="variant-hint" id="variant-hint"></div>' +
+          '</div>'
+        : '') +
+        '<div class="ort-notiz-block">' +
+          '<label>Notizen zum Ort (übergeordnet)</label>' +
+          '<textarea id="ort-notiz" placeholder="z.B. allgemeine Stimmung, Vorfälle ohne Bezug zu einer einzelnen Interaktion…"></textarea>' +
+          '<div class="save-hint" id="ort-notiz-hint"></div>' +
+        '</div>' +
+        '<div class="interaktionen" id="interaktionen-list"></div>' +
+        '<div class="sync-warning" id="sync-warning" style="display:none; padding:0 24px 20px; font-size:11.5px; color:#c76a5a;"></div>';
+
+      const iaKeys = getSceneInteraktionen(ort, viewState.szene);
+
+      // Sofort mit statischen Daten rendern (Trigger ungesetzt, Notizfeld leer),
+      // damit die Spalte auch ohne/bei langsamer Firebase-Verbindung nie leer bleibt.
+      document.getElementById('ort-notiz').value = '';
+      renderInteraktionen(ort, iaKeys, {});
+
+      if (markerInfo.variants) {
+        renderVariantButtons(markerInfo);
+      }
+
+      document.getElementById('ort-notiz').addEventListener('input', debounce(function (e) {
+        saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
+      }, 600));
+      document.getElementById('ort-notiz').addEventListener('blur', function (e) {
+        saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
+      });
+
+      if (!db) return; // ohne Firebase: statischer Stand bleibt, kein Speichern möglich
+
+      // Danach asynchron echten Stand nachladen und drüberlegen, falls vorhanden.
+      db.ref(dynPath).once('value').then(function (snap) {
+        const dyn = snap.val() || {};
+        if (typeof dyn.ortNotizen === 'string') {
+          document.getElementById('ort-notiz').value = dyn.ortNotizen;
+        }
+        if (dyn.interaktionen) {
+          renderInteraktionen(ort, iaKeys, dyn.interaktionen);
+        }
+      }).catch(function (err) {
+        const warn = document.getElementById('sync-warning');
+        if (warn) {
+          warn.style.display = 'block';
+          warn.textContent = 'Gespeicherter Stand (Trigger/Notizen) konnte nicht geladen werden: ' + err.message + ' — angezeigt wird der unbearbeitete Ausgangsstand. Änderungen werden trotzdem versucht zu speichern.';
+        }
+        console.error('Fehler beim Laden von', dynPath, err);
+      });
+    }
+
+    function renderInteraktionen(ort, iaKeys, dynInteraktionen) {
+      const listEl = document.getElementById('interaktionen-list');
+      if (iaKeys.length === 0) return;
+      listEl.innerHTML = '';
+
+      iaKeys.forEach(function (iaId) {
+        const ia = ort.interaktionen[iaId];
+        const dynIa = dynInteraktionen[iaId] || {};
+        const dynTrigger = dynIa.trigger || {};
+
+        const wrap = document.createElement('div');
+        wrap.className = 'interaktion';
+        wrap.innerHTML =
+          '<div class="interaktion-head">' +
+            '<div><div class="title">' + ia.title + '</div><div class="kurz">' + ia.kurz + '</div></div>' +
+            '<div class="chevron">▶</div>' +
+          '</div>' +
+          '<div class="interaktion-body">' +
+            '<div class="details-text">' + ia.details + '</div>' +
+            '<div class="trigger-label">Trigger</div>' +
+            '<div class="trigger-list"></div>' +
+            '<div class="notiz-block">' +
+              '<label>Notizen zu dieser Interaktion</label>' +
+              '<textarea placeholder="z.B. besondere Reaktionen, Würfe, Abweichungen vom Skript…">' + (dynIa.notizen || '') + '</textarea>' +
+              '<div class="save-hint"></div>' +
+            '</div>' +
+          '</div>';
+
+        wrap.querySelector('.interaktion-head').onclick = function () {
+          wrap.classList.toggle('open');
+        };
+
+        const triggerList = wrap.querySelector('.trigger-list');
+        const triggerHint = document.createElement('div');
+        triggerHint.className = 'save-hint';
+        ia.trigger.forEach(function (t) {
+          const fired = !!dynTrigger[t.id];
+          const row = document.createElement('div');
+          row.className = 'trigger' + (fired ? ' fired' : '');
+          row.innerHTML = '<div class="seal"></div><div class="trigger-text">' + t.label + '</div>';
+          row.onclick = function () {
+            const nowFired = !row.classList.contains('fired');
+            row.classList.toggle('fired');
+            triggerHint.textContent = '';
+            triggerHint.style.color = '';
+            if (!db) return;
+            const path = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort) + '/interaktionen/' + iaId + '/trigger/' + t.id;
+            db.ref(path).set(nowFired).catch(function (err) {
+              console.error('Fehler beim Speichern von', path, err);
+              row.classList.toggle('fired'); // zurücksetzen, da nicht gespeichert
+              triggerHint.style.color = '#c76a5a';
+              triggerHint.textContent = 'NICHT gespeichert — ' + err.message;
+            });
+          };
+          triggerList.appendChild(row);
+        });
+        triggerList.insertAdjacentElement('afterend', triggerHint);
+
+        const notizTextarea = wrap.querySelector('.notiz-block textarea');
+        const notizHint = wrap.querySelector('.notiz-block .save-hint');
+        const notizPath = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort) + '/interaktionen/' + iaId + '/notizen';
+        notizTextarea.addEventListener('input', debounce(function (e) {
+          saveField(notizPath, e.target.value, notizHint);
+        }, 600));
+        notizTextarea.addEventListener('blur', function (e) {
+          saveField(notizPath, e.target.value, notizHint);
+        });
+
+        listEl.appendChild(wrap);
+      });
+    }
+
+    // Rendert die Bild-Varianten-Buttons für einen Marker (z.B. Frachtraum
+    // "Standard" / "Leer"). Unabhängig vom Trigger-System: der aktive Wert
+    // liegt unter markerVariant/<markerId> und wirkt sich direkt auf das
+    // Bild aus, das Spieler auf der Karte sehen (siehe karte.html).
+    function renderVariantButtons(markerInfo) {
+      const wrap = document.getElementById('variant-buttons');
+      const hint = document.getElementById('variant-hint');
+      if (!wrap) return;
+
+      const variantKeys = Object.keys(markerInfo.variants);
+      // Fallback, falls in Firebase noch nichts gesetzt ist: die Variante
+      // nehmen, deren Bild dem aktuellen Basis-/Override-Bild entspricht.
+      const implicitDefault = variantKeys.find(function (k) {
+        return markerInfo.variants[k].img === markerInfo.img;
+      }) || variantKeys[0];
+
+      function draw(activeKey) {
+        wrap.innerHTML = '';
+        variantKeys.forEach(function (key) {
+          const variant = markerInfo.variants[key];
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'variant-btn' + (key === activeKey ? ' active' : '');
+          btn.textContent = variant.label || key;
+          btn.onclick = function () {
+            if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+            const path = 'markerVariant/' + fbKey(markerInfo.id);
+            db.ref(path).set(key).then(function () {
+              draw(key);
+              hint.className = 'variant-hint saved';
+              hint.textContent = 'gespeichert — Spieler sehen jetzt „' + (variant.label || key) + '“';
+              setTimeout(function () { hint.textContent = ''; hint.className = 'variant-hint'; }, 2000);
+            }).catch(function (err) {
+              console.error('Fehler beim Speichern von', path, err);
+              hint.style.color = '#c76a5a';
+              hint.textContent = 'NICHT gespeichert — ' + err.message;
+            });
+          };
+          wrap.appendChild(btn);
+        });
+      }
+
+      draw(implicitDefault); // sofort mit sinnvollem Default zeichnen
+      if (!db) return;
+      db.ref('markerVariant/' + fbKey(markerInfo.id)).once('value').then(function (snap) {
+        const saved = snap.val();
+        if (saved && markerInfo.variants[saved]) draw(saved);
+      }).catch(function (err) {
+        console.error('Fehler beim Laden der aktiven Variante', err);
+      });
+    }
+
+    function saveField(path, value, hintTarget) {
+      const hintEl = typeof hintTarget === 'string' ? document.getElementById(hintTarget) : hintTarget;
+      if (!db) return;
+      db.ref(path).set(value).then(function () {
+        if (hintEl) {
+          hintEl.style.color = '';
+          hintEl.textContent = 'gespeichert';
+          hintEl.classList.add('saved');
+          setTimeout(function () { if (hintEl) { hintEl.textContent = ''; hintEl.classList.remove('saved'); } }, 1500);
+        }
+      }).catch(function (err) {
+        console.error('Fehler beim Speichern von', path, err);
+        if (hintEl) {
+          hintEl.style.color = '#c76a5a';
+          hintEl.textContent = 'NICHT gespeichert — ' + err.message;
+        }
+      });
+    }
+
+    function renderAll() {
+      renderSzenen();
+      renderOrte();
+      renderDetail();
+      renderSoundBar();
+      renderCharBar();
+    }
+
+    // ---------- Stoppuhr (rein admin-seitig, GM definiert eigene Merker) ----------
+    // Zustand liegt unter gmTimer/ in Firebase (nicht unter regie/ oder
+    // markerVariant/, da unabhängig von Szene/Ort - eine durchgehende
+    // Session-Uhr). So bleibt der Stand auch bei Neuladen der Admin-Seite
+    // erhalten. "Marks" sind frei benannte Erinnerungen (Label + Minute),
+    // die der SL live selbst setzt - keine im Code fest hinterlegten
+    // Zeitpunkte, damit sich später verzweigende Handlungsstränge nicht
+    // gegenseitig ins Gehege kommen.
+    const timerDisplayEl = document.getElementById('timerDisplay');
+    const timerStartPauseBtn = document.getElementById('timerStartPause');
+    const timerResetBtn = document.getElementById('timerReset');
+    const timerMarkForm = document.getElementById('timerMarkForm');
+    const timerMarkLabelInput = document.getElementById('timerMarkLabel');
+    const timerMarkMinutesInput = document.getElementById('timerMarkMinutes');
+    const timerMarksEl = document.getElementById('timerMarks');
+
+    let gmTimerState = { running: false, startedAt: null, elapsedBeforeStart: 0, marks: {} };
+    let timerTickInterval = null;
+
+    function formatElapsed(totalSeconds) {
+      const s = Math.max(0, Math.floor(totalSeconds));
+      const hh = String(Math.floor(s / 3600)).padStart(2, '0');
+      const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+      const ss = String(s % 60).padStart(2, '0');
+      return hh + ':' + mm + ':' + ss;
+    }
+
+    function currentElapsedSeconds() {
+      let sec = gmTimerState.elapsedBeforeStart || 0;
+      if (gmTimerState.running && gmTimerState.startedAt) {
+        sec += (Date.now() - gmTimerState.startedAt) / 1000;
+      }
+      return sec;
+    }
+
+    function renderTimerTick() {
+      const elapsedSec = currentElapsedSeconds();
+      timerDisplayEl.textContent = formatElapsed(elapsedSec);
+
+      const elapsedMin = elapsedSec / 60;
+      timerMarksEl.querySelectorAll('.timer-mark').forEach(function (el) {
+        const targetMin = parseFloat(el.dataset.minutes);
+        el.classList.toggle('due', elapsedMin >= targetMin);
+      });
+    }
+
+    function renderTimerBar() {
+      timerStartPauseBtn.textContent = gmTimerState.running ? 'Pause' : 'Start';
+      timerStartPauseBtn.classList.toggle('running', gmTimerState.running);
+
+      timerMarksEl.innerHTML = '';
+      Object.keys(gmTimerState.marks || {}).forEach(function (markId) {
+        const mark = gmTimerState.marks[markId];
+        const chip = document.createElement('div');
+        chip.className = 'timer-mark';
+        chip.dataset.minutes = mark.minutes;
+        chip.textContent = mark.label + ' (' + mark.minutes + ' Min)';
+        chip.title = 'Klicken zum Entfernen';
+        chip.onclick = function () {
+          if (!db) return;
+          db.ref('gmTimer/marks/' + markId).remove();
+        };
+        timerMarksEl.appendChild(chip);
+      });
+
+      renderTimerTick();
+
+      clearInterval(timerTickInterval);
+      if (gmTimerState.running) {
+        timerTickInterval = setInterval(renderTimerTick, 1000);
+      }
+    }
+
+    if (db) {
+      db.ref('gmTimer').on('value', function (snap) {
+        const val = snap.val() || {};
+        gmTimerState = {
+          running: !!val.running,
+          startedAt: val.startedAt || null,
+          elapsedBeforeStart: val.elapsedBeforeStart || 0,
+          marks: val.marks || {}
+        };
+        renderTimerBar();
+      });
+    } else {
+      renderTimerBar();
+    }
+
+    timerStartPauseBtn.onclick = function () {
+      if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+      if (gmTimerState.running) {
+        // Pausieren: laufende Zeit einfrieren, startedAt löschen
+        db.ref('gmTimer').update({
+          running: false,
+          elapsedBeforeStart: currentElapsedSeconds(),
+          startedAt: null
+        });
+      } else {
+        // Starten: ab jetzt weiterzählen, vorhandene elapsedBeforeStart bleibt Basis
+        db.ref('gmTimer').update({
+          running: true,
+          startedAt: Date.now()
+        });
+      }
+    };
+
+    timerResetBtn.onclick = function () {
+      if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+      db.ref('gmTimer').update({ running: false, startedAt: null, elapsedBeforeStart: 0 });
+    };
+
+    timerMarkForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+      const label = timerMarkLabelInput.value.trim();
+      const minutes = parseFloat(timerMarkMinutesInput.value);
+      if (!label || isNaN(minutes)) return;
+      db.ref('gmTimer/marks').push({ label: label, minutes: minutes });
+      timerMarkLabelInput.value = '';
+      timerMarkMinutesInput.value = '';
+      timerMarkLabelInput.focus();
+    });
+
+    // ---------- Sound-Leiste (YouTube-Link pro Szene) ----------
+    // Deklarationen (soundLinkInput/-Hint/-Label, soundBarScene) liegen jetzt
+    // oben bei den anderen Skript-weiten Variablen, siehe Kommentar dort.
+
+    // Prüft, ob der eingegebene Text plausibel eine Audiodatei benennt
+    // (endet auf eine gängige Audio-Dateiendung). Erlaubt auch relative
+    // Pfade (z.B. "audio/sturm.mp3"), falls die Dateien in einem
+    // Unterordner liegen.
+    function isPlausibleAudioFilename(input) {
+      if (!input) return false;
+      const s = input.trim();
+      return /\.(mp3|ogg|wav|m4a|aac)$/i.test(s);
+    }
+
+    function renderSoundBar() {
+      soundBarScene = viewState.szene;
+      soundBarLabel.textContent = 'Szene: ' + (soundBarScene ? getSceneLabel(soundBarScene) : '–');
+      soundLinkInput.value = '';
+      soundLinkHint.textContent = '';
+      soundLinkHint.className = 'save-hint';
+
+      if (!db || !soundBarScene) return;
+      db.ref('sceneAudioFile/' + fbKey(soundBarScene)).once('value').then(function (snap) {
+        const savedFile = snap.val();
+        if (savedFile && soundBarScene === viewState.szene) {
+          soundLinkInput.value = savedFile;
+        }
+      });
+    }
+
+    soundLinkInput.addEventListener('blur', saveSoundLink);
+    soundLinkInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); soundLinkInput.blur(); }
+    });
+
+    function saveSoundLink() {
+      if (!db || !soundBarScene) return;
+      const raw = soundLinkInput.value.trim();
+
+      if (!raw) {
+        // Leeres Feld = Ton für diese Szene entfernen
+        db.ref('sceneAudioFile/' + fbKey(soundBarScene)).remove().then(function () {
+          soundLinkHint.textContent = 'entfernt';
+          soundLinkHint.className = 'save-hint saved';
+          setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
+        });
+        return;
+      }
+
+      if (!isPlausibleAudioFilename(raw)) {
+        soundLinkHint.textContent = 'Kein gültiger Dateiname (.mp3/.ogg/.wav/.m4a/.aac erwartet)';
+        soundLinkHint.className = 'save-hint error';
+        return;
+      }
+
+      db.ref('sceneAudioFile/' + fbKey(soundBarScene)).set(raw).then(function () {
+        soundLinkHint.textContent = 'gespeichert';
+        soundLinkHint.className = 'save-hint saved';
+        setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
+      }).catch(function (err) {
+        soundLinkHint.textContent = 'NICHT gespeichert — ' + err.message;
+        soundLinkHint.className = 'save-hint error';
+      });
+    }
+
+    // ---------- Charakter-Leiste (welche Portraits sind in der Szene sichtbar) ----------
+    // Deklarationen (charCheckboxesEl, charBarScene) liegen jetzt oben bei
+    // den anderen Skript-weiten Variablen, siehe Kommentar dort.
+
+    function renderCharBar() {
+      charBarScene = viewState.szene;
+      charCheckboxesEl.innerHTML = '';
+      if (typeof CHARACTERS === 'undefined' || !charBarScene) return;
+
+      if (!db) {
+        CHARACTERS.forEach(function (ch) {
+          charCheckboxesEl.appendChild(buildCharToggle(ch, false));
+        });
+        return;
+      }
+
+      db.ref('sceneCharacters/' + fbKey(charBarScene)).once('value').then(function (snap) {
+        if (charBarScene !== viewState.szene) return; // Szene wurde inzwischen gewechselt
+        const active = snap.val() || {};
+        CHARACTERS.forEach(function (ch) {
+          charCheckboxesEl.appendChild(buildCharToggle(ch, !!active[ch.id]));
+        });
+      });
+    }
+
+    function buildCharToggle(ch, isActive) {
+      const label = document.createElement('label');
+      label.className = 'char-toggle' + (isActive ? ' active' : '');
+      label.innerHTML = '<input type="checkbox"' + (isActive ? ' checked' : '') + '> ' + ch.name;
+      const checkbox = label.querySelector('input');
+      checkbox.addEventListener('change', function () {
+        label.classList.toggle('active', checkbox.checked);
+        if (!db || !charBarScene) return;
+        db.ref('sceneCharacters/' + fbKey(charBarScene) + '/' + ch.id).set(checkbox.checked);
+      });
+      return label;
+    }
+  </script>
+
+</body>
+</html>
