@@ -470,6 +470,29 @@
     }
 
     // ---------- Spalte 2: Orte ----------
+    // Filtert die Interaktionen eines Ortes auf die für eine bestimmte
+    // Szene relevanten. Zwei optionale, sich ergänzende Felder pro
+    // Interaktion:
+    //   nurSzenen: [id, ...]      - Positivliste. Erscheint NUR, wenn eine
+    //                               dieser Szenen aktiv ist (z.B. "kanone_sturm"
+    //                               mit nurSzenen: ["3.1"] - reiner Sturm-Inhalt).
+    //   nichtInSzenen: [id, ...]  - Negativliste. Erscheint in JEDER Szene
+    //                               AUSSER diesen (z.B. "dirk_vertrauen" mit
+    //                               nichtInSzenen: ["3.1"] - gilt normalerweise
+    //                               immer, ist aber während des Sturms ausgesetzt,
+    //                               weil Dirk dort mit anderem beschäftigt ist).
+    // Fehlen beide Felder, ist die Interaktion wie bisher in JEDER Szene
+    // sichtbar (abwärtskompatibel).
+    function getSceneInteraktionen(ort, sceneId) {
+      const all = ort.interaktionen || {};
+      return Object.keys(all).filter(function (iaId) {
+        const ia = all[iaId];
+        if (ia.nurSzenen && ia.nurSzenen.indexOf(sceneId) === -1) return false;
+        if (ia.nichtInSzenen && ia.nichtInSzenen.indexOf(sceneId) !== -1) return false;
+        return true;
+      });
+    }
+
     function renderOrte() {
       const col = document.getElementById('col-orte');
       col.innerHTML = '<div class="col-head">Orte</div>';
@@ -480,7 +503,7 @@
       }
       markers.forEach(function (marker) {
         const ort = ORTE[marker.id] || {};
-        const hatInhalt = ort.interaktionen && Object.keys(ort.interaktionen).length > 0;
+        const hatInhalt = getSceneInteraktionen(ort, viewState.szene).length > 0;
         const card = document.createElement('div');
         card.className = 'ort-card' + (viewState.ort === marker.id ? ' active' : '') + (hatInhalt ? '' : ' leer');
         card.innerHTML =
@@ -531,7 +554,7 @@
         '<div class="interaktionen" id="interaktionen-list"></div>' +
         '<div class="sync-warning" id="sync-warning" style="display:none; padding:0 24px 20px; font-size:11.5px; color:#c76a5a;"></div>';
 
-      const iaKeys = Object.keys(ort.interaktionen || {});
+      const iaKeys = getSceneInteraktionen(ort, viewState.szene);
 
       // Sofort mit statischen Daten rendern (Trigger ungesetzt, Notizfeld leer),
       // damit die Spalte auch ohne/bei langsamer Firebase-Verbindung nie leer bleibt.
