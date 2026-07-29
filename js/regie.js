@@ -242,18 +242,41 @@ const ORTE = {
     personen: "Francesco Almeida",
     kurz: "Francesco lehnt an der Reeling, faulenzt statt zu beaufsichtigen. Kein Auftrag — freundliche Präsenz, ehrliche Einschätzungen auf Nachfrage.",
     ortHinweis: "Francesco hängt sich bei Spielern ein, die hier herumstehen, macht aber von sich aus nicht viel. Ohne Ansprache sehnt er sich hörbar nach Sonne und warmer Luft — \"nicht wie hier in diesem traurigen, grauen England\". Zahlt sich später aus, sobald die Golden Lion in der Karibik ankommt (deutliche Kontraständerung in seinem Auftreten möglich).",
-    // 3.1 (Sturm): bewusst OHNE Francesco - im Sturm-Flavortext ist die Crew an Deck
-    // absichtlich anonym (vgl. Design-Prinzip "keine Namen im Sturm-Chaos", siehe
-    // Batteriedeck/"kanone_sturm"). Francescos Einschätzungen-Interaktion ist ohnehin
-    // per nichtInSzenen ausgesetzt.
+    // 3.1 (Sturm): Francesco tritt hier nicht auf (siehe nichtInSzenen bei
+    // "einschaetzungen" unten) - stattdessen zwei eigene Sturm-Interaktionen mit
+    // Cormac und Ned (Juli 2026, Inhalt von Hendrik).
     szenenUeberschreibungen: {
       "3.1": {
-        personen: "Anonyme Crew (keine benannte Figur)",
-        kurz: "Chaotische Segelarbeit im Sturm, keine benannte Figur — keine Interaktion in dieser Szene.",
-        ortHinweis: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Männer hängen in den Wanten, kämpfen mit den Segeln — eines hat sich bereits losgerissen und flattert zerfetzt im Wind. Andere ziehen mit vereinten Kräften an nassen Leinen, während wieder andere sich nur noch am Deck festkrallen, von der letzten Welle niedergeworfen.\n\nBewusst ohne Francesco oder andere benannte Figuren — reines Chaos-Bild."
+        personen: "Cormac Daly · Ned Sharpe (situativ, stürzt)",
+        kurz: "Cormac ruft Befehle, schickt die geschicktesten Spieler zum Segel-Einschnüren hoch. Ned rutscht am Bug aus und wird übers Deck geschliffen — auffangbar.",
+        ortHinweis: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Cormac steht mitten im Chaos und ruft Befehle — die Segel sind noch zu weit draußen, es droht, den Mast abzureißen, wenn sie nicht bald eingeschnürt werden.\n\nKommen Spieler in seine Nähe, schickt er die zwei mit dem höchsten Geschick-Wert hoch in die Takelage (siehe Interaktion \"Segel einschnüren\")."
       }
     },
     interaktionen: {
+      "cormac_segel_sturm": {
+        title: "Cormac — Segel einschnüren (nur Sturm-Szene 3.1)",
+        kurz: "Cormac schickt die 2 Spieler mit dem höchsten Geschick-Wert in die Takelage. Geschick+10-Probe, um das Segel oben einzuschnüren. Guter Erfolg beeindruckt Cormac.",
+        nurSzenen: ["3.1"],
+        details: "Cormac steht an Deck und ruft Befehle — die Segel sind noch zu weit draußen, der Mast droht abgerissen zu werden, wenn sie nicht bald eingeschnürt werden. Kommen Spieler in seine Nähe, schickt er die zwei mit dem höchsten Geschick-Wert hoch in die Takelage (objektiver Vergleich der Charakterbögen).\n\nDer Aufstieg in der Takelage ist bei diesem Wetter gefährlich — Regen und Wind reißen an den Spielern, während oben das Segel eingeschnürt werden muss.\n\nProbe: Geschick+10.\n\n— Guter Erfolg: beeindruckt Cormac sichtbar\n— Normaler/Schlechter Erfolg: geschafft, kein besonderer Kommentar → neutral\n— Misserfolg: [OFFEN] Konsequenz noch nicht festgelegt\n\nGleichzeitig würfeln die übrigen Spieler an Deck Körper-Proben, um sich festzuhalten.",
+        trigger: [
+          { id: "ausgeloest", label: "Cormac schickt 2 Spieler hoch (höchstes Geschick)" },
+          { id: "aufstieg_gut", label: "Aufstieg: Guter Erfolg → beeindruckt Cormac" },
+          { id: "aufstieg_normal", label: "Aufstieg: Normaler/Schlechter Erfolg → neutral" },
+          { id: "aufstieg_misserfolg", label: "Aufstieg: Misserfolg" },
+          { id: "deck_koerper", label: "Übrige Spieler: Körper-Probe zum Festhalten gewürfelt" }
+        ]
+      },
+      "ned_sturz_sturm": {
+        title: "Ned — Rutscht über das Deck (nur Sturm-Szene 3.1)",
+        kurz: "Ned rutscht vorne am Bug aus und wird übers ganze Deck geschliffen. Auffangen möglich → Freund fürs Leben.",
+        nurSzenen: ["3.1"],
+        details: "Ned Sharpe rutscht vorne am Bug aus und wird übers ganze Deck geschliffen. Spieler können versuchen, ihn aufzufangen (Probe: Körper oder Geschick, [OFFEN] welche genau bzw. ob wahlweise).\n\n— Aufgefangen: Ned hat einen Freund fürs Leben gewonnen — großer, dauerhafter Ruf-Gewinn bei Ned\n— Nicht aufgefangen: [OFFEN] Konsequenz noch nicht festgelegt",
+        trigger: [
+          { id: "ausgeloest", label: "Ned rutscht aus und wird übers Deck geschliffen" },
+          { id: "aufgefangen", label: "Aufgefangen → Freund fürs Leben (großer Ruf-Gewinn bei Ned)" },
+          { id: "nicht_aufgefangen", label: "Nicht aufgefangen" }
+        ]
+      },
       "einschaetzungen": {
         title: "Francesco — Ehrliche Einschätzungen",
         kurz: "Auf direkte Frage nach anderen Personen: ehrliche, nie proaktiv genannte Meinung. Kein Trigger/Ruf-Effekt, reine Charakterinfo.",

@@ -700,18 +700,19 @@ Grundarchitektur anzutasten.
 > 3.1 weiterhin exakt dieselbe Zusammenfassung wie für 2.1 — obwohl 3.1 inhaltlich eine
 > komplett andere Szene ist und außer dem Ortsnamen selbst nichts übernommen werden sollte.
 > Behoben über ein neues, analoges Feld `szenenUeberschreibungen` in `regie.js` (siehe 13.2),
-> mit eigenständigem Text für alle vier Orte. Dabei bewusst konsistent mit dem Design-Prinzip
-> „keine Namen im Sturm-Chaos" (s. u., Batteriedeck): Oberdeck, Batteriedeck und Frachtraum
-> nennen für 3.1 keine Figur mehr namentlich (Francesco/Dirk/Trewin-Zwillinge/blinder
-> Passagier fehlen dort bewusst), nur Achterdeck behält Tom, da er im Flavortext selbst
-> namentlich auftaucht.
+> mit eigenständigem Text für alle vier Orte. Batteriedeck und Frachtraum bleiben konsistent
+> zum Design-Prinzip „keine Namen im Sturm-Chaos" (s. u.) namenlos (Dirk/Trewin-Zwillinge/
+> blinder Passagier fehlen dort bewusst); Achterdeck behält Tom und Oberdeck bekam mit Cormac
+> und Ned eigene, namentlich benannte Sturm-Interaktionen (siehe unten), da beide im
+> Flavortext selbst auftauchen.
 
 **Finale Flavortexte (alle fünf Orte mit eigenem `_sturm`-Bild):**
 
 > **Oberdeck:** Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel.
-> Männer hängen in den Wanten, kämpfen mit den Segeln — eines hat sich bereits losgerissen und
-> flattert zerfetzt im Wind. Andere ziehen mit vereinten Kräften an nassen Leinen, während
-> wieder andere sich nur noch am Deck festkrallen, von der letzten Welle niedergeworfen.
+> Cormac steht mitten im Chaos und ruft Befehle — die Segel sind noch zu weit draußen, und
+> wenn sie nicht bald eingeschnürt werden, droht der Mast abzureißen. Männer hängen in den
+> Wanten, kämpfen mit den nassen Leinen, während andere sich nur noch am Deck festkrallen, von
+> der letzten Welle niedergeworfen.
 
 > **Achterdeck:** Tom kämpft mit dem Ruder, beide Hände fest um die Speichen, Muskeln sichtbar
 > angespannt — von der lässigen Mühelosigkeit sonst keine Spur. Jede Welle versucht, ihm das
@@ -732,6 +733,24 @@ Grundarchitektur anzutasten.
 > **Frachtraum:** Der Frachtraum steht knöcheltief unter Wasser — bei jeder Welle schwappt es
 > zwischen den Fässern hin und her. Irgendwo dringt Wasser ein, das hier nicht hingehört. Wenn
 > niemand bald etwas unternimmt, wird es mehr.
+
+**Oberdeck — Cormac & das Segel:** Kommen Spieler in Cormacs Nähe, schickt er die zwei mit dem
+höchsten Geschick-Wert hoch in die Takelage, um das noch zu weit draußen stehende Segel
+einzuschnüren, bevor der Mast abreißt. Der Aufstieg bei diesem Wetter ist gefährlich — Regen
+und Wind reißen an den Spielern.
+
+- Probe: **Geschick+10**
+- **Guter Erfolg** beeindruckt Cormac sichtbar — normaler/schlechter Erfolg neutral,
+  **Misserfolg [OFFEN]** (Konsequenz noch nicht festgelegt)
+- Gleichzeitig würfeln die übrigen Spieler an Deck **Körper-Proben**, um sich festzuhalten
+
+**Oberdeck — Ned stürzt:** Ned Sharpe rutscht vorne am Bug aus und wird übers ganze Deck
+geschliffen. Spieler können versuchen, ihn aufzufangen (Probe **[OFFEN]** — Körper oder
+Geschick, welche genau bzw. ob wahlweise ist noch nicht entschieden).
+
+- **Aufgefangen** → Ned hat einen Freund fürs Leben gewonnen — großer, dauerhafter
+  Ruf-Gewinn bei Ned
+- **Nicht aufgefangen [OFFEN]** (Konsequenz noch nicht festgelegt)
 
 **Batteriedeck — Losgerissene Kanone:** Bewusst **keine Namen, keine vorweggenommenen
 Handlungen** im Flavortext — Dirk hilft zwar mit und ruft Anweisungen, wird aber nicht genannt
@@ -1106,6 +1125,9 @@ dafür, dass die **künstliche Verknappung** (30 Minuten bis Wat, 60 Minuten bis
 - Erkennungs-Mechanik Hafenmeisterei (Probe oder automatisch?)
 - Konsequenz bei Nicht-Eingreifen in der Bordell-Raubein-Szene
 - Ob die Spieler das Zeit-Trigger-Muster später **aktiv nutzen** können
+- Konsequenz bei Misserfolg beim Segel-Einschnüren (Oberdeck, Sturm-Szene)
+- Welche Probe (Körper/Geschick/wahlweise) zum Auffangen von Ned zählt, und Konsequenz bei
+  Nicht-Auffangen (Oberdeck, Sturm-Szene)
 
 ### Struktur
 - Koexistenz von freier Wahl und Zwangsstopp (spanischer Hafen bei schlechtem Ruf)
