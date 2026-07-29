@@ -1,0 +1,84 @@
+# CLAUDE.md — Projekt-Gedächtnis
+
+Kurzer technischer Leitfaden für dieses Repo. Die eigentliche Story-/Design-Doku steht in
+`KAMPAGNEN-BIBEL.md` — vor inhaltlicher Arbeit lesen, v. a. Abschnitt 13 „Technischer Stack"
+und Abschnitt 17 „Arbeitsweise". Dieses Dokument hier ist rein technisch/prozessual und hält
+zusätzlich einen laufenden Changelog.
+
+## Projekt in Kürze
+
+Statische GM/Spieler-Toolseite für eine Piraten/Kaperfahrer-Pen&Paper-Kampagne („Korsaren"),
+gehostet über GitHub Pages, kein Build-Schritt. Firebase Realtime Database synchronisiert die
+Spielleiter-Ansicht (`regie.html`) live mit der Spieler-Kartenansicht (`karte.html`).
+
+## Architektur-Muster (Details: Bibel 13.2)
+
+- **MAP_REGISTRY-/`getAllSceneEntries()`-Muster:** Jede Karte/Örtlichkeit (Grimsgate-Stadt,
+  Golden-Lion-Schiff, Schatzinsel) ist eine eigene Datei (`js/scenes.js`,
+  `js/golden_lion_scenes.js`, `js/schatzinsel_scenes.js`) mit direkten Funktionsreferenzen statt
+  `window[]`-Lookups (wegen `const`/`let`-Scoping). Neue Karte = neue Datei + ein
+  Registry-Eintrag in `karte.html` UND `regie.html`, sonst nichts.
+- **Zwei Marker-Muster:**
+  - *Flach* (`scenes.js`, `schatzinsel_scenes.js`): jede Szene listet ihre Marker komplett
+    selbst. Passt, solange eine Örtlichkeit nur einen Szenen-Zustand hat.
+  - *Basis/Override* (`golden_lion_scenes.js`): Marker-Position/Titel/Bild nur EINMAL in
+    `..._MARKERS_BASE`, Szenen überschreiben nur `imgOverrides`/`descOverrides`/`hiddenMarkers`.
+    Nötig, sobald eine Örtlichkeit mehrere Szenen-Zustände bekommt.
+- **Szenen-ID-Konvention:** führende Ziffer = Örtlichkeit (1.x Grimsgate, 2.x/3.x Golden Lion,
+  4.x Schatzinsel), zweite Ziffer = Zustand dieser Örtlichkeit. Eine NEUE Örtlichkeit bekommt
+  eine NEUE führende Ziffer, statt einfach weiterzuzählen — Fehler ist am 29.07. passiert
+  (Schatzinsel fälschlich als `3.2` statt `4.1`, siehe Changelog).
+- **`szenenUeberschreibungen`** (`regie.js`): analoges Override-Prinzip für die GM-Felder
+  `personen`/`kurz`/`ortHinweis`, aufgelöst über `resolveOrtForScene()` in `regie.html`. Ohne
+  dieses Feld zeigt das Admin-Panel für eine neue Szene weiterhin den Text der Basis-Szene.
+- **`nurSzenen`/`nichtInSzenen`** (`regie.js`, pro Interaktion): steuert, in welchen Szenen eine
+  GM-Interaktion im Admin-Panel auftaucht.
+- **Bild-Overlay-Fallback:** Marker ohne `img` zeigen in `karte.html` automatisch „Kein Bild
+  hinterlegt." — kein Crash, wirkt für Spieler/GM aber wie ein Fehler. Lieber ein
+  Platzhalter-Bild setzen (z. B. das Kartenbild selbst) als das Feld leer zu lassen.
+
+## Workflow-Eigenheiten
+
+- **Bilder:** Neues PNG in `images/` ablegen, dann `python3 tools/optimize_images.py` (WebP,
+  Kantenlänge je nach Namensmuster gekappt). Löscht das PNG NICHT automatisch, trägt den neuen
+  Dateinamen NICHT automatisch in `.js`-Dateien ein — beides bleibt manuell.
+- **Audio:** `python3 tools/optimize_audio.py <datei.mp3>` (Opus/OGG, 64 kbps VBR, volle Länge
+  bleibt erhalten). Hendrik hört jede konvertierte Datei komplett an — nicht ohne explizites
+  „passt" mergen.
+- **Git-Push-Eigenheit:** Der Remote-Feature-Branch behält oft eine veraltete Spitze von vor
+  einem früheren Squash-Merge, wodurch `git push` als „non-fast-forward" abgelehnt wird, obwohl
+  der Inhalt längst in `main` gemergt ist. Fix: `git fetch origin <branch>`, dann
+  `git diff FETCH_HEAD origin/main --stat` (bestätigt: kein echter Unterschied), dann
+  `git merge --no-edit FETCH_HEAD`. Bei Konflikten (kommt vor, wenn dieselben Zeilen mehrfach
+  angefasst wurden): `git checkout --ours <datei>` — die eingehende Seite ist immer die
+  veraltete.
+- **Testen ohne Firebase:** `python3 -m http.server` + Playwright/Chromium headless, Szenen-
+  Funktionen direkt per `page.evaluate()` aufrufen (z. B. `getMarkersForScene('4.1')`), da ohne
+  echte Firebase-Verbindung nichts live geschaltet werden kann.
+- **Merge-Ablauf:** Branch → Commit → Push → PR → auf Hendriks explizites „merge" warten →
+  Squash-Merge. Nie ungefragt mergen.
+
+## Arbeitsweise (siehe Bibel 17)
+
+Hendrik entwickelt Story-Inhalte selbst — keine proaktiven Inhaltsvorschläge ohne Anweisung.
+Bei Story-Lücken lieber `[OFFEN]` in der Bibel vermerken als selbst etwas erfinden.
+
+## Changelog
+
+### 2026-07-29
+- Admin-Panel-Duplikat behoben: Sturm-Szene (3.1) zeigte identische GM-Zusammenfassung wie
+  Basis-Szene (2.1) → `szenenUeberschreibungen` + `resolveOrtForScene()` eingeführt
+- Projekt-Reorg: Ordnerstruktur, einheitliche Dateinamen, Redirect-Stubs für alte URLs,
+  Admin-Panel gegen versehentlichen Spieler-Zugriff über die Root-URL abgesichert
+- Performance-Fix (Lags/Ladezeiten): alle Bilder PNG→WebP (132 MB → 4,5 MB), alle Audiodateien
+  MP3→Opus/OGG (242 MB → 93 MB, volle Länge erhalten) — Pipeline in `tools/optimize_images.py`
+  und `tools/optimize_audio.py`
+- Sturm-Szene (3.1) inhaltlich ausgearbeitet: Oberdeck (Cormac & Segel, Ned stürzt, Sturm-
+  Höhepunkt mit Mastbruch/Ruderklemme/Toms Anker-Highlight/Harwicks vielsagenden Blicken),
+  Achterdeck (Toms loses Mundwerk)
+- Redundantes „(nur Sturm-Szene 3.1)" aus Interaktions-Titeln entfernt
+- Schatzinsel-Referenzbild (`images/schatzinsel.webp`) und `island1.ogg` eingebaut/komprimiert
+- Neue Schatzinsel-Szene (dritte Kartenquelle, `js/schatzinsel_scenes.js`) mit erstem Ort
+  (`schiffswrack`, die gestrandete Golden Lion) — bewusst noch ohne weitere Orte/GM-Inhalt.
+  Zunächst fälschlich als `3.2` angelegt (Kollision mit der Schiffs-Nummerierung), auf `4.1`
+  korrigiert; Schiffswrack-Marker bekam ein Platzhalter-Bild statt leerem `img`-Feld
