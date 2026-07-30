@@ -172,6 +172,11 @@
   #diceForm input {
     width: 42px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
     color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 6px;
+    -moz-appearance: textfield;
+  }
+  #diceForm input::-webkit-outer-spin-button,
+  #diceForm input::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
   }
   #diceFeed {
     position: fixed; top: 16px; left: 16px; z-index: 200;
