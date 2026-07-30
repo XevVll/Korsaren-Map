@@ -192,6 +192,12 @@
     transition: opacity .4s ease;
   }
   .dice-toast.fade { opacity: 0; }
+  .dice-toast.private { border-style: dashed; font-style: italic; }
+  #dicePrivateLabel {
+    display: flex; align-items: center; gap: 5px;
+    color: var(--ink-dim); font-size: 12px; cursor: pointer; white-space: nowrap;
+  }
+  #dicePrivateLabel input { accent-color: var(--gold); cursor: pointer; }
 
   /* ---------- Board ---------- */
   .board {
@@ -426,7 +432,7 @@
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
-      initDiceRoller(db);
+      initDiceRoller(db, { allowPrivate: true });
 
       db.ref('currentScene').on('value', function (snapshot) {
         liveScene = snapshot.val() || DEFAULT_SCENE;
