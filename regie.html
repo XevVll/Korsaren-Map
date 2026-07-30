@@ -100,15 +100,25 @@
   .char-toggle.active { color: var(--ink); }
 
   /* ---------- Live-Vorschau (Spieleransicht) ---------- */
-  #previewBar {
-    padding: 8px 24px;
-    border-bottom: 1px solid var(--line);
-    background: var(--panel);
+  /* Schwebendes Widget unten rechts statt volle Breite, damit die
+     Szenen-Inhalte (Spalten links/mitte) gleichzeitig lesbar bleiben. */
+  #previewWidget {
+    position: fixed; bottom: 16px; right: 16px; z-index: 250;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
   }
+  #previewToggle {
+    background: rgba(15,12,8,0.85); border: 1px solid var(--line);
+    color: var(--ink-dim); border-radius: 20px;
+    padding: 6px 14px; font-size: 11.5px;
+    backdrop-filter: blur(2px);
+  }
+  #previewToggle:hover { border-color: var(--gold); color: var(--ink); }
   #previewPanel {
     display: none;
-    height: 60vh;
-    border-bottom: 1px solid var(--line);
+    width: 380px; height: 300px;
+    border: 1px solid var(--line); border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.55);
     background: #000;
   }
   #previewPanel.open {
@@ -116,6 +126,9 @@
   }
   #previewFrame {
     width: 100%; height: 100%; border: none;
+  }
+  @media (max-width: 500px) {
+    #previewPanel { width: 88vw; height: 66vw; }
   }
 
   /* ---------- Stoppuhr ---------- */
@@ -411,11 +424,11 @@
     <div id="charCheckboxes"></div>
   </div>
 
-  <div id="previewBar">
-    <button class="timer-btn" id="previewToggle">▶ Live-Vorschau (Spieleransicht)</button>
-  </div>
-  <div id="previewPanel">
-    <iframe id="previewFrame" title="Live-Vorschau Spieleransicht"></iframe>
+  <div id="previewWidget">
+    <div id="previewPanel">
+      <iframe id="previewFrame" title="Live-Vorschau Spieleransicht"></iframe>
+    </div>
+    <button id="previewToggle">▶ Live-Vorschau</button>
   </div>
 
   <div class="board">
