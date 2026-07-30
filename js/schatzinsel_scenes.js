@@ -30,11 +30,7 @@ const SCHATZINSEL_SCENES = {
         top: 70, left: 73,
         title: "Die gestrandete Golden Lion",
         desc: "Die Golden Lion liegt zerzaust in einer sandigen Bucht auf der Seite, der vordere Mast gebrochen, der Rumpf übel zugerichtet. Tauwerk und Trümmer verteilen sich über den Strand. Die Crew ist bereits mitten in den Reparaturarbeiten — Balken werden herangeschafft, der Schmied schlägt am improvisierten Amboss Beschläge zurecht, Leitern lehnen am Rumpf. Für die meisten an Bord wirkt es wie reines Glück, hier überhaupt festen Boden unter den Füßen zu haben — dass Tom sie mit gezielten Ankermanövern genau hierher gesteuert hat, wissen nur die wenigsten.",
-        // Noch kein eigenes Nahaufnahme-Bild für diesen Ort (wie z.B.
-        // interior_oberdeck.webp fürs Schiff) - bis eines existiert, wird
-        // hilfsweise dasselbe Insel-Bild wie der Kartenhintergrund gezeigt,
-        // statt "Kein Bild hinterlegt." anzuzeigen.
-        img: "images/schatzinsel.webp"
+        img: "images/interior_schiffswrack.webp"
       }
     ]
   }

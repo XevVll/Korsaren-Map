@@ -1062,8 +1062,9 @@ schicken (Details und die Firebase-Falle siehe Docstring im Skript).
   Quelle angehängt — genau wie in den bestehenden Code-Kommentaren als Beispiel vorgesehen.
   Bisher nur ein Marker (`schiffswrack`, die gestrandete Golden Lion) — weitere Orte der Insel
   (Höhle, knorriger Baum, Felsformationen) folgen erst in einem späteren Schritt. Der Marker
-  nutzt vorübergehend dasselbe Bild wie der Kartenhintergrund (kein eigenes Nahaufnahme-Bild
-  vorhanden), damit der Overlay-Klick nicht „Kein Bild hinterlegt." zeigt
+  hat inzwischen ein eigenes Nahaufnahme-Bild (`interior_schiffswrack.webp` — Crew bei
+  Reparaturarbeiten am gestrandeten Schiff), anfangs zeigte er noch behelfsmäßig dasselbe
+  Bild wie der Kartenhintergrund
 - **Varianten + imgOverride zusammen:** Überschreibt eine Szene das Bild eines Markers, der in
   BASE ein `variants`-Feld hat (z. B. Frachtraum), werden die Varianten für diese Szene
   automatisch deaktiviert (`variants: null`). Sonst könnte eine in einer ANDEREN Szene aktiv
