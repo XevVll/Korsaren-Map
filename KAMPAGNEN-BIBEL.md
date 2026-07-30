@@ -1223,13 +1223,15 @@ Würfel-Steuerung abfangen, sobald der Bogen offen ist.
 
 ### 13.8 Live-Vorschau im Admin-Panel (Juli 2026)
 
-`regie.html` bekommt eine ein-/ausklappbare Leiste („▶/▼ Live-Vorschau (Spieleransicht)")
-unterhalb der Charakter-Leiste. Ausgeklappt zeigt sie `karte.html` per `<iframe>` — bewusst
-keine eigene Render-Logik, da so exakt das zu sehen ist, was Spieler gerade wirklich sehen
-(bleibt über dieselbe Firebase-`currentScene`-Anbindung automatisch synchron). iframe-`src`
-wird auch hier erst beim ersten Ausklappen gesetzt (Lazy-Load). Zustand (auf/zu) wird in
-`localStorage` gemerkt (`korsaren_regie_preview_open`) — rein UI-Komfort für diesen einen
-Admin-Browser, kein Firebase-Pfad nötig.
+`regie.html` bekommt ein schwebendes, ein-/ausklappbares Widget unten rechts (`#previewWidget`,
+freie Ecke — `#diceControls` unten links, `#diceFeed` oben links). Ausgeklappt zeigt ein
+kompaktes Panel (380×300px) `karte.html` per `<iframe>` — bewusst keine eigene Render-Logik,
+da so exakt das zu sehen ist, was Spieler gerade wirklich sehen (bleibt über dieselbe
+Firebase-`currentScene`-Anbindung automatisch synchron). Bewusst klein und in der Ecke statt
+volle Breite, damit die Szenen-Spalten (Orte/Details) gleichzeitig lesbar bleiben. iframe-`src`
+wird erst beim ersten Ausklappen gesetzt (Lazy-Load). Zustand (auf/zu) wird in `localStorage`
+gemerkt (`korsaren_regie_preview_open`) — rein UI-Komfort für diesen einen Admin-Browser, kein
+Firebase-Pfad nötig.
 
 ---
 
