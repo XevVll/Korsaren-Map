@@ -86,6 +86,9 @@ Bei Story-Lücken lieber `[OFFEN]` in der Bibel vermerken als selbst etwas erfin
   eigene Szene mehr nötig
 - Szenen-Label ohne Nummer (siehe Architektur-Muster oben) — betrifft alle drei
   Szenen-Dateien
+- Referenzbilder für `zwischenstation`, `stammesdorf`, `lager` eingebaut (PNG→WebP,
+  7-10 MB → 130-315 KB via `tools/optimize_images.py`), Platzhaltertexte durch
+  ausformulierte Stimmungsbeschreibungen ersetzt
 
 ### 2026-07-29
 - Admin-Panel-Duplikat behoben: Sturm-Szene (3.1) zeigte identische GM-Zusammenfassung wie
