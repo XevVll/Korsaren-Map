@@ -50,7 +50,7 @@
 
 const SCHATZINSEL_SCENES = {
   "4.1": {
-    label: "4.1 – Schatzinsel (Strandung)",
+    label: "Schatzinsel (Strandung)",
     background: "images/schatzinsel.webp",
     soundFile: "island1.ogg",
     markers: [

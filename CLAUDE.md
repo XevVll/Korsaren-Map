@@ -28,6 +28,13 @@ Spielleiter-Ansicht (`regie.html`) live mit der Spieler-Kartenansicht (`karte.ht
   4.x Schatzinsel), zweite Ziffer = Zustand dieser Örtlichkeit. Eine NEUE Örtlichkeit bekommt
   eine NEUE führende Ziffer, statt einfach weiterzuzählen — Fehler ist am 29.07. passiert
   (Schatzinsel fälschlich als `3.2` statt `4.1`, siehe Changelog).
+- **Szenen-Label ohne Nummer (seit 30.07.):** Die ID (z.B. `"2.1"`) bleibt intern nötig
+  (Firebase-Pfade, Szenen-Zuordnung), taucht aber im `label`-Text nicht mehr auf — nur noch
+  Ortsname (+ Zustand, falls das für Unterscheidbarkeit nötig ist, z.B. „Golden Lion im
+  Sturm"). Grund: Seit Marker einzeln live ein-/ausblendbar sind (`hiddenMarkersLive`),
+  brauchen unterschiedliche „Zustände" derselben Örtlichkeit oft keine eigene Szene mehr —
+  die Nummer suggerierte eine Reihenfolge/Feingranularität, die es im Admin-Panel gar nicht
+  mehr braucht.
 - **`szenenUeberschreibungen`** (`regie.js`): analoges Override-Prinzip für die GM-Felder
   `personen`/`kurz`/`ortHinweis`, aufgelöst über `resolveOrtForScene()` in `regie.html`. Ohne
   dieses Feld zeigt das Admin-Panel für eine neue Szene weiterhin den Text der Basis-Szene.
@@ -64,6 +71,21 @@ Hendrik entwickelt Story-Inhalte selbst — keine proaktiven Inhaltsvorschläge 
 Bei Story-Lücken lieber `[OFFEN]` in der Bibel vermerken als selbst etwas erfinden.
 
 ## Changelog
+
+### 2026-07-30
+- Live-Sichtbarkeits-Schalter für Marker (`hiddenMarkersLive/{sceneId}/{markerId}`): SL kann
+  in `regie.html` jeden Ort per Klick live aus-/wieder einblenden, ohne Szenenwechsel oder
+  Codedeploy (KAMPAGNEN-BIBEL 13.10)
+- Schatzinsel (Szene `4.1`) inhaltlich erweitert: Marker `stammesdorf`, `hoehle`,
+  `zwischenstation`, `lager` ergänzt (letztere zwei mit Platzhaltertext/-bild, bis
+  Referenzbilder existieren); `hoehle`-Text um vorweggenommenes Plot-Wissen bereinigt
+- Neue Design-Regel 2.8 in der Bibel: Marker-`desc`-Texte sind reine Ort-/Stimmungsangaben,
+  kein Plot-Wissen/Handlungsauftrag
+- Szene `1.2` ("Golden Lion sichtbar") in `1.1` gemergt — der einzige Unterschied (ein
+  zusätzlicher Marker) lässt sich jetzt über den Sichtbarkeits-Schalter abbilden, keine
+  eigene Szene mehr nötig
+- Szenen-Label ohne Nummer (siehe Architektur-Muster oben) — betrifft alle drei
+  Szenen-Dateien
 
 ### 2026-07-29
 - Admin-Panel-Duplikat behoben: Sturm-Szene (3.1) zeigte identische GM-Zusammenfassung wie

@@ -23,7 +23,7 @@
 //   Stelle im Code. Eine neue Szene braucht im einfachsten Fall nur:
 //
 //     "3.1": {
-//       label: "3.1 - Golden Lion im Sturm",
+//       label: "Golden Lion im Sturm",
 //       background: "images/golden_lion_cutaway_sturm.webp",
 //       imgOverrides: { oberdeck: "images/interior_oberdeck_sturm.webp" }
 //     }
@@ -129,7 +129,7 @@ const GOLDEN_LION_MARKERS_BASE = {
 
 const GOLDEN_LION_SCENES = {
   "2.1": {
-    label: "2.1 – Golden Lion (Basis)",
+    label: "Golden Lion (Basis)",
     background: "images/golden_lion_cutaway.webp",
     imgOverrides: {}      // nutzt für alle Marker einfach die img aus BASE
     // descOverrides: {}  // optional, falls in einer Szene auch Texte abweichen sollen
@@ -137,7 +137,7 @@ const GOLDEN_LION_SCENES = {
   },
 
   "3.1": {
-    label: "3.1 – Golden Lion im Sturm",
+    label: "Golden Lion im Sturm",
     background: "images/golden_lion_cutaway_sturm.webp",
     // Bug, Offiziersquartier, Unterdeck, Werkstatt und Kombüse spielen in
     // dieser Szene nicht mit - dort passiert nichts Sturmrelevantes.
@@ -159,10 +159,13 @@ const GOLDEN_LION_SCENES = {
     soundFile: "storm1.ogg" // war "sturm.mp3" - passte nie zur tatsaechlich abgelegten Datei
   }
 
-  // Beispiel für später, zum Reinkopieren und Anpassen:
+  // Beispiel für später, zum Reinkopieren und Anpassen. ACHTUNG: "4.1" ist
+  // inzwischen von der Schatzinsel belegt (schatzinsel_scenes.js) - eine
+  // neue Golden-Lion-Örtlichkeit bräuchte die nächste freie führende
+  // Ziffer (aktuell "5.1"), siehe CLAUDE.md, Szenen-ID-Konvention.
   //
-  // "4.1": {
-  //   label: "4.1 – Golden Lion in der Karibik",
+  // "5.1": {
+  //   label: "Golden Lion in der Karibik",
   //   background: "images/golden_lion_cutaway_karibik.webp",
   //   imgOverrides: {
   //     oberdeck: "images/interior_oberdeck_karibik.webp"
