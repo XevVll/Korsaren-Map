@@ -1088,6 +1088,7 @@ schicken (Details und die Firebase-Falle siehe Docstring im Skript).
 | `markerVariant/{markerId}` | **Aktive Bildvariante eines Ortes** — wirkt direkt auf die Spieleransicht |
 | `gmTimer/…` | Stoppuhr: `running`, `startedAt`, `elapsedBeforeStart`, `marks` |
 | `diceRolls/{pushId}` | Live-Würfel-Feed, selbst-verfallend nach ~90s (siehe 13.6) |
+| `openMarkers/{sceneId}/{markerId}/{sessionId}` | Live-Präsenz: wer hat welchen Ort gerade offen (siehe 13.9) |
 
 ### 13.4 Bildvarianten-System
 
@@ -1241,6 +1242,37 @@ Kartenbild ab. Das Live-Vorschau-Widget lädt deshalb `karte.html?preview=1` sta
 `#diceFeed`, `#charSheetHandle`, `#charSheetDrawer` und `#charSheetBackdrop` ausblendet.
 Betrifft nur diesen einen Aufruf mit Query-Parameter — die normale Spieleransicht (ohne
 `?preview=1`) bleibt unverändert vollständig interaktiv.
+
+### 13.9 Live-Anzeige: wer hat welchen Ort offen (Juli 2026)
+
+Jeder Marker-Overlay-Klick auf `karte.html` schreibt eine Präsenz nach
+`openMarkers/{fbKey(sceneId)}/{markerId}/{sessionId} = true`. Die `sessionId` wird pro **Tab**
+erzeugt (`sessionStorage`, nicht `localStorage`) — bewusst, damit zwei offene Tabs auch als
+zwei Betrachter zählen, nicht als einer. `regie.html` zählt die Kinder pro Marker und zeigt
+sie als kleines Badge neben dem Ort-Titel in der Orte-Spalte (`.ort-open-count`, nur sichtbar
+wenn > 0).
+
+**Aufräumen über zwei Wege:** Aktives Schließen des Overlays entfernt den Eintrag sofort
+(`clearOpenMarker()`). Zusätzlich registriert jeder Eintrag `.onDisconnect().remove()` —
+Firebase' Standard-Präsenzmuster, das den Eintrag automatisch entfernt, wenn der Tab
+geschlossen wird oder die Verbindung abbricht, ohne dass der Client sich aktiv abmelden muss.
+Ein Szenenwechsel räumt ebenfalls sofort auf (`renderScene()` ruft `clearOpenMarker()`), damit
+kein Eintrag unter der alten Szene hängen bleibt, falls jemand beim Wechsel gerade ein Overlay
+offen hatte.
+
+**Admin-eigene Live-Vorschau zählt bewusst nicht mit:** Der `?preview=1`-Modus (13.8) lädt
+`karte.html` ebenfalls per iframe, und Marker-Klicks funktionieren dort weiterhin (nur die
+UI-Chrome ist ausgeblendet, das Overlay selbst nicht). `setOpenMarker()` prüft deshalb zuerst
+`document.documentElement.classList.contains('preview-mode')` und schreibt in diesem Fall gar
+nicht erst — sonst würde ein Marker-Klick des Spielleiters in seiner eigenen Vorschau die
+Zählung für echte Spieler verfälschen.
+
+**Listener-Muster in `regie.html`:** `attachOpenMarkersListener(sceneId)` folgt demselben
+An-/Abhäng-Prinzip wie `renderCharacterRail()` in `karte.html` (`ref.off()` vor jedem
+Neu-Verbinden), mit einem zusätzlichen Guard (`if (sceneId === openMarkersScene) return;`) —
+nötig, weil `renderOrte()` (und damit dieser Aufruf) über `renderAll()` sehr häufig läuft, im
+Unterschied zu `karte.html`, wo der Aufruf schon durch den `currentScene`-Listener selbst
+gedrosselt ist.
 
 ---
 

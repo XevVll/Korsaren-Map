@@ -291,6 +291,13 @@
   .ort-card .personen { font-size: 11px; color: var(--gold); margin-bottom: 6px; }
   .ort-card .kurz { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
   .ort-card.leer .kurz { font-style: italic; }
+  .ort-open-count {
+    display: inline-block;
+    background: var(--live); color: #0a0a0a;
+    border-radius: 10px; padding: 1px 7px;
+    font-size: 11px; font-weight: 700;
+    vertical-align: middle;
+  }
 
   /* ---------- Col 3: Detail ---------- */
   .ort-detail-head { padding: 18px 24px 10px; border-bottom: 1px solid var(--line); }
@@ -466,6 +473,14 @@
     let soundBarScene = null; // welche Szene aktuell im Eingabefeld steht
     const charCheckboxesEl = document.getElementById('charCheckboxes');
     let charBarScene = null; // welche Szene aktuell die Checkboxen zeigen
+
+    // ---------- Live-Präsenz: wer hat welchen Ort gerade offen ----------
+    // Vorgezogen aus demselben Grund wie soundBarScene/charBarScene oben -
+    // renderOrte() (weiter unten) greift beim ersten Aufruf schon darauf zu.
+    let openMarkersRef = null;
+    let openMarkersListener = null;
+    let openMarkersScene = null;
+    let openMarkerCounts = {}; // { markerId: Anzahl offener Sessions }
 
     // ---------- Live-Vorschau (Spieleransicht) ----------
     // Zeigt karte.html per iframe genau so, wie Spieler sie live sehen -
@@ -656,7 +671,34 @@
       };
     }
 
+    // Hängt einen Live-Listener auf openMarkers/{szene} - analog zum
+    // charRailRef/charRailListener-Muster in karte.html (dort zum Lesen der
+    // sichtbaren Portraits, hier zum Zählen offener Marker-Overlays). Der
+    // Guard unten ist nötig, weil renderAll() (und damit dieser Aufruf)
+    // sehr häufig läuft (jeder Klick/jede Eingabe) - anders als in
+    // karte.html, wo der Aufruf schon durch den currentScene-Listener
+    // selbst gedrosselt ist.
+    function attachOpenMarkersListener(sceneId) {
+      if (sceneId === openMarkersScene) return;
+      if (openMarkersRef && openMarkersListener) {
+        openMarkersRef.off('value', openMarkersListener);
+      }
+      openMarkersScene = sceneId;
+      openMarkerCounts = {};
+      if (!db || !sceneId) return;
+      openMarkersRef = db.ref('openMarkers/' + fbKey(sceneId));
+      openMarkersListener = openMarkersRef.on('value', function (snap) {
+        const data = snap.val() || {};
+        openMarkerCounts = {};
+        Object.keys(data).forEach(function (markerId) {
+          openMarkerCounts[markerId] = Object.keys(data[markerId] || {}).length;
+        });
+        renderOrte();
+      });
+    }
+
     function renderOrte() {
+      attachOpenMarkersListener(viewState.szene);
       const col = document.getElementById('col-orte');
       col.innerHTML = '<div class="col-head">Orte</div>';
       const markers = getMarkersForScene(viewState.szene);
@@ -668,10 +710,13 @@
         const ortRaw = ORTE[marker.id] || {};
         const ort = resolveOrtForScene(ortRaw, viewState.szene);
         const hatInhalt = getSceneInteraktionen(ort, viewState.szene).length > 0;
+        const openCount = openMarkerCounts[marker.id] || 0;
         const card = document.createElement('div');
         card.className = 'ort-card' + (viewState.ort === marker.id ? ' active' : '') + (hatInhalt ? '' : ' leer');
         card.innerHTML =
-          '<div class="title">' + marker.title + '</div>' +
+          '<div class="title">' + marker.title +
+          (openCount > 0 ? ' <span class="ort-open-count" title="' + openCount + ' Spieler haben diesen Ort gerade offen">' + openCount + '</span>' : '') +
+          '</div>' +
           (ort.personen ? '<div class="personen">' + ort.personen + '</div>' : '') +
           '<div class="kurz">' + (ort.kurz || marker.desc) + '</div>';
         card.onclick = function () { viewState.ort = marker.id; renderAll(); };
