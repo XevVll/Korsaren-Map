@@ -146,6 +146,48 @@
     50% { box-shadow: 0 0 0 5px rgba(168,57,30,0); }
   }
 
+  /* ---------- Würfel-Feed (szenenübergreifend, identisch zu karte.html) ---------- */
+  #diceControls {
+    position: fixed; bottom: 16px; left: 16px; z-index: 200;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: rgba(15,12,8,0.75);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 8px 14px;
+    backdrop-filter: blur(2px);
+    font-size: 12.5px;
+  }
+  #diceNameLabel {
+    color: var(--ink-dim); cursor: pointer; white-space: nowrap;
+  }
+  #diceNameLabel:hover { color: var(--gold); }
+  #diceD100Btn, #diceForm button {
+    font-family: inherit; font-size: 12.5px;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink); border-radius: 3px;
+    padding: 5px 10px; cursor: pointer;
+  }
+  #diceD100Btn:hover, #diceForm button:hover { border-color: var(--gold); color: var(--gold); }
+  #diceForm { display: flex; align-items: center; gap: 6px; }
+  #diceForm input {
+    width: 42px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 6px;
+  }
+  #diceFeed {
+    position: fixed; top: 16px; left: 16px; z-index: 200;
+    display: flex; flex-direction: column; gap: 6px;
+    max-width: 320px;
+  }
+  .dice-toast {
+    background: rgba(15,12,8,0.85);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 12.5px; color: var(--ink);
+    transition: opacity .4s ease;
+  }
+  .dice-toast.fade { opacity: 0; }
+
   /* ---------- Board ---------- */
   .board {
     display: grid;
@@ -354,6 +396,7 @@
   <script src="js/golden_lion_scenes.js"></script>
   <script src="js/schatzinsel_scenes.js"></script>
   <script src="js/characters.js"></script>
+  <script src="js/dice.js"></script>
   <script src="js/regie.js"></script>
 
   <script>
@@ -378,6 +421,7 @@
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
+      initDiceRoller(db);
 
       db.ref('currentScene').on('value', function (snapshot) {
         liveScene = snapshot.val() || DEFAULT_SCENE;
