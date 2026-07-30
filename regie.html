@@ -330,6 +330,48 @@
   .variant-hint { font-size: 10.5px; color: var(--ink-faint); margin-top: 6px; min-height: 14px; }
   .variant-hint.saved { color: var(--live); }
 
+  /* ---------- Szenen-Dokument (Stimmung + Ghosts) & Steckbriefe ---------- */
+  .szene-doc-head {
+    margin: 10px 12px 2px; padding: 10px 13px;
+    background: var(--panel); border: 1px solid var(--gold); border-radius: 4px;
+    cursor: pointer; color: var(--gold); font-size: 13px;
+    display: flex; align-items: center; gap: 7px;
+    transition: background .12s, color .12s;
+  }
+  .szene-doc-head:hover { background: var(--panel-2); }
+  .szene-doc-head.active { background: var(--gold); color: #0a0a0a; }
+  .szene-doc-icon { font-size: 14px; }
+
+  .szene-stimmung {
+    margin: 16px 24px; padding: 16px 20px;
+    background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--gold);
+    border-radius: 4px; font-size: 15px; line-height: 1.7; color: var(--ink);
+  }
+
+  .steckbrief-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
+  .steckbrief-block label {
+    display: block; font-size: 10.5px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px;
+  }
+  .steckbrief {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    padding: 10px 13px; margin-bottom: 10px;
+  }
+  .steckbrief:last-child { margin-bottom: 0; }
+  .steckbrief.koerperlich { border-left: 3px solid var(--accent); }
+  .sb-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 7px; }
+  .sb-name { font-size: 14px; color: var(--ink); font-weight: 600; }
+  .sb-rolle { font-size: 12px; color: var(--gold); }
+  .sb-koerper {
+    font-size: 10px; color: var(--accent); border: 1px solid var(--accent);
+    border-radius: 3px; padding: 1px 6px; margin-left: auto; white-space: nowrap;
+  }
+  .sb-zeile { font-size: 12.5px; line-height: 1.5; color: var(--ink-dim); margin-top: 4px; }
+  .sb-label {
+    display: inline-block; font-size: 9.5px; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--ink-faint); margin-right: 7px; min-width: 62px; vertical-align: baseline;
+  }
+
   .ort-notiz-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
   .ort-hinweis {
     margin: 14px 24px 0; padding: 11px 14px;
@@ -472,7 +514,7 @@
     const statusEl = document.getElementById('status');
     let db = null;
     let liveScene = null;       // aktuell für Spieler live gesetzte Szene (aus Firebase)
-    let viewState = { szene: null, ort: null }; // welche Szene/Ort gerade in der Regie-Ansicht angesehen wird
+    let viewState = { szene: null, ort: null, szeneDoc: false }; // welche Szene/Ort gerade in der Regie-Ansicht angesehen wird; szeneDoc: Detail-Spalte zeigt das Szenen-Dokument (Stimmung+Ghosts) statt eines Ort-Details
 
     // Vorgezogen aus den Sound-/Charakter-Leisten-Abschnitten weiter unten:
     // renderAll() kann synchron aus dem Firebase-Fallback (catch-Block direkt
@@ -634,6 +676,7 @@
         row.querySelector('.label').onclick = function () {
           viewState.szene = sceneId;
           viewState.ort = firstOrtOf(sceneId);
+          viewState.szeneDoc = false; // neue Szene startet im Ort-Detail, nicht im Szenen-Dokument
           renderAll();
         };
         row.querySelector('.live-btn').onclick = function (e) {
@@ -684,6 +727,7 @@
         personen: override.personen !== undefined ? override.personen : ort.personen,
         kurz: override.kurz !== undefined ? override.kurz : ort.kurz,
         ortHinweis: override.ortHinweis !== undefined ? override.ortHinweis : ort.ortHinweis,
+        npcs: override.npcs !== undefined ? override.npcs : ort.npcs,
         interaktionen: ort.interaktionen
       };
     }
@@ -747,10 +791,29 @@
       attachOpenMarkersListener(viewState.szene);
       attachHiddenMarkersListener(viewState.szene);
       const col = document.getElementById('col-orte');
-      col.innerHTML = '<div class="col-head">Orte</div>';
+      col.innerHTML = '';
+
+      // Szenen-Überblick-Kopf (Grundstimmung + Ghosts) - nur, wenn für die
+      // Szene GM-Material hinterlegt ist. Klick schaltet die Detail-Spalte in
+      // den Szenen-Dokument-Modus (siehe renderSzeneDoc); ein Ort-Klick weiter
+      // unten schaltet zurück.
+      const szeneRegie = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[viewState.szene] : null;
+      if (szeneRegie) {
+        const docHead = document.createElement('div');
+        docHead.className = 'szene-doc-head' + (viewState.szeneDoc ? ' active' : '');
+        docHead.innerHTML = '<span class="szene-doc-icon">📖</span> Szene: Stimmung &amp; Leute';
+        docHead.onclick = function () { viewState.szeneDoc = true; renderAll(); };
+        col.appendChild(docHead);
+      }
+
+      const orteHead = document.createElement('div');
+      orteHead.className = 'col-head';
+      orteHead.textContent = 'Orte';
+      col.appendChild(orteHead);
+
       const markers = getMarkersForScene(viewState.szene);
       if (!markers || markers.length === 0) {
-        col.innerHTML += '<div class="empty-hint">Keine Orte in dieser Szene</div>';
+        col.insertAdjacentHTML('beforeend', '<div class="empty-hint">Keine Orte in dieser Szene</div>');
         return;
       }
       markers.forEach(function (marker) {
@@ -776,7 +839,7 @@
           e.stopPropagation();
           toggleMarkerVisibility(viewState.szene, marker.id);
         };
-        card.onclick = function () { viewState.ort = marker.id; renderAll(); };
+        card.onclick = function () { viewState.ort = marker.id; viewState.szeneDoc = false; renderAll(); };
         col.appendChild(card);
       });
     }
@@ -787,8 +850,56 @@
       return function (...args) { clearTimeout(t); t = setTimeout(function () { fn.apply(null, args); }, ms); };
     }
 
+    // Baut die Steckbrief-Karten (name/rolle/verfassung/beduerfnis) für eine
+    // Liste von Figuren - gemeinsam genutzt von Ghosts (Szenen-Dokument) und
+    // verankerten NPCs (Ort-Detail). koerperlich:true markiert einen Ghost,
+    // an dem sich ein kampflustiger Spieler gefahrlos reiben kann.
+    function steckbriefCardsHTML(list) {
+      return (list || []).map(function (p) {
+        return '<div class="steckbrief' + (p.koerperlich ? ' koerperlich' : '') + '">' +
+          '<div class="sb-head">' +
+            '<span class="sb-name">' + (p.name || '') + '</span>' +
+            (p.rolle ? '<span class="sb-rolle">' + p.rolle + '</span>' : '') +
+            (p.koerperlich ? '<span class="sb-koerper" title="Gefahrloses körperliches Ventil - hier kann sich ein kampflustiger Spieler reiben">✊ körperlich</span>' : '') +
+          '</div>' +
+          (p.verfassung ? '<div class="sb-zeile"><span class="sb-label">Verfassung</span>' + p.verfassung + '</div>' : '') +
+          (p.beduerfnis ? '<div class="sb-zeile"><span class="sb-label">Bedürfnis</span>' + p.beduerfnis + '</div>' : '') +
+        '</div>';
+      }).join('');
+    }
+
+    // Szenen-Dokument (Grundstimmung + Ghost-Ensemble) in der breiten
+    // Detail-Spalte - zum Vorlesen / Spieler-Hinlocken. Aktiviert über den
+    // Szenen-Kopf in der Orte-Spalte (viewState.szeneDoc).
+    function renderSzeneDoc(col) {
+      const szeneRegie = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[viewState.szene] : null;
+      if (!szeneRegie) {
+        col.innerHTML = '<div class="empty-hint">Für diese Szene ist noch kein Stimmungs-Dokument hinterlegt.</div>';
+        return;
+      }
+      col.innerHTML =
+        '<div class="ort-detail-head"><h2>' + getSceneLabel(viewState.szene) + '</h2>' +
+          '<div class="personen-line">Grundstimmung &amp; frei platzierbare Leute — zum Vorlesen und Einstreuen</div>' +
+        '</div>' +
+        (szeneRegie.stimmung ? '<div class="szene-stimmung">' + szeneRegie.stimmung + '</div>' : '') +
+        (szeneRegie.ghosts && szeneRegie.ghosts.length
+          ? '<div class="steckbrief-block"><label>Leute in der Szene (frei platzierbar, plot-neutral)</label>' +
+              steckbriefCardsHTML(szeneRegie.ghosts) +
+            '</div>'
+          : '');
+    }
+
     function renderDetail() {
       const col = document.getElementById('col-detail');
+
+      // Szenen-Dokument-Modus: Detail-Spalte zeigt Stimmung + Ghosts statt
+      // eines einzelnen Ortes (umgeschaltet über den Szenen-Kopf in der
+      // Orte-Spalte).
+      if (viewState.szeneDoc) {
+        renderSzeneDoc(col);
+        return;
+      }
+
       const sceneMarkers = getMarkersForScene(viewState.szene);
       const markerInfo = sceneMarkers.find(function (m) { return m.id === viewState.ort; });
 
@@ -806,6 +917,9 @@
           '<div class="personen-line">' + (ort.personen || '') + '</div>' +
         '</div>' +
         (ort.ortHinweis ? '<div class="ort-hinweis"><span class="ort-hinweis-label">Hinweis (Regie-Referenz)</span>' + ort.ortHinweis + '</div>' : '') +
+        (ort.npcs && ort.npcs.length
+          ? '<div class="steckbrief-block"><label>Vor Ort</label>' + steckbriefCardsHTML(ort.npcs) + '</div>'
+          : '') +
         (markerInfo.variants ?
           '<div class="ort-variant-block">' +
             '<label>Aktives Bild (unabhängig von Szene/Trigger)</label>' +
