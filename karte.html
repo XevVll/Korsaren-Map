@@ -250,6 +250,57 @@
     color: var(--ink-dim); font-size: 12px; cursor: pointer; white-space: nowrap;
   }
   #dicePrivateLabel input { accent-color: var(--gold); cursor: pointer; }
+
+  /* ---------- Charakterbogen-Drawer ---------- */
+  #charSheetHandle {
+    position: fixed; top: 50%; left: 0; transform: translateY(-50%);
+    z-index: 300;
+    writing-mode: vertical-rl;
+    background: rgba(15,12,8,0.85);
+    border: 1px solid var(--line); border-left: none;
+    border-radius: 0 8px 8px 0;
+    color: var(--ink-dim);
+    padding: 14px 8px;
+    cursor: pointer;
+    font-size: 12.5px;
+    letter-spacing: .04em;
+    transition: color .15s, background .15s;
+  }
+  #charSheetHandle:hover { color: var(--gold); background: rgba(15,12,8,0.95); }
+  #charSheetBackdrop {
+    position: fixed; inset: 0;
+    background: rgba(8,6,4,0.6);
+    z-index: 290;
+    display: none;
+  }
+  #charSheetBackdrop.open { display: block; }
+  #charSheetDrawer {
+    position: fixed; top: 0; left: 0; height: 100vh;
+    width: 70vw; max-width: 900px;
+    z-index: 300;
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    box-shadow: 8px 0 30px rgba(0,0,0,0.5);
+    transform: translateX(-100%);
+    transition: transform .3s ease;
+    display: flex; flex-direction: column;
+  }
+  #charSheetDrawer.open { transform: translateX(0); }
+  #charSheetDrawer iframe {
+    flex: 1; width: 100%; border: none;
+  }
+  #charSheetDrawerClose {
+    position: absolute; top: 10px; right: 10px; z-index: 1;
+    background: rgba(15,12,8,0.85); border: 1px solid var(--line);
+    color: var(--ink-dim); border-radius: 50%;
+    width: 30px; height: 30px;
+    font-size: 16px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #charSheetDrawerClose:hover { color: var(--gold); }
+  @media (max-width: 700px) {
+    #charSheetDrawer { width: 100vw; max-width: 100vw; }
+  }
 </style>
 </head>
 <body>
@@ -280,6 +331,13 @@
   </div>
   <div id="charRail"></div>
   <audio id="bgAudio" loop preload="auto"></audio>
+
+  <div id="charSheetHandle" onclick="toggleCharSheetDrawer()">📋 Charakterbogen</div>
+  <div id="charSheetBackdrop" onclick="closeCharSheetDrawer()"></div>
+  <div id="charSheetDrawer">
+    <button id="charSheetDrawerClose" onclick="closeCharSheetDrawer()" aria-label="Schließen">✕</button>
+    <iframe id="charSheetFrame" title="Charakterbogen" allow="clipboard-write"></iframe>
+  </div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -577,6 +635,38 @@
       }
       applyAudioState();
     });
+
+    // ---------- Charakterbogen-Drawer ----------
+    // Eigenständige Seite (charakterbogen.html) im iframe statt inline
+    // eingebettet - vermeidet CSS-Konflikte (die Datei definiert eigene
+    // :root-Variablen mit denselben Namen wie hier, z.B. --gold/--line,
+    // aber anderen Werten). iframe-src wird erst beim ersten Öffnen
+    // gesetzt (lazy), damit die Seite nicht bei jedem Kartenaufruf
+    // mitgeladen wird, auch wenn niemand den Bogen öffnet.
+    (function () {
+      const handle = document.getElementById('charSheetHandle');
+      const backdrop = document.getElementById('charSheetBackdrop');
+      const drawer = document.getElementById('charSheetDrawer');
+      const iframe = document.getElementById('charSheetFrame');
+      let loaded = false;
+
+      function openDrawer() {
+        if (!loaded) { iframe.src = 'charakterbogen.html'; loaded = true; }
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+      }
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+      }
+      window.toggleCharSheetDrawer = function () {
+        if (drawer.classList.contains('open')) closeDrawer(); else openDrawer();
+      };
+      window.closeCharSheetDrawer = closeDrawer;
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeDrawer();
+      });
+    })();
 
     // Browser blockieren Autoplay MIT Ton grundsätzlich - das lässt sich
     // nicht umgehen. Um es so nah wie möglich an "startet direkt mit Ton"

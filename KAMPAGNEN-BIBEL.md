@@ -1163,6 +1163,51 @@ gestrichelter Rahmen). Damit sehen Spieler auf `karte.html` einen privaten Wurf 
 nie, ganz ohne Firebase-Regeln/Auth: Sie lesen nur `diceRolls/`, und dort landet ein privater
 Wurf schlicht nicht.
 
+### 13.7 Charakterbogen-Drawer (Juli 2026)
+
+`charakterbogen.html` (neue, eigenständige Seite) ist ein von Hendrik gebauter
+Charakter-Creator + Charakterbogen + Kurzregelwerk, komplett unabhängig vom Rest des Projekts:
+eigenes Design (eigene `:root`-Variablen, teils gleiche Namen wie `karte.html`/`regie.html`
+z. B. `--gold`/`--line`, aber andere Werte), eigene Google-Fonts, keine Firebase-Anbindung.
+
+**Datenhaltung: bewusst nur `localStorage`, kein Firebase.** Zwei Schlüssel — `kors_s` (Werte-
+Aufbau: Archetyp, Fertigkeiten/Wissen samt Mastery) und `kors_sh` (Bogen: Name, Spieler,
+Notizen, Ruf, Ausrüstung, Crew-Ansehen, Körperpunkte, Portraitbild als Base64). Jeder Spieler
+hat also seinen eigenen, rein lokalen Bogen auf seinem eigenen Gerät — analog zum
+Spielernamen des Würfel-Feeds (13.6), nur mit sehr viel mehr Daten. Eine Migration auf
+Firebase (damit z. B. der Spielleiter oder andere Spieler mitlesen könnten) wäre ein großer,
+eigenständiger Umbau (jedes Feld müsste synchronisiert werden, plus Sichtbarkeits-
+Entscheidungen) und war nicht der eigentliche Wunsch — der eigentliche Wunsch war schneller
+Zugriff UND Bearbeitung direkt von der Karte aus, beides löst der Drawer unten ohne
+Architektur-Änderung am Bogen selbst.
+
+**Einbindung in `karte.html` — Slide-in-Drawer per iframe, kein Inline-Einbau:** Ein schmaler
+Griff am linken Bildschirmrand (`#charSheetHandle`, vertikal zentriert, `z-index: 300`) öffnet
+ein von links hereinfahrendes Panel (`#charSheetDrawer`, `transform: translateX(-100%)` →
+`translateX(0)`), das `charakterbogen.html` per `<iframe>` lädt. Ein eigenes Dokument im
+iframe statt direktem HTML-Einbau vermeidet die CSS-Variablen-Kollision (s. o.) komplett —
+kein Sonderfall im Bogen-Code nötig. Das iframe bekommt seine `src` erst beim ersten Öffnen
+(Lazy-Load), damit die Seite (samt Google-Fonts-Ladeversuch) nicht bei jedem Kartenaufruf
+mitgeladen wird, wenn niemand den Bogen öffnet. Da `karte.html` und `charakterbogen.html`
+auf demselben Origin liegen (dieselbe GitHub-Pages-Domain), teilen sie sich denselben
+`localStorage` — eine Änderung im iframe (z. B. Körperpunkte anpassen) landet direkt und
+zuverlässig im selben Speicher, den `charakterbogen.html` auch bei direktem Aufruf nutzt.
+**Nur auf `karte.html`**, nicht auf `regie.html` (reine Spieler-Funktion).
+
+**Layout-Zwang:** Der Bogen hat keine Responsive-Breakpoints außer `@media print` — mehrere
+Grids brauchen realistisch mindestens ~500–600px Breite. Der Drawer ist deshalb deutlich
+breiter als schmale Elemente wie `#charRail` (70vw, gedeckelt bei 900px auf Desktop; volle
+Bildschirmbreite unter 700px Viewport-Breite), kein schmaler Seitenstreifen.
+
+**Datenumzug (Export/Import):** Da jeder Spieler schon eine lokal ausgefüllte Version dieser
+Datei nutzt (anderer Origin als die jetzt gehostete Version), wandern bestehende Daten nicht
+automatisch mit — Browser trennen `localStorage` strikt pro Origin. Neuer Knopf
+„⇄ Export/Import" im Bogen selbst: Export zeigt `JSON.stringify({s: S, sh: SHEET})` zum
+Kopieren, Import liest eingefügtes JSON zurück in `localStorage` und rendert neu. Reiner
+Copy-Paste-Mechanismus, kein Datei-Download/-Upload, passt zum „kein Build-Schritt"-Prinzip
+des Projekts. Jeder Spieler muss diesen Umzug einmalig selbst durchführen (alte Datei öffnen →
+exportieren → gehostete Version öffnen → importieren).
+
 ---
 
 ## 14. Visueller Stil & Bild-Pipeline
