@@ -89,6 +89,13 @@ Hochwirksame Symbole werden bewusst selten eingesetzt. **Cormacs Knoten** (das g
 das die Tochter ihm beibrachte) darf in **maximal zwei Szenen** auftauchen. Ein drittes Mal
 würde es abnutzen.
 
+### 2.8 Marker-Beschreibungen: Ort statt Plot
+`desc`-Felder in den `*_scenes.js`-Dateien geben ausschließlich Ort und Stimmung wieder. Sie
+dürfen **nicht** zu Handlungen anstiften, Aufgaben formulieren, Plot-Wissen unterstellen, das
+Spieler zu diesem Zeitpunkt noch nicht haben können, oder NPC-Ziele vorwegnehmen. Alles
+Hintergrundwissen für den Spielleiter gehört in GM-Notizen (`regie.js`), sobald diese
+ausgearbeitet werden — nicht in den spielersichtbaren Marker-Text.
+
 ---
 
 ## 3. Die Golden Lion
