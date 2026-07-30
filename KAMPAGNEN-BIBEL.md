@@ -1086,6 +1086,7 @@ schicken (Details und die Firebase-Falle siehe Docstring im Skript).
 | `sceneCharacters/{sceneId}/{charId}` | Sichtbare Portraits in der Seitenleiste |
 | `markerVariant/{markerId}` | **Aktive Bildvariante eines Ortes** — wirkt direkt auf die Spieleransicht |
 | `gmTimer/…` | Stoppuhr: `running`, `startedAt`, `elapsedBeforeStart`, `marks` |
+| `diceRolls/{pushId}` | Live-Würfel-Feed, selbst-verfallend nach ~90s (siehe 13.6) |
 
 ### 13.4 Bildvarianten-System
 
@@ -1112,6 +1113,46 @@ Rein admin-seitig. Start/Pause/Reset, Zustand in Firebase (überlebt Seitenneula
 benannte Merker** (Label + Minute) live in der Session an. Sobald die Uhr die Zielminute
 erreicht, pulsiert der Merker rot. Begründung: Sobald sich die Handlung nach der Insel in drei
 Wege verzweigt, würden im Code hinterlegte Zeitpunkte Fehler produzieren.
+
+### 13.6 Würfel-Feed (Juli 2026)
+
+Szenenübergreifendes Feature auf **beiden** Seiten (`karte.html` UND `regie.html`, identisch),
+umgesetzt in `js/dice.js` (`initDiceRoller(db)`), einem neuen gemeinsamen Verhaltens-Modul —
+bisher waren geteilte `.js`-Dateien in diesem Projekt reine Datendateien (`scenes.js`,
+`characters.js` etc.), keine Logik. Lohnt sich hier, weil das Feature auf beiden Seiten absolut
+identisch laufen soll und zwei separate Kopien sonst hätten auseinanderdriften können.
+
+**Spielername:** Jeder Besucher vergibt sich selbst einen Namen, gespeichert unter
+`localStorage`-Key `korsaren_playername` (gleiches Muster wie `korsaren_volume`/
+`korsaren_muted`). Namenspflicht: Der erste Würfel-Versuch ohne gesetzten Namen öffnet einen
+blockierenden `prompt()` — ohne Eingabe wird nicht gewürfelt. Ein klickbares Namens-Label
+erlaubt jederzeit eine Korrektur.
+
+**Würfeln:** Ein Schnellknopf für „1×100" sowie ein Formular für frei wählbare Anzahl Würfel
+(1–20) × Augenzahl (2–1000). Zeigt bewusst **nur die rohe Zahl** — keine automatische
+Erfolgsgrad-Berechnung nach dem d100-Probensystem (4.1). Die Einordnung (Gut/Normal/Schlecht/
+Miss) bleibt Sache von Spieler und Spielleiter.
+
+**Firebase-Datenmodell** (`diceRolls/{pushId}`):
+```
+{ name, count, sides, results: [...], total, ts: ServerValue.TIMESTAMP }
+```
+`ts` wird bewusst über `ServerValue.TIMESTAMP` gesetzt statt `Date.now()` — anders als bei
+`gmTimer` (das nur die eine GM-Session schreibt) schreiben hier potenziell viele
+Spieler-Geräte mit abweichenden Client-Uhren.
+
+**„Prune on read" statt Server-Job:** Jeder Client mit offenem Feed räumt bei jedem
+`on('value', …)`-Snapshot Einträge auf, die älter als 90 Sekunden sind, per `.remove()`. Ein
+`.remove()` auf einen bereits entfernten Eintrag ist ein No-Op — mehrere Clients können also
+gleichzeitig aufräumen, ohne dass sich das ins Gehege kommt. Kein Cron/Cloud-Function nötig,
+passt zum „kein Build-Schritt"-Prinzip des Projekts.
+
+**Anzeige:** Jeder Wurf erscheint als eigene Karte in einem Feed (oben links), bleibt 60
+Sekunden sichtbar und blendet dann aus (gleiches `opacity`-Übergangsprinzip wie der
+Verbindungs-Toast `#status`, aber als stapelbare Liste statt Einzelelement — jeder Toast
+braucht einen eigenen Fade-Timer). Die Würfel-Steuerung selbst sitzt unten links (bisher freie
+Ecke auf `karte.html`; `#audioControl` unten rechts, `#charRail` rechter Rand, `#status` oben
+mittig).
 
 ---
 
