@@ -31,12 +31,8 @@
 // relevant) - Positionen anhand von images/schatzinsel.webp geschätzt,
 // bei Bedarf im Admin-Panel live nachjustieren.
 //
-// Zwischenstation/Lager haben noch keine ausformulierten Beschreibungen
-// und kein eigenes Bild - beides folgt erst nach Erstellung passender
-// Referenzbilder (Gemini-Pipeline, KAMPAGNEN-BIBEL 14), auf ausdrücklichen
-// Wunsch nicht vorher am Schreibtisch erfunden. Bis dahin Platzhaltertext
-// und das Kartenbild selbst als Platzhalterbild (siehe CLAUDE.md,
-// "Bild-Overlay-Fallback" - lieber ein Platzhalter als ein leeres Feld).
+// Alle fünf Marker haben inzwischen eigene Referenzbilder (Gemini-Pipeline,
+// KAMPAGNEN-BIBEL 14) und ausformulierte Beschreibungen.
 //
 // Alle fünf Marker sind über den Sichtbarkeits-Schalter im Admin-Panel
 // (regie.html) einzeln live ein-/ausblendbar (KAMPAGNEN-BIBEL 13.10,
@@ -65,14 +61,15 @@ const SCHATZINSEL_SCENES = {
         id: "zwischenstation",
         top: 45, left: 62,
         title: "Der Pfad zum toten Baum",
-        desc: "[Platzhaltertext — wird nach Erstellung eines Referenzbilds ausformuliert.]",
-        img: "images/schatzinsel.webp"
+        desc: "Ein schmaler Trampelpfad schneidet sich durch dichtes Unterholz, von Farnen und breiten Palmwedeln fast überwuchert. Hohe Bäume schließen sich über dem Weg zu einem grünen Dach, nur vereinzelt fällt Licht schräg durchs Blätterwerk. Insekten surren, schwere, feuchte Luft hängt zwischen den Stämmen. Voraus hellt sich der Wald auf, dort, wo der Pfad auf eine Lichtung zuläuft.",
+        img: "images/interior_zwischenstation.webp"
       },
       {
         id: "stammesdorf",
         top: 24, left: 59,
         title: "Das Dorf am knorrigen Baum",
-        desc: "Ein schmaler Pfad führt vom Dschungelrand auf eine Lichtung, in deren Mitte ein knorriger, halb abgestorbener Baum aufragt. Um ihn herum gruppieren sich einfache Hütten aus Holz und geflochtenem Palmblatt, Rauch steigt von einer Feuerstelle auf. Wachsame Blicke der Bewohner folgen jedem Schritt der Fremden. Hier lebt der Stamm, der seit Generationen das Siegel hütet, das den Zugang zur Wasserhöhle der Insel öffnet."
+        desc: "Ein schmaler Pfad führt vom Dschungelrand auf eine Lichtung, überragt von einem gewaltigen, halb abgestorbenen Baum mit kahlen, weit ausladenden Ästen. Zwischen den umliegenden Bäumen hängen Hütten aus Holz und geflochtenem Palmblatt, über schmale Hängebrücken miteinander verbunden. Ein reich verziertes Gebäude aus Stein und bemaltem Holz thront auf einer kleinen Freitreppe in der Mitte der Lichtung. Rauch steigt von mehreren Feuerstellen auf, Stimmen und das Klappern von Kochgeschirr mischen sich mit den Geräuschen des Waldes. Kinder laufen zwischen den Hütten, während wachsame Blicke der Bewohner jedem Schritt der Fremden folgen.",
+        img: "images/interior_stammesdorf.webp"
       },
       {
         id: "hoehle",
@@ -90,8 +87,8 @@ const SCHATZINSEL_SCENES = {
         id: "lager",
         top: 27, left: 52,
         title: "Nachtlager am Dorfrand",
-        desc: "[Platzhaltertext — wird nach Erstellung eines Referenzbilds ausformuliert.]",
-        img: "images/schatzinsel.webp"
+        desc: "Zwischen den Bäumen am Waldrand stehen mehrere Zeltplanen im Halbkreis um ein Lagerfeuer, dessen Licht tief in die Nacht hinausflackert. Laternen hängen an improvisierten Pfosten und werfen unruhige Schatten auf Werkzeug, aufgerolltes Tauwerk und Kisten. Einige sitzen erschöpft auf Hockern und Kisten, andere arbeiten noch im Laternenschein weiter — Seile werden geflochten, Klingen gewetzt. Dahinter liegt der Dschungel vollkommen dunkel und still.",
+        img: "images/interior_lager.webp"
       }
     ]
   }
