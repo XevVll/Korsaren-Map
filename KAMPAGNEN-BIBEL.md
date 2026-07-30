@@ -1154,6 +1154,14 @@ braucht einen eigenen Fade-Timer). Die Würfel-Steuerung selbst sitzt unten link
 Ecke auf `karte.html`; `#audioControl` unten rechts, `#charRail` rechter Rand, `#status` oben
 mittig).
 
+**Private Würfe (nur Admin, Juli 2026):** `regie.html` ruft `initDiceRoller(db, { allowPrivate:
+true })` auf (`karte.html` weiterhin ohne dieses Flag) — nur dadurch erscheint dort zusätzlich
+eine Checkbox „Privat". Ist sie beim Würfeln aktiv, wird **überhaupt nicht** nach
+`diceRolls/` geschrieben — der Wurf wird nur lokal im eigenen Feed angezeigt (🔒-Präfix,
+gestrichelter Rahmen). Damit sehen Spieler auf `karte.html` einen privaten Wurf grundsätzlich
+nie, ganz ohne Firebase-Regeln/Auth: Sie lesen nur `diceRolls/`, und dort landet ein privater
+Wurf schlicht nicht.
+
 ---
 
 ## 14. Visueller Stil & Bild-Pipeline
