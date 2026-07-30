@@ -15,14 +15,38 @@
 //
 // Marker-Felder: siehe scenes.js (id/top/left/title/desc/img/variants).
 //
-// Drei Marker: Schiffswrack (Strand, unten rechts), Stammesdorf (beim
-// knorrigen Baum, oben mittig) und Höhle (Felshöhlen an der Westklippe,
-// unten links) - Positionen anhand von images/schatzinsel.webp geschätzt,
-// bei Bedarf im Admin-Panel live nachjustieren. Ausführliche Inhalte für
-// Stammesdorf/Höhle (genauer Ablauf der Begegnung etc.) folgen noch -
-// hier zunächst Ort + Atmosphäre, damit die Marker schon existieren und
-// über den Sichtbarkeits-Schalter im Admin-Panel (regie.html) freigegeben
-// werden können (siehe KAMPAGNEN-BIBEL 13.x, "hiddenMarkersLive").
+// WICHTIG für "desc"-Texte: reine Ort-/Stimmungsbeschreibung, kein
+// Handlungsauftrag, kein Plot-Wissen, das Spieler an diesem Punkt noch
+// nicht haben können, keine vorweggenommenen NPC-Ziele - siehe
+// KAMPAGNEN-BIBEL 2.8 ("Marker-Beschreibungen: Ort statt Plot"). GM-only
+// Hintergrundwissen gehört in regie.js (Ort-Notizen), sobald diese Orte
+// dort ausgearbeitet werden - nicht hierher.
+//
+// Ablaufreihenfolge der Dorf-Expedition (siehe Bewegung auf der Karte):
+// schiffswrack -> zwischenstation -> stammesdorf -> (danach erst) lager.
+// Fünf Marker: Schiffswrack (Strand, unten rechts), Zwischenstation (Pfad
+// landeinwärts, Höhe des toten Baums), Stammesdorf (beim knorrigen Baum,
+// oben mittig), Höhle (Felshöhlen an der Westklippe, unten links) und
+// Nachtlager (dicht neben dem Dorf, erst nach dem ersten Dorfbesuch
+// relevant) - Positionen anhand von images/schatzinsel.webp geschätzt,
+// bei Bedarf im Admin-Panel live nachjustieren.
+//
+// Zwischenstation/Lager haben noch keine ausformulierten Beschreibungen
+// und kein eigenes Bild - beides folgt erst nach Erstellung passender
+// Referenzbilder (Gemini-Pipeline, KAMPAGNEN-BIBEL 14), auf ausdrücklichen
+// Wunsch nicht vorher am Schreibtisch erfunden. Bis dahin Platzhaltertext
+// und das Kartenbild selbst als Platzhalterbild (siehe CLAUDE.md,
+// "Bild-Overlay-Fallback" - lieber ein Platzhalter als ein leeres Feld).
+//
+// Alle fünf Marker sind über den Sichtbarkeits-Schalter im Admin-Panel
+// (regie.html) einzeln live ein-/ausblendbar (KAMPAGNEN-BIBEL 13.10,
+// "hiddenMarkersLive") - so lässt sich die Dorf-Expedition schrittweise
+// aufdecken, ohne dass jeder neue Ort einen Codedeploy braucht.
+//
+// Bewusst KEINE Interaktionen/Trigger in regie.js für die neuen Marker -
+// Diebstahl/Aufhetzen-Handel/Gewalt laufen über das normale
+// Erfolg/Misserfolg-Probensystem (Bibel 4.1), Schwierigkeit legt Hendrik
+// spontan am Tisch fest, nicht der Code.
 
 const SCHATZINSEL_SCENES = {
   "4.1": {
@@ -38,6 +62,13 @@ const SCHATZINSEL_SCENES = {
         img: "images/interior_schiffswrack.webp"
       },
       {
+        id: "zwischenstation",
+        top: 45, left: 62,
+        title: "Der Pfad zum toten Baum",
+        desc: "[Platzhaltertext — wird nach Erstellung eines Referenzbilds ausformuliert.]",
+        img: "images/schatzinsel.webp"
+      },
+      {
         id: "stammesdorf",
         top: 24, left: 59,
         title: "Das Dorf am knorrigen Baum",
@@ -47,7 +78,20 @@ const SCHATZINSEL_SCENES = {
         id: "hoehle",
         top: 58, left: 14,
         title: "Die Wasserhöhle",
-        desc: "In die zerklüfteten Klippen an der Westseite der Insel fressen sich zwei Öffnungen, die sich im Inneren zu einer einzigen, weitläufigen Höhle verbinden — die trennende Wand ist längst der Brandung zum Opfer gefallen. Nur mit dem Boot und bei ablaufendem Wasser ist der Zugang zu wagen. Irgendwo im Dunkel soll der Schatz liegen, den Harwick sucht — verschlossen hinter etwas, das nur mit dem Siegel des Inselstamms zu öffnen ist."
+        desc: "In die zerklüfteten Klippen an der Westseite der Insel fressen sich zwei Öffnungen, die sich im Inneren zu einer einzigen, weitläufigen Höhle verbinden — die trennende Wand ist längst der Brandung zum Opfer gefallen. Nur mit dem Boot und bei ablaufendem Wasser ist der Zugang zu wagen."
+      },
+      {
+        // Erst NACH dem ersten Dorfbesuch relevant/aufzuschlagen, nicht auf
+        // dem Hinweg (siehe Ablaufreihenfolge oben). Funktional künftig
+        // wichtig: hier kontaktiert der Thahal-Helfer die Spieler nachts
+        // heimlich (einziger Zugang zu den Routen "Diebstahl" und
+        // "Aufhetzen") - bewusst noch kein Trigger/Mechanik dafür, nur als
+        // Notiz vermerkt.
+        id: "lager",
+        top: 27, left: 52,
+        title: "Nachtlager am Dorfrand",
+        desc: "[Platzhaltertext — wird nach Erstellung eines Referenzbilds ausformuliert.]",
+        img: "images/schatzinsel.webp"
       }
     ]
   }
