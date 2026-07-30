@@ -1089,6 +1089,7 @@ schicken (Details und die Firebase-Falle siehe Docstring im Skript).
 | `gmTimer/…` | Stoppuhr: `running`, `startedAt`, `elapsedBeforeStart`, `marks` |
 | `diceRolls/{pushId}` | Live-Würfel-Feed, selbst-verfallend nach ~90s (siehe 13.6) |
 | `openMarkers/{sceneId}/{markerId}/{sessionId}` | Live-Präsenz: wer hat welchen Ort gerade offen (siehe 13.9) |
+| `hiddenMarkersLive/{sceneId}/{markerId}` | Vom SL live ausgeblendete Marker (siehe 13.10) |
 
 ### 13.4 Bildvarianten-System
 
@@ -1273,6 +1274,27 @@ Neu-Verbinden), mit einem zusätzlichen Guard (`if (sceneId === openMarkersScene
 nötig, weil `renderOrte()` (und damit dieser Aufruf) über `renderAll()` sehr häufig läuft, im
 Unterschied zu `karte.html`, wo der Aufruf schon durch den `currentScene`-Listener selbst
 gedrosselt ist.
+
+### 13.10 Live-Sichtbarkeit: Marker schrittweise aufdecken (Juli 2026)
+
+Standardmäßig sind alle Marker einer Szene sichtbar. Der SL kann in `regie.html` in der
+Orte-Spalte pro Ort auf den Schalter "sichtbar"/"ausgeblendet" klicken
+(`toggleMarkerVisibility()`) — das schreibt `hiddenMarkersLive/{fbKey(sceneId)}/{markerId} =
+true` (bzw. entfernt den Eintrag wieder). `karte.html` hört live auf diesen Pfad
+(`attachHiddenMarkersListener()`, gleiches An-/Abhäng-Muster wie `renderCharacterRail()`) und
+blendet den entsprechenden Marker sofort bei allen Spielern aus bzw. wieder ein — ohne
+Szenenwechsel und ohne Codedeploy.
+
+**Zweck:** Neue Orte innerhalb einer bestehenden Szene lassen sich so schrittweise freigeben
+(z.B. Schatzinsel 4.1: Stammesdorf und Höhle existieren bereits als Marker, bleiben aber bis
+zum passenden Moment in der Sitzung ausgeblendet, statt für jede Freigabe eine neue Szene
+oder einen neuen Deploy zu brauchen). Diese Live-Ebene ist unabhängig vom statischen
+`hiddenMarkers`-Feld einzelner Szenen-Definitionen (13.2, genutzt z.B. beim Sturm) — jenes
+blendet Marker fest pro Szene aus, dies hier blendet sie live und pro Session um.
+
+Im Admin-Panel selbst bleibt ein ausgeblendeter Ort weiterhin sichtbar (nur abgedunkelt,
+`.ort-card.ausgeblendet`) — der SL soll ihn jederzeit vorbereiten und anklicken können, auch
+bevor er live geht.
 
 ---
 

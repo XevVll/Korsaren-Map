@@ -287,7 +287,10 @@
   }
   .ort-card:hover { border-color: var(--ink-faint); }
   .ort-card.active { border-color: var(--gold); background: var(--panel-2); }
+  .ort-card.ausgeblendet { opacity: .55; }
+  .ort-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .ort-card .title { font-size: 15px; color: var(--ink); margin-bottom: 4px; }
+  .ort-card-head .title { margin-bottom: 0; }
   .ort-card .personen { font-size: 11px; color: var(--gold); margin-bottom: 6px; }
   .ort-card .kurz { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
   .ort-card.leer .kurz { font-style: italic; }
@@ -298,6 +301,15 @@
     font-size: 11px; font-weight: 700;
     vertical-align: middle;
   }
+  .vis-btn {
+    font-family: inherit; font-size: 10px;
+    background: transparent; border: 1px solid var(--live);
+    color: var(--live); border-radius: 3px;
+    padding: 2px 7px; cursor: pointer; white-space: nowrap; flex: 0 0 auto;
+    transition: border-color .12s, color .12s;
+  }
+  .vis-btn:hover { border-color: var(--accent); color: #e0a08e; }
+  .vis-btn.is-hidden { color: var(--ink-faint); border-color: var(--line); }
 
   /* ---------- Col 3: Detail ---------- */
   .ort-detail-head { padding: 18px 24px 10px; border-bottom: 1px solid var(--line); }
@@ -481,6 +493,11 @@
     let openMarkersListener = null;
     let openMarkersScene = null;
     let openMarkerCounts = {}; // { markerId: Anzahl offener Sessions }
+
+    let hiddenMarkersRef = null;
+    let hiddenMarkersListener = null;
+    let hiddenMarkersScene = null;
+    let hiddenMarkerIds = {}; // { markerId: true } - vom SL live ausgeblendete Orte
 
     // ---------- Live-Vorschau (Spieleransicht) ----------
     // Zeigt karte.html per iframe genau so, wie Spieler sie live sehen -
@@ -697,8 +714,38 @@
       });
     }
 
+    // Hängt einen Live-Listener auf hiddenMarkersLive/{szene} - gleiches
+    // Muster wie attachOpenMarkersListener oben. Steuert, welche Marker
+    // aktuell für Spieler ausgeblendet sind (siehe karte.html,
+    // attachHiddenMarkersListener, und KAMPAGNEN-BIBEL 13.x).
+    function attachHiddenMarkersListener(sceneId) {
+      if (sceneId === hiddenMarkersScene) return;
+      if (hiddenMarkersRef && hiddenMarkersListener) {
+        hiddenMarkersRef.off('value', hiddenMarkersListener);
+      }
+      hiddenMarkersScene = sceneId;
+      hiddenMarkerIds = {};
+      if (!db || !sceneId) return;
+      hiddenMarkersRef = db.ref('hiddenMarkersLive/' + fbKey(sceneId));
+      hiddenMarkersListener = hiddenMarkersRef.on('value', function (snap) {
+        hiddenMarkerIds = snap.val() || {};
+        renderOrte();
+      });
+    }
+
+    function toggleMarkerVisibility(sceneId, markerId) {
+      if (!db) return;
+      const ref = db.ref('hiddenMarkersLive/' + fbKey(sceneId) + '/' + markerId);
+      if (hiddenMarkerIds[markerId]) {
+        ref.remove();
+      } else {
+        ref.set(true);
+      }
+    }
+
     function renderOrte() {
       attachOpenMarkersListener(viewState.szene);
+      attachHiddenMarkersListener(viewState.szene);
       const col = document.getElementById('col-orte');
       col.innerHTML = '<div class="col-head">Orte</div>';
       const markers = getMarkersForScene(viewState.szene);
@@ -711,14 +758,24 @@
         const ort = resolveOrtForScene(ortRaw, viewState.szene);
         const hatInhalt = getSceneInteraktionen(ort, viewState.szene).length > 0;
         const openCount = openMarkerCounts[marker.id] || 0;
+        const istAusgeblendet = !!hiddenMarkerIds[marker.id];
         const card = document.createElement('div');
-        card.className = 'ort-card' + (viewState.ort === marker.id ? ' active' : '') + (hatInhalt ? '' : ' leer');
+        card.className = 'ort-card' + (viewState.ort === marker.id ? ' active' : '') + (hatInhalt ? '' : ' leer') + (istAusgeblendet ? ' ausgeblendet' : '');
         card.innerHTML =
-          '<div class="title">' + marker.title +
-          (openCount > 0 ? ' <span class="ort-open-count" title="' + openCount + ' Spieler haben diesen Ort gerade offen">' + openCount + '</span>' : '') +
+          '<div class="ort-card-head">' +
+            '<div class="title">' + marker.title +
+            (openCount > 0 ? ' <span class="ort-open-count" title="' + openCount + ' Spieler haben diesen Ort gerade offen">' + openCount + '</span>' : '') +
+            '</div>' +
+            '<button class="vis-btn' + (istAusgeblendet ? ' is-hidden' : '') + '" title="' +
+              (istAusgeblendet ? 'Für Spieler ausgeblendet - klicken zum Aufdecken' : 'Für Spieler sichtbar - klicken zum Ausblenden') +
+            '">' + (istAusgeblendet ? 'ausgeblendet' : 'sichtbar') + '</button>' +
           '</div>' +
           (ort.personen ? '<div class="personen">' + ort.personen + '</div>' : '') +
           '<div class="kurz">' + (ort.kurz || marker.desc) + '</div>';
+        card.querySelector('.vis-btn').onclick = function (e) {
+          e.stopPropagation();
+          toggleMarkerVisibility(viewState.szene, marker.id);
+        };
         card.onclick = function () { viewState.ort = marker.id; renderAll(); };
         col.appendChild(card);
       });

@@ -15,9 +15,14 @@
 //
 // Marker-Felder: siehe scenes.js (id/top/left/title/desc/img/variants).
 //
-// Bewusst nur EIN Marker bisher (Schiffswrack) - weitere Orte der Insel
-// (Höhle, knorriger Baum, Felsformationen) folgen erst in einem späteren
-// Schritt, auf ausdrücklichen Wunsch schrittweise statt auf einmal.
+// Drei Marker: Schiffswrack (Strand, unten rechts), Stammesdorf (beim
+// knorrigen Baum, oben mittig) und Höhle (Felshöhlen an der Westklippe,
+// unten links) - Positionen anhand von images/schatzinsel.webp geschätzt,
+// bei Bedarf im Admin-Panel live nachjustieren. Ausführliche Inhalte für
+// Stammesdorf/Höhle (genauer Ablauf der Begegnung etc.) folgen noch -
+// hier zunächst Ort + Atmosphäre, damit die Marker schon existieren und
+// über den Sichtbarkeits-Schalter im Admin-Panel (regie.html) freigegeben
+// werden können (siehe KAMPAGNEN-BIBEL 13.x, "hiddenMarkersLive").
 
 const SCHATZINSEL_SCENES = {
   "4.1": {
@@ -31,6 +36,18 @@ const SCHATZINSEL_SCENES = {
         title: "Die gestrandete Golden Lion",
         desc: "Die Golden Lion liegt zerzaust in einer sandigen Bucht auf der Seite, der vordere Mast gebrochen, der Rumpf übel zugerichtet. Tauwerk und Trümmer verteilen sich über den Strand. Die Crew ist bereits mitten in den Reparaturarbeiten — Balken werden herangeschafft, der Schmied schlägt am improvisierten Amboss Beschläge zurecht, Leitern lehnen am Rumpf. Für die meisten an Bord wirkt es wie reines Glück, hier überhaupt festen Boden unter den Füßen zu haben.",
         img: "images/interior_schiffswrack.webp"
+      },
+      {
+        id: "stammesdorf",
+        top: 24, left: 59,
+        title: "Das Dorf am knorrigen Baum",
+        desc: "Ein schmaler Pfad führt vom Dschungelrand auf eine Lichtung, in deren Mitte ein knorriger, halb abgestorbener Baum aufragt. Um ihn herum gruppieren sich einfache Hütten aus Holz und geflochtenem Palmblatt, Rauch steigt von einer Feuerstelle auf. Wachsame Blicke der Bewohner folgen jedem Schritt der Fremden. Hier lebt der Stamm, der seit Generationen das Siegel hütet, das den Zugang zur Wasserhöhle der Insel öffnet."
+      },
+      {
+        id: "hoehle",
+        top: 58, left: 14,
+        title: "Die Wasserhöhle",
+        desc: "In die zerklüfteten Klippen an der Westseite der Insel fressen sich zwei Öffnungen, die sich im Inneren zu einer einzigen, weitläufigen Höhle verbinden — die trennende Wand ist längst der Brandung zum Opfer gefallen. Nur mit dem Boot und bei ablaufendem Wasser ist der Zugang zu wagen. Irgendwo im Dunkel soll der Schatz liegen, den Harwick sucht — verschlossen hinter etwas, das nur mit dem Siegel des Inselstamms zu öffnen ist."
       }
     ]
   }
