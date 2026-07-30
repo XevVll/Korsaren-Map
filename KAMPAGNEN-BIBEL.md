@@ -1233,6 +1233,15 @@ wird erst beim ersten Ausklappen gesetzt (Lazy-Load). Zustand (auf/zu) wird in `
 gemerkt (`korsaren_regie_preview_open`) — rein UI-Komfort für diesen einen Admin-Browser, kein
 Firebase-Pfad nötig.
 
+**Vorschau-Modus (`?preview=1`):** In dem kleinen 380×300px-Panel wirkten Audio-Regler,
+Würfel-Steuerung und der Charakterbogen-Griff überdimensioniert und lenken vom eigentlichen
+Kartenbild ab. Das Live-Vorschau-Widget lädt deshalb `karte.html?preview=1` statt
+`karte.html` — `karte.html` prüft diesen Query-Parameter beim Laden und setzt die Klasse
+`preview-mode` auf `<html>`, die per CSS `#status`, `#audioControl`, `#diceControls`,
+`#diceFeed`, `#charSheetHandle`, `#charSheetDrawer` und `#charSheetBackdrop` ausblendet.
+Betrifft nur diesen einen Aufruf mit Query-Parameter — die normale Spieleransicht (ohne
+`?preview=1`) bleibt unverändert vollständig interaktiv.
+
 ---
 
 ## 14. Visueller Stil & Bild-Pipeline
