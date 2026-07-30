@@ -536,6 +536,7 @@
 
       const background = getBackgroundForScene(sceneId);
       const markers = getMarkersForScene(sceneId);
+      currentSceneRawMarkers = markers;
 
       if (!background) {
         // Unbekannte Szene - Kartendaten fehlen (z.B. Tippfehler in
@@ -553,7 +554,7 @@
       nextImg.onload = function () {
         mapImageEl.src = background;
         mapImageEl.classList.add('loaded');
-        renderMarkers(markers);
+        attachHiddenMarkersListener(sceneId);
       };
       nextImg.onerror = function () {
         showEmptyState('Kartenbild "' + background + '" konnte nicht geladen werden.');
@@ -567,14 +568,43 @@
 
     function renderMarkers(markers) {
       clearMarkers();
-      markers.forEach(function (marker) {
-        const el = document.createElement('div');
-        el.className = 'marker';
-        el.style.top = marker.top + '%';
-        el.style.left = marker.left + '%';
-        el.innerHTML = '<div class="pin"></div><div class="label">' + marker.title + '</div>';
-        el.onclick = function () { openOverlay(marker); };
-        mapWrapEl.appendChild(el);
+      markers
+        .filter(function (marker) { return !currentHiddenMarkerIds[marker.id]; })
+        .forEach(function (marker) {
+          const el = document.createElement('div');
+          el.className = 'marker';
+          el.style.top = marker.top + '%';
+          el.style.left = marker.left + '%';
+          el.innerHTML = '<div class="pin"></div><div class="label">' + marker.title + '</div>';
+          el.onclick = function () { openOverlay(marker); };
+          mapWrapEl.appendChild(el);
+        });
+    }
+
+    // ---------- Live-Sichtbarkeit: welche Marker der SL gerade ausgeblendet hat ----------
+    // Standardmäßig sind alle Marker einer Szene sichtbar. Setzt der SL im
+    // Admin-Panel (regie.html) hiddenMarkersLive/{szene}/{markerId} = true,
+    // verschwindet der Marker live bei allen Spielern, ohne Szenenwechsel
+    // oder Codedeploy - ermöglicht schrittweises Aufdecken neuer Orte
+    // innerhalb derselben Szene (siehe KAMPAGNEN-BIBEL 13.x).
+    let currentSceneRawMarkers = [];
+    let hiddenMarkersLiveRef = null;
+    let hiddenMarkersLiveListener = null;
+    let currentHiddenMarkerIds = {};
+
+    function attachHiddenMarkersListener(sceneId) {
+      if (hiddenMarkersLiveRef && hiddenMarkersLiveListener) {
+        hiddenMarkersLiveRef.off('value', hiddenMarkersLiveListener);
+      }
+      currentHiddenMarkerIds = {};
+      if (!db || !sceneId) { renderMarkers(currentSceneRawMarkers); return; }
+      hiddenMarkersLiveRef = db.ref('hiddenMarkersLive/' + fbKey(sceneId));
+      hiddenMarkersLiveListener = hiddenMarkersLiveRef.on('value', function (snap) {
+        currentHiddenMarkerIds = snap.val() || {};
+        renderMarkers(currentSceneRawMarkers);
+      }, function () {
+        currentHiddenMarkerIds = {};
+        renderMarkers(currentSceneRawMarkers);
       });
     }
 
