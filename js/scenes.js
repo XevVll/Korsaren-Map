@@ -24,11 +24,22 @@
 //
 // Szenen-Feld "background":
 //   Pfad des Kartenbilds, auf dem die Marker dieser Szene liegen, relativ
-//   zur HTML-Seite (images/-Ordner). Grimsgate-Szenen (1.1/1.2) nutzen
-//   beide dieselbe Stadtkarte (images/grimsgate_map.webp). Andere Karten
-//   (z.B. das Golden-Lion-Schiff, siehe golden_lion_scenes.js) haben
-//   eigene Hintergrundbilder - die Spieler-Seite karte.html liest dieses
-//   Feld pro Szene aus und lädt automatisch das passende Bild.
+//   zur HTML-Seite (images/-Ordner). Grimsgate (Szene "1.1") nutzt
+//   images/grimsgate_map.webp. Andere Karten (z.B. das Golden-Lion-Schiff,
+//   siehe golden_lion_scenes.js) haben eigene Hintergrundbilder - die
+//   Spieler-Seite karte.html liest dieses Feld pro Szene aus und lädt
+//   automatisch das passende Bild.
+//
+// Szenen-Label ohne Nummer: Die Szenen-ID (z.B. "1.1") bleibt intern
+// nötig (Firebase-Pfade etc.), taucht aber im Admin-Panel nicht mehr im
+// "label"-Text auf - nur noch der Ortsname (+ Zustand, falls mehrere
+// Szenen sich sonst nicht unterscheiden ließen). Siehe CLAUDE.md.
+//
+// Frühere Szene "1.2" ("Golden Lion sichtbar") wurde hierher gemergt: Der
+// einzige Unterschied zu "1.1" war ein zusätzlicher Marker
+// (golden_lion) - jetzt, wo Marker einzeln live ein-/ausblendbar sind
+// (hiddenMarkersLive, KAMPAGNEN-BIBEL 13.10), braucht es dafür keine
+// eigene Szene mehr.
 
 // Szenen-Feld "soundFile" (optional):
 //   Dateiname einer selbst gehosteten Audiodatei (mp3/ogg/wav/m4a/aac,
@@ -41,7 +52,7 @@
 
 const SCENES = {
   "1.1": {
-    label: "1.1 – Grimsgate (Start)",
+    label: "Grimsgate",
     background: "images/grimsgate_map.webp",
     markers: [
       {
@@ -85,59 +96,14 @@ const SCENES = {
         title: "Bordell",
         desc: "Etwas abseits der Stadt gelegen, unauffällig. Rote Fenster, wenig Fragen.",
         img: "images/interior_bordell.webp"
-      }
-    ]
-  },
-
-  "1.2": {
-    label: "1.2 – Golden Lion sichtbar",
-    background: "images/grimsgate_map.webp",
-    // Alle Marker aus 1.1 plus den neuen Golden-Lion-Marker.
-    // Position ist ein Platzhalter (top/left) - wird noch final festgelegt.
-    markers: [
-      {
-        id: "heuer",
-        top: 58.3, left: 40,
-        title: "Zur letzten Heuer",
-        desc: "Raue Hafenkneipe. Kaum Stammgäste — die meisten, die hier trinken, sieht man Jahre nicht wieder. Wer anheuern will, landet früher oder später hier.",
-        img: "images/interior_heuer.webp"
       },
       {
-        id: "hafenmeisterei",
-        top: 27.5, left: 9.4,
-        title: "Hafenmeisterei",
-        desc: "Verwaltet Anlegerechte, Fracht und Papiere. Ordnungsmacht des Hafens.",
-        img: "images/interior_hafenmeisterei.webp"
-      },
-      {
-        id: "lagerhaeuser",
-        top: 26.7, left: 26.3,
-        title: "Lagerhäuser",
-        desc: "Von außen chaotisch, im Kern strikt organisiert. Hier läuft die Beladung des Konvois wie ein Uhrwerk.",
-        img: "images/interior_lagerhaeuser.webp"
-      },
-      {
-        id: "markt",
-        top: 74.6, left: 53.2,
-        title: "Marktplatz",
-        desc: "Handel, Menschenmengen, guter Ort für Gerüchte und Zufallsbegegnungen.",
-        img: "images/interior_markt.webp"
-      },
-      {
-        id: "kraemerladen",
-        top: 58.9, left: 49.8,
-        title: "Krämerladen",
-        desc: "Ausrüstung und Grundbedarf. Der Krämer hört viel — und vergisst wenig.",
-        img: "images/interior_kraemerladen.webp"
-      },
-      {
-        id: "bordell",
-        top: 50.5, left: 85.1,
-        title: "Bordell",
-        desc: "Etwas abseits der Stadt gelegen, unauffällig. Rote Fenster, wenig Fragen.",
-        img: "images/interior_bordell.webp"
-      },
-      {
+        // Vormals eigene Szene "1.2" ("Golden Lion sichtbar") - jetzt Teil
+        // von "1.1", live per Sichtbarkeits-Schalter in regie.html
+        // ein-/ausblendbar (siehe Kommentar am Dateianfang). Nach diesem
+        // Merge zunächst SICHTBAR wie jeder andere Marker - falls das
+        // Schiff zu diesem Zeitpunkt der Kampagne noch nicht auftauchen
+        // soll, im Admin-Panel einmalig ausblenden.
         id: "golden_lion",
         top: 40, left: 15,   // PLATZHALTER - Position später anpassen
         title: "Golden Lion",
