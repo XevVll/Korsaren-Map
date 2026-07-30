@@ -1202,11 +1202,34 @@ Bildschirmbreite unter 700px Viewport-Breite), kein schmaler Seitenstreifen.
 **Datenumzug (Export/Import):** Da jeder Spieler schon eine lokal ausgefüllte Version dieser
 Datei nutzt (anderer Origin als die jetzt gehostete Version), wandern bestehende Daten nicht
 automatisch mit — Browser trennen `localStorage` strikt pro Origin. Neuer Knopf
-„⇄ Export/Import" im Bogen selbst: Export zeigt `JSON.stringify({s: S, sh: SHEET})` zum
-Kopieren, Import liest eingefügtes JSON zurück in `localStorage` und rendert neu. Reiner
-Copy-Paste-Mechanismus, kein Datei-Download/-Upload, passt zum „kein Build-Schritt"-Prinzip
-des Projekts. Jeder Spieler muss diesen Umzug einmalig selbst durchführen (alte Datei öffnen →
-exportieren → gehostete Version öffnen → importieren).
+„⇄ Export/Import" im Bogen selbst: Export lädt eine kleine `.json`-Datei herunter
+(`JSON.stringify({s: S, sh: SHEET})` als Blob), Import öffnet einen Datei-Dialog für genau
+diese Datei und schreibt sie zurück in `localStorage`. Jeder Spieler muss diesen Umzug
+einmalig selbst durchführen (alte Datei öffnen → exportieren → gehostete Version öffnen →
+importieren).
+
+> **Verworfen:** PDF-Export lesbar machen (Hendrik schlug vor, dass Spieler stattdessen den
+> bereits vorhandenen Druck-Knopf nutzen und die PDF-Datei importiert wird). Geprüft an einem
+> echten Beispiel (`pdftotext`/`pdfimages`) — die PDF enthält **keinen echten Text**, Windows’
+> „Drucken als PDF" rastert die ganze Seite zu JPEG-Streifen. Rückgewinnung der Werte würde
+> OCR brauchen, was bei exakten Zahlen/Mastery-Badges/Kästchen ein echtes Korruptionsrisiko für
+> Charakterdaten ist (eine falsch erkannte Ziffer fällt nicht auf). Deshalb bei der
+> Datei-Export/Import-Lösung oben geblieben statt PDF-Text-Extraktion.
+
+**Würfeln bei geöffnetem Bogen:** `#diceControls`/`#diceFeed` liegen bewusst auf `z-index: 350`
+— höher als Drawer (300) und dessen Backdrop (290). Ohne das würde der vollflächige,
+transparente Backdrop (fängt Klicks zum Schließen des Drawers ab) auch Klicks auf die
+Würfel-Steuerung abfangen, sobald der Bogen offen ist.
+
+### 13.8 Live-Vorschau im Admin-Panel (Juli 2026)
+
+`regie.html` bekommt eine ein-/ausklappbare Leiste („▶/▼ Live-Vorschau (Spieleransicht)")
+unterhalb der Charakter-Leiste. Ausgeklappt zeigt sie `karte.html` per `<iframe>` — bewusst
+keine eigene Render-Logik, da so exakt das zu sehen ist, was Spieler gerade wirklich sehen
+(bleibt über dieselbe Firebase-`currentScene`-Anbindung automatisch synchron). iframe-`src`
+wird auch hier erst beim ersten Ausklappen gesetzt (Lazy-Load). Zustand (auf/zu) wird in
+`localStorage` gemerkt (`korsaren_regie_preview_open`) — rein UI-Komfort für diesen einen
+Admin-Browser, kein Firebase-Pfad nötig.
 
 ---
 

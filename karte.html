@@ -199,8 +199,12 @@
   }
 
   /* ---------- Würfel-Feed (szenenübergreifend) ---------- */
+  /* z-index 350: bewusst ÜBER dem Charakterbogen-Drawer (300) und dessen
+     Backdrop (290) - Würfeln muss auch möglich sein, während der Bogen
+     ausgeklappt ist, sonst würde der Backdrop Klicks auf die Würfel-
+     Steuerung abfangen (volle Bildschirmfläche, höherer z-index). */
   #diceControls {
-    position: fixed; bottom: 16px; left: 16px; z-index: 200;
+    position: fixed; bottom: 16px; left: 16px; z-index: 350;
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     background: rgba(15,12,8,0.75);
     border: 1px solid var(--line);
@@ -231,7 +235,7 @@
     -webkit-appearance: none; margin: 0;
   }
   #diceFeed {
-    position: fixed; top: 16px; left: 16px; z-index: 200;
+    position: fixed; top: 16px; left: 16px; z-index: 350;
     display: flex; flex-direction: column; gap: 6px;
     max-width: 320px;
   }

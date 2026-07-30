@@ -99,6 +99,25 @@
   .char-toggle input { accent-color: var(--gold); cursor: pointer; }
   .char-toggle.active { color: var(--ink); }
 
+  /* ---------- Live-Vorschau (Spieleransicht) ---------- */
+  #previewBar {
+    padding: 8px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  #previewPanel {
+    display: none;
+    height: 60vh;
+    border-bottom: 1px solid var(--line);
+    background: #000;
+  }
+  #previewPanel.open {
+    display: block;
+  }
+  #previewFrame {
+    width: 100%; height: 100%; border: none;
+  }
+
   /* ---------- Stoppuhr ---------- */
   #timerBar {
     display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
@@ -392,6 +411,13 @@
     <div id="charCheckboxes"></div>
   </div>
 
+  <div id="previewBar">
+    <button class="timer-btn" id="previewToggle">▶ Live-Vorschau (Spieleransicht)</button>
+  </div>
+  <div id="previewPanel">
+    <iframe id="previewFrame" title="Live-Vorschau Spieleransicht"></iframe>
+  </div>
+
   <div class="board">
     <div class="col" id="col-szenen"><div class="col-head">Szenen</div></div>
     <div class="col" id="col-orte"><div class="col-head">Orte</div></div>
@@ -427,6 +453,31 @@
     let soundBarScene = null; // welche Szene aktuell im Eingabefeld steht
     const charCheckboxesEl = document.getElementById('charCheckboxes');
     let charBarScene = null; // welche Szene aktuell die Checkboxen zeigen
+
+    // ---------- Live-Vorschau (Spieleransicht) ----------
+    // Zeigt karte.html per iframe genau so, wie Spieler sie live sehen -
+    // kein eigener Render-Code nötig, da einfach dieselbe Seite eingebettet
+    // wird (bleibt automatisch über Firebase synchron). Ein-/ausklappbar,
+    // Zustand wird in localStorage gemerkt (rein UI-Komfort, kein Firebase-
+    // Pfad nötig, da nur diesen einen Admin-Browser betreffend).
+    (function () {
+      const toggle = document.getElementById('previewToggle');
+      const panel = document.getElementById('previewPanel');
+      const frame = document.getElementById('previewFrame');
+      const STORAGE_KEY = 'korsaren_regie_preview_open';
+      let loaded = false;
+
+      function setOpen(open) {
+        panel.classList.toggle('open', open);
+        toggle.textContent = (open ? '▼' : '▶') + ' Live-Vorschau (Spieleransicht)';
+        localStorage.setItem(STORAGE_KEY, open ? '1' : '0');
+        if (open && !loaded) { frame.src = 'karte.html'; loaded = true; }
+      }
+      toggle.addEventListener('click', function () {
+        setOpen(!panel.classList.contains('open'));
+      });
+      setOpen(localStorage.getItem(STORAGE_KEY) === '1');
+    })();
 
     // ---------- Firebase-Verbindung ----------
     try {
