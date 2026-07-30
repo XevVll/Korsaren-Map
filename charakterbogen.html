@@ -220,8 +220,7 @@ body{font-family:'Libre Baskerville',Georgia,serif;background:var(--bg);color:va
 .eximp-hint{font-size:.75rem;color:var(--gray);font-style:italic;margin-bottom:.8rem;line-height:1.4}
 .eximp-col{margin-bottom:.9rem}
 .eximp-label{font-family:'Cinzel',serif;font-size:.62rem;letter-spacing:.1em;color:var(--gray);text-transform:uppercase;margin-bottom:.3rem}
-.eximp-ta{width:100%;min-height:90px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;color:var(--ink);font-family:monospace;font-size:.68rem;padding:.5rem;resize:vertical;margin-bottom:.4rem}
-.eximp-msg{font-size:.72rem;color:var(--teal);min-height:1rem}
+.eximp-msg{font-size:.72rem;color:var(--teal);min-height:1rem;margin-top:.4rem}
 .eximp-msg.error{color:#e05555}
 
 @media print{
@@ -262,17 +261,15 @@ body{font-family:'Libre Baskerville',Georgia,serif;background:var(--bg);color:va
     </div>
     <div class="eximp-body">
       <p class="eximp-hint">Zum Umziehen auf eine andere Version dieser Seite (z.B. von einer
-        lokalen Datei hierher): hier exportieren, Text kopieren, dort ins Import-Feld einfügen
-        und übernehmen.</p>
+        lokal geöffneten Datei hierher): dort exportieren (lädt eine kleine Datei herunter),
+        hier genau diese Datei importieren.</p>
       <div class="eximp-col">
         <div class="eximp-label">Exportieren</div>
-        <textarea class="eximp-ta" id="eximpExportTa" readonly></textarea>
-        <button class="btn btn-outline" style="font-size:.68rem;padding:.3rem .7rem" onclick="copyExport()">In Zwischenablage kopieren</button>
+        <button class="btn btn-outline" style="font-size:.68rem;padding:.3rem .7rem" onclick="doExport()">Als Datei herunterladen</button>
       </div>
       <div class="eximp-col">
         <div class="eximp-label">Importieren</div>
-        <textarea class="eximp-ta" id="eximpImportTa" placeholder="Hier exportierten Text einfügen..."></textarea>
-        <button class="btn btn-gold" style="font-size:.68rem;padding:.3rem .7rem" onclick="doImport()">Übernehmen</button>
+        <input type="file" id="eximpImportFile" accept="application/json,.json" onchange="doImport(this)">
       </div>
       <div class="eximp-msg" id="eximpMsg"></div>
     </div>
@@ -787,13 +784,14 @@ function resetAll(){
 
 // ======================================================
 // EXPORT / IMPORT
-// Reiner localStorage-Umzug zwischen zwei Origins (z.B. einer
-// lokal geöffneten Datei und dieser gehosteten Version) - kein
-// Server beteiligt, nur JSON kopieren/einfügen.
+// Reiner localStorage-Umzug zwischen zwei Origins (z.B. einer lokal
+// geöffneten Datei und dieser gehosteten Version) - kein Server beteiligt.
+// Export lädt eine kleine .json-Datei herunter, Import liest genau diese
+// Datei wieder ein (Datei-Dialog statt Text kopieren/einfügen - robuster
+// und einfacher für nicht-technische Spieler).
 // ======================================================
 function showExportImport(){
-  document.getElementById('eximpExportTa').value = JSON.stringify({s:S, sh:SHEET});
-  document.getElementById('eximpImportTa').value = '';
+  document.getElementById('eximpImportFile').value = '';
   document.getElementById('eximpMsg').textContent = '';
   document.getElementById('eximpMsg').className = 'eximp-msg';
   document.getElementById('eximpOverlay').classList.add('open');
@@ -801,31 +799,39 @@ function showExportImport(){
 function hideExportImport(){
   document.getElementById('eximpOverlay').classList.remove('open');
 }
-function copyExport(){
-  const ta = document.getElementById('eximpExportTa');
-  ta.select();
+function doExport(){
+  const blob = new Blob([JSON.stringify({s:S, sh:SHEET})], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const nameSlug = (SHEET.name||'charakter').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'charakter';
+  a.href = url;
+  a.download = 'korsaren-' + nameSlug + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
   const msg = document.getElementById('eximpMsg');
-  navigator.clipboard.writeText(ta.value).then(function(){
-    msg.textContent = 'Kopiert!'; msg.className = 'eximp-msg';
-  }).catch(function(){
-    try{ document.execCommand('copy'); msg.textContent = 'Kopiert!'; msg.className = 'eximp-msg'; }
-    catch(e){ msg.textContent = 'Kopieren fehlgeschlagen - Text manuell markieren.'; msg.className = 'eximp-msg error'; }
-  });
+  msg.textContent = 'Heruntergeladen!'; msg.className = 'eximp-msg';
 }
-function doImport(){
-  const raw = document.getElementById('eximpImportTa').value.trim();
+function doImport(input){
   const msg = document.getElementById('eximpMsg');
-  if(!raw){ msg.textContent = 'Kein Text zum Importieren.'; msg.className = 'eximp-msg error'; return; }
-  let parsed;
-  try{ parsed = JSON.parse(raw); }
-  catch(e){ msg.textContent = 'Ungültiges Format - bitte den exakt exportierten Text einfügen.'; msg.className = 'eximp-msg error'; return; }
-  if(!parsed || typeof parsed!=='object' || !parsed.s || !parsed.sh){
-    msg.textContent = 'Ungültiges Format - bitte den exakt exportierten Text einfügen.'; msg.className = 'eximp-msg error'; return;
-  }
-  S = parsed.s; SHEET = parsed.sh;
-  save(); saveSheetState();
-  render(); renderSheet();
-  msg.textContent = 'Übernommen!'; msg.className = 'eximp-msg';
+  const file = input.files && input.files[0];
+  if(!file){ msg.textContent = 'Keine Datei ausgewählt.'; msg.className = 'eximp-msg error'; return; }
+  const r = new FileReader();
+  r.onload = function(e){
+    let parsed;
+    try{ parsed = JSON.parse(e.target.result); }
+    catch(err){ msg.textContent = 'Ungültige Datei - bitte die exakt exportierte .json-Datei wählen.'; msg.className = 'eximp-msg error'; return; }
+    if(!parsed || typeof parsed!=='object' || !parsed.s || !parsed.sh){
+      msg.textContent = 'Ungültige Datei - bitte die exakt exportierte .json-Datei wählen.'; msg.className = 'eximp-msg error'; return;
+    }
+    S = parsed.s; SHEET = parsed.sh;
+    save(); saveSheetState();
+    render(); renderSheet();
+    msg.textContent = 'Übernommen!'; msg.className = 'eximp-msg';
+  };
+  r.onerror = function(){ msg.textContent = 'Datei konnte nicht gelesen werden.'; msg.className = 'eximp-msg error'; };
+  r.readAsText(file);
 }
 // saveSheet() liest Werte aus den DOM-Feldern aus - beim Import kommen die
 // Werte aber direkt vom importierten Objekt, DOM ist noch nicht neu gerendert.
