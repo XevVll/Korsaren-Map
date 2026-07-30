@@ -104,6 +104,20 @@ const ORTE = {
 
   "hafenmeisterei": {
     personen: "Bartholomew Ashworth (Hafenmeister) · Gehilfe (namenlos, tollpatschig)",
+    npcs: [
+      {
+        name: "Bartholomew Ashworth",
+        rolle: "Hafenmeister von Grimsgate",
+        verfassung: "Phlegmatisch, auf Fassade bedacht, nicht dumm — ein Mann aus gutem Hause, der es nie zu Größerem brachte und sich seit 30 Jahren mit Anlegerechten begnügt.",
+        beduerfnis: "Seine Ruhe und den Anschein von Ordnung. Kein Ärger, der Arbeit macht."
+      },
+      {
+        name: "Der Gehilfe",
+        rolle: "Ashworths junger Schreiber",
+        verfassung: "Eifrig, notorisch überfordert, mischt sich öfter ein, als es ihm zusteht.",
+        beduerfnis: "Dazugehören und sich beweisen — und plaudert dabei aus, was er besser für sich behielte."
+      }
+    ],
     kurz: "Verwaltet Anlegerechte, Fracht und Papiere. Zwei Wege: normale Nachfrage oder Sonderfall bei Besuch vor der Kneipe.",
     ortHinweis: "Ein bescheidener Verwaltungsbau, mehr Aktenstaub als Amtswürde. Ashworth sitzt meist hinter einem überladenen Schreibtisch, den Blick eher auf seine Fingernägel als auf die Besucher gerichtet — ein Mann aus gutem Hause, der es nie zu etwas Größerem gebracht hat und sich seit rund 30 Jahren mit Anlegerechten und Frachtpapieren in Grimsgate begnügt. Phlegmatisch, auf Fassade bedacht, aber nicht dumm. Sein Gehilfe — jung, eifrig, notorisch überfordert — sitzt meist mit einem Klemmbrett im Hintergrund und mischt sich öfter ein, als es ihm zusteht.",
     interaktionen: {
@@ -155,12 +169,28 @@ const ORTE = {
   },
   "kraemerladen": {
     personen: "Krämer (namenlos)",
+    npcs: [
+      {
+        name: "Der Krämer",
+        rolle: "Ladenbesitzer",
+        verfassung: "Resigniert-pragmatisch, verramscht gerade alles zu Schleuderpreisen — ab morgen ist die Stadt tot.",
+        beduerfnis: "Seinen Bestand loswerden, solange noch Publikum da ist."
+      }
+    ],
     kurz: "Ausrüstung und Grundbedarf. Krämer verkauft gerade alles zu Schleuderpreisen, weil morgen ohnehin nichts mehr los ist.",
     ortHinweis: "Ein vollgestopfter kleiner Laden, in dem sich Kisten, Fässer und Regale bis unter die Decke stapeln — Seile, Werkzeug, Konserven, Ersatzkleidung, alles, was man kurz vor einer Abfahrt noch braucht und vergessen hat. Der Krämer kennt jeden Winkel seines Ladens auswendig und findet auch im Chaos sofort, wonach man fragt.\n\nSpieler können hier Ausrüstung kaufen, an die sie vorher nicht gedacht haben. Fragt man ihn grob, wo man hier anheuert, winkt er ab: die meisten Schiffe seien schon voll, und ab morgen sei ohnehin nichts mehr los in Grimsgate — deswegen haut er gerade alles zu Schleuderpreisen raus, solange noch Publikum da ist.\n\n„Frag mich nicht nach 'nem Schiff, frag mich, was du noch brauchst, bevor's zu spät ist — das hier wird nach morgen keiner mehr kaufen wollen.“\n\nKein fester Interaktions-Ablauf — freie Improvisation, ähnlich dem Markt, nur mit Kaufmöglichkeit und dieser einen wiederkehrenden Grundhaltung des Krämers.",
     interaktionen: {}
   },
   "bordell": {
     personen: "Constance Wrey (Madame) · Ezra Coombe · Ned Sharpe · diverse Frauen (namenlos, teils für Wat tätig)",
+    npcs: [
+      {
+        name: "Constance Wrey",
+        rolle: "Madame des Hauses",
+        verfassung: "Ruhige, unmissverständliche Autorität — nichts geschieht hier ohne ihr Wissen.",
+        beduerfnis: "Kontrolle über ihr Haus. Kein Ärger, der die Geschäfte stört."
+      }
+    ],
     kurz: "Sozialer Zugang + Wat-Falle + 'Raubein'-Zusatzszene mit Rufmechanik bei Ezra/Ned.",
     ortHinweis: "Etwas abseits der Stadt, unauffällig von außen, drinnen wärmer und aufwendiger eingerichtet als der Rest von Grimsgate — rote Vorhänge, gedämpftes Licht, der Lärm der Docks bleibt vor der Tür. Constance Wrey führt das Haus mit ruhiger, unmissverständlicher Autorität; nichts passiert hier ohne ihr Wissen. Im Empfangsbereich sitzen häufig Ezra Coombe und Ned Sharpe, zwei Crew-Mitglieder, die das Haus als eine Art zweites Zuhause behandeln.",
     interaktionen: {
@@ -499,5 +529,59 @@ const ORTE = {
         trigger: []
       }
     }
+  }
+};
+
+// Regie-Daten pro SZENE (nicht pro Ort) - anders als ORTE, das flach pro
+// Ort-ID definiert ist. Hält das szenen-weite GM-Material, das keinem
+// einzelnen Marker gehört:
+//   stimmung - Vorlese-Grundton der ganzen Örtlichkeit (Grundstimmung +
+//              aktuelle Lage), zum Vorlesen / Spieler-Hinlocken.
+//   ghosts   - generische, szenen-weit frei platzierbare Statisten
+//              ("Scheincharaktere"), die die Stimmung verkörpern. Plot-
+//              neutral, reines Atmosphäre-/Rollenspiel-Futter. Felder je
+//              Ghost: name, rolle, verfassung, beduerfnis, koerperlich?
+//              (koerperlich: true markiert einen Ghost, an dem sich ein
+//              kampflustiger Spieler gefahrlos reiben kann - fehlt es,
+//              ist der Ghost rein sozial).
+// Verankerte NPCs (an EINEM Ort) stehen dagegen in ORTE[ortId].npcs.
+// Angezeigt wird beides im Admin-Panel (regie.html): stimmung+ghosts über
+// den Szenen-Kopf in der Orte-Spalte, npcs im jeweiligen Ort-Detail.
+const SZENEN_REGIE = {
+  "1.1": {
+    stimmung: "Grimsgate lebt über seine Verhältnisse. Im Hafen liegt der größte Geleitzug, den die Stadt je gesehen hat — keine Handelsflotte, sondern eine Siedlungsfahrt in die Neue Welt. Wer drüben von Bord geht, dem versprechen sie Land, Arbeit für jede Hand, ein Leben, das bei null beginnt — und man muss nicht einmal reich sein, ein Platz an Deck genügt. Die halbe Stadt redet von nichts anderem. Man spürt es an jeder Ecke: die fiebrige Euphorie derer, die morgen gehen und alles hinter sich lassen; die stille Angst derer, die bleiben und sich gegen das Versprechen von Sonne und Freiheit wappnen müssen; der Frust derer, die mitwollten — doch die Schiffe sind voll. Nichts davon ist Politik oder ferne Macht. Für jeden Einzelnen steht ganz persönlich der nächste Schritt auf dem Spiel: bleiben, wer man ist — oder sich in ein paar Wochen drüben völlig neu würfeln.",
+    ghosts: [
+      {
+        name: "Silas Coote",
+        rolle: "Böttcher, morgen an Bord",
+        verfassung: "Fiebrig aufgekratzt, hat Haus und Werkstatt verkauft, redet von nichts als drüben.",
+        beduerfnis: "Jemand, der seinen Rausch teilt — oder ihm bestätigt, dass er das Richtige tut."
+      },
+      {
+        name: "Reuben Slade",
+        rolle: "Tagelöhner, kein Platz mehr bekommen",
+        verfassung: "Verbittert, kurz angebunden, das Fenster schließt sich vor seiner Nase.",
+        beduerfnis: "Irgendwie doch an Bord — oder wenigstens einen, an dem er seinen Zorn auslässt.",
+        koerperlich: true
+      },
+      {
+        name: "Ambrose Tench",
+        rolle: "Alteingesessener Fassmacher, bleibt",
+        verfassung: "Betont gelassen, drückt aber jedem ungefragt auf, warum drüben alle am Fieber krepieren.",
+        beduerfnis: "Zustimmung — dass Bleiben Klugheit ist, nicht Feigheit."
+      },
+      {
+        name: "Jory Vane",
+        rolle: "Fliegender Händler",
+        verfassung: "Glattzüngig, blendend gelaunt, wittert das Geschäft seines Lebens.",
+        beduerfnis: "Auswanderern „unverzichtbares“ Zeug für die Neue Welt andrehen — Fiebertinkturen, Wunderwerkzeug, Schutzamulette."
+      },
+      {
+        name: "Nell Alderton",
+        rolle: "Näherin, verwitwet",
+        verfassung: "Tapferes Lächeln über echter Angst — ihr einziger Sohn geht morgen und kommt wohl nie zurück.",
+        beduerfnis: "Dem Jungen ein Andenken mitgeben — oder das Versprechen, dass jemand auf ihn achtgibt."
+      }
+    ]
   }
 };
