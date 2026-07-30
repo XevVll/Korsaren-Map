@@ -496,9 +496,43 @@
 
     let currentRenderedScene = null;
 
+    // ---------- Live-Präsenz: wer hat welchen Ort gerade offen ----------
+    // Pro Tab (nicht pro Gerät) eine Session-ID, damit zwei offene Tabs auch
+    // als zwei Betrachter zählen. regie.html liest openMarkers/{szene}/{ort}
+    // und zeigt die Anzahl der Kinder als Badge (siehe KAMPAGNEN-BIBEL 13.9).
+    let mySessionId = sessionStorage.getItem('korsaren_session_id');
+    if (!mySessionId) {
+      mySessionId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem('korsaren_session_id', mySessionId);
+    }
+    let openMarkerRef = null; // aktuell gesetzter Präsenz-Ref, zum sauberen Aufräumen
+
+    function clearOpenMarker() {
+      if (openMarkerRef) {
+        openMarkerRef.onDisconnect().cancel();
+        openMarkerRef.remove();
+        openMarkerRef = null;
+      }
+    }
+
+    function setOpenMarker(sceneId, markerId) {
+      clearOpenMarker();
+      // Im Admin-eigenen Vorschau-iframe (?preview=1) nicht mitzählen - sonst
+      // würde ein Marker-Klick des Spielleiters in seiner eigenen Live-
+      // Vorschau die Zählung für echte Spieler verfälschen.
+      if (!db || !sceneId || document.documentElement.classList.contains('preview-mode')) return;
+      openMarkerRef = db.ref('openMarkers/' + fbKey(sceneId) + '/' + markerId + '/' + mySessionId);
+      openMarkerRef.set(true);
+      openMarkerRef.onDisconnect().remove();
+    }
+
     function renderScene(sceneId) {
       if (sceneId === currentRenderedScene) return; // nichts geändert, kein Neu-Rendern nötig
       currentRenderedScene = sceneId;
+      // Szene wechselt - ein evtl. offenes Overlay bezieht sich sonst auf
+      // einen Ort in der ALTEN Szene, dessen Präsenz-Eintrag sonst dort
+      // hängen bliebe, bis die Verbindung getrennt wird.
+      clearOpenMarker();
 
       const background = getBackgroundForScene(sceneId);
       const markers = getMarkersForScene(sceneId);
@@ -563,6 +597,7 @@
     function openOverlay(marker) {
       overlayTitle.textContent = marker.title || '';
       overlayEl.classList.add('open');
+      setOpenMarker(currentRenderedScene, marker.id);
 
       resolveActiveVariant(marker, function (variant) {
         // Eine Variante kann "img" und/oder "desc" überschreiben. Fehlt
@@ -590,6 +625,7 @@
 
     function closeOverlay() {
       overlayEl.classList.remove('open');
+      clearOpenMarker();
     }
     document.getElementById('overlayClose').onclick = closeOverlay;
     overlayEl.addEventListener('click', function (e) {
