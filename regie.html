@@ -484,7 +484,7 @@
         panel.classList.toggle('open', open);
         toggle.textContent = (open ? '▼' : '▶') + ' Live-Vorschau (Spieleransicht)';
         localStorage.setItem(STORAGE_KEY, open ? '1' : '0');
-        if (open && !loaded) { frame.src = 'karte.html'; loaded = true; }
+        if (open && !loaded) { frame.src = 'karte.html?preview=1'; loaded = true; }
       }
       toggle.addEventListener('click', function () {
         setOpen(!panel.classList.contains('open'));
