@@ -619,6 +619,27 @@ const ORTE = {
         ]
       }
     }
+  },
+
+  "stammesdorf": {
+    personen: "James Harwick (\"Vanthei\") · Cormac Daly · Häuptling Ta'ahal",
+    interaktionen: {
+      "ankunft_vanthei": {
+        title: "Vanthei ist nicht mehr willkommen",
+        kurz: "Reiner Erzählmoment, kein Wurf (außer optional Wahrnehmung/Menschenkenntnis) — der Häuptling weist Harwick öffentlich zurück, das Dorf ist erkennbar gespalten.",
+        details: "Kaum betritt die Gruppe die Lichtung, geht ein Raunen durch die Menge. Ein Wort läuft von Mund zu Mund, kaum lauter als ein Atemzug: „Vanthei.“ Manche senken den Kopf, andere weichen einen Schritt zurück.\n\nJe näher die Gruppe kommt, desto ernster wird der Blick des Häuptlings auf sie gerichtet. Harwick bleibt vorsichtig, breitet aber trotzdem — fast einstudiert — die Arme aus, wie zur Begrüßung eines alten Bekannten.\n\nHäuptling Ta'ahal (GM-Hinweis: kein Eigenname, sondern der Titel jedes Thahal-Anführers — von \"Thahal\"/\"Bewahrer\" abgeleitet, bedeutet \"der, der erhält\") lässt ihn ausreden. Dann sagt er, scharf, absichtlich laut und für jeden im Dorf deutlich hörbar, mit unverhohlenem Abscheu: „Vanthei! Du bist hier nicht länger willkommen!“\n\nNiemand im Dorf trägt eine Waffe — nur der Häuptling einen Speer. Er stößt ihn in den Boden, dreht sich um und geht.\n\nEinige Dorfbewohner starren mit großen Augen zu Harwick. Der steht da wie bestellt und nicht abgeholt, blickt sich ernst um.\n\nEin junger Mann ruft: „Vanthei!“ — und macht einen Schritt auf ihn zu, wird aber sofort von anderen festgehalten und in eine Hütte gezogen.\n\nWer gute Wahrnehmung oder Menschenkenntnis hat, erkennt den Zwiespalt, in dem die Dorfbewohner stecken. Niemand kommt der Gruppe zu nahe. Jeder Versuch, Kontakt aufzunehmen, verschreckt die Leute nur.\n\nHarwick spricht einen alten Mann direkt an — in Worten, die die Spieler nicht verstehen. Der alte Mann schüttelt traurig den Kopf und verlässt den Platz.\n\nHarwick dreht sich um, geht mit ernster Miene durch die Gruppe hindurch und verlässt das Dorf. Der junge Mann von vorhin ruft ihm in gebrochenem Englisch nach: „Er hätte gewollt, dass du es zu ihr bringst!“ (GM-Hinweis: \"Er\" = der verstorbene alte Häuptling, \"sie\" = die Göttin/das Heiligtum. Dieser junge Mann ist der spätere Thahal-Helfer im Nachtlager — Station 4, kontaktiert die Gruppe dort heimlich nachts, einziger Zugang zu Diebstahl/Aufhetzen. Für die Spieler bleibt das hier nur Sympathie, kein Versprechen.)\n\nLangsam wird es dunkel. In gebührendem Abstand zum Dorf macht Harwick klar, dass hier das Lager aufgeschlagen wird.",
+        trigger: [
+          { id: "geraunt", label: "Menge raunt \"Vanthei\", manche weichen zurück" },
+          { id: "haeuptling_ablehnung", label: "Häuptling Ta'ahal weist Harwick laut und mit Abscheu zurück" },
+          { id: "speer_geste", label: "Häuptling stößt den Speer in den Boden und geht" },
+          { id: "junger_mann_zurueckgehalten", label: "Ein junger Mann ruft \"Vanthei\", wird zurückgehalten und weggezogen" },
+          { id: "zwiespalt_wahrnehmung", label: "Nur bei Wahrnehmung/Menschenkenntnis: Zwiespalt im Dorf erkennbar" },
+          { id: "alter_mann_thahal", label: "Harwick spricht mit einem alten Mann auf Thahal, dieser lehnt traurig ab" },
+          { id: "abschiedsruf", label: "Junger Mann ruft Harwick in gebrochenem Englisch nach: \"Er hätte gewollt, dass du es zu ihr bringst!\"" },
+          { id: "lager_aufgeschlagen", label: "Bei Einbruch der Dunkelheit schlägt die Gruppe in gebührendem Abstand das Nachtlager auf" }
+        ]
+      }
+    }
   }
 };
 
