@@ -540,7 +540,22 @@ const ORTE = {
         verfassung: "Ruhig und geübt, konzentriert am improvisierten Amboss — das Herz der Reparatur.",
         beduerfnis: "Kohle, Metall und Platz zum Arbeiten; natürlicher Anlaufpunkt für alles, was geschmiedet oder gerichtet werden muss."
       }
-    ]
+    ],
+    interaktionen: {
+      "landung": {
+        title: "Die Landung",
+        kurz: "Die Golden Lion läuft mit gebrochenem Mast auf den Strand auf. Reiner Erzählmoment, kein Wurf — Spieler können jederzeit eingreifen, SL entscheidet.",
+        details: "Mit Knarren und Zittern schleppt sich die Golden Lion auf den Strand. Niemand traut sich mehr, am angeknacksten Mast die Segel zu bergen — der gibt beim abrupten Stopp ohnehin nach und knickt einfach ein, Holz, so dick wie ein Mensch, bricht wie ein Streichholz. Das Schiff schlingert zur Seite und frisst sich trotzdem tief in den Sand. Eins ist klar: Hier kommen sie so schnell nicht wieder weg.\n\nEin großer Teil der Crew blickt sich verunsichert um. Tom, ganz vorn am Bug — das Ruder war schon eine Weile nutzlos —, schaut auf seinen Kompass, blickt auf und sucht Augenkontakt mit Harwick, der inzwischen sein Quartier verlassen hat. Ein kurzes Nicken von Harwick, und Tom bricht in lautes Lachen aus. (GM-Hinweis: Das ist der Moment, der den Sturm-Reveal bestätigt, dass Tom das Schiff absichtlich hierher gesteuert hat — siehe 10.11/Bibel 16 \"Reveal\". Bleibt für die Spieler unerklärt, nur der Blick zählt.)\n\nWer hier nicht versteht, was gerade passiert ist, ist nicht allein. Cormac nickt den Leuten anerkennend zu, die sich im Sturm nützlich gemacht haben, und auch Tom. Weil das Ausmaß noch niemand richtig begriffen hat, steht die Crew wie eingefroren — bis Harwick die Stille mit seiner charismatischen, freundlichen Stimme durchbricht. Er reibt sich die Hände: „Dann wollen wir mal!“ Schneidet ein Seil an einer Winde durch und lässt sich damit vom Deck ab.\n\nUnten am Strand, weit unterhalb aller, die noch an Deck stehen, kratzt er sich am Hinterkopf und blickt zurück nach oben. „Das haben wir aber auch schon ruhiger hierhergeschafft, Tom!“ Kopfschüttelnd geht er ums Schiff, um es zu inspizieren.\n\nDie Crew erwacht langsam aus der Starre und beginnt, das Schiff zu verlassen — mit Hilfe der Zimmerer werden Leitern gebaut, manche klettern direkt aus dem Frachtraum ins Freie. Schnell wird klar: Hier liegt eine Menge Arbeit vor allen. Trotzdem stellt Harwick auf einmal eine kleine Gruppe zusammen und ordert bestimmte Leute zu sich.",
+        trigger: [
+          { id: "aufgelaufen", label: "Schiff läuft mit gebrochenem Mast auf den Strand auf" },
+          { id: "blickkontakt", label: "Tom & Harwick tauschen einen Blick, Tom lacht auf" },
+          { id: "abgeseilt", label: "Harwick durchtrennt ein Seil, seilt sich vom Deck ab" },
+          { id: "seitenhieb", label: "Harwicks Seitenhieb an Tom (\"...auch schon ruhiger hierhergeschafft\")" },
+          { id: "crew_verlaesst_schiff", label: "Crew verlässt langsam das Schiff (Leitern/Frachtraum)" },
+          { id: "gruppe_zusammengestellt", label: "Harwick stellt eine kleine Gruppe zusammen, ordert Leute zu sich" }
+        ]
+      }
+    }
   }
 };
 
