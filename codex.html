@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex — Weltatlas</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=IM+Fell+English:ital@0;1&display=swap');
+
+  :root {
+    --ink: #1a1208;
+    --ink-soft: #3a2c18;
+    --ink-faint: #7a6748;
+    --parchment: #f2e8d5;
+    --parchment-dark: #e7dabf;
+    --parchment-darker: #d8c69e;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --sea: #1a3a4a;
+    --shadow: rgba(26, 18, 8, 0.35);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: #17110a;
+    background-image:
+      radial-gradient(ellipse at 15% 10%, #2a1e0e 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 90%, #0e1a20 0%, transparent 55%);
+    min-height: 100vh;
+    font-family: 'IM Fell English', Georgia, serif;
+    color: var(--ink);
+  }
+
+  /* ── LAYOUT ── */
+  .layout { display: grid; grid-template-columns: 280px 1fr; gap: 0; max-width: 1180px; margin: 0 auto; }
+
+  /* ── TABLE OF CONTENTS ── */
+  .toc {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    padding: 2.5rem 1.5rem 2rem; border-right: 1px solid rgba(184,134,11,0.18);
+  }
+  .toc-brand { font-family: 'Cinzel', serif; font-size: 1.35rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--parchment); text-shadow: 0 0 30px rgba(184,134,11,0.35); }
+  .toc-sub { font-style: italic; font-size: 0.82rem; color: rgba(216,198,158,0.6); margin-top: 0.25rem; margin-bottom: 1.8rem; }
+  .toc-group { margin-bottom: 1.4rem; }
+  .toc-chapter { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-light); display: block; padding: 0.35rem 0; text-decoration: none; opacity: 0.85; transition: opacity 0.15s, color 0.15s; }
+  .toc-chapter:hover { opacity: 1; }
+  .toc-chapter.pending { color: rgba(216,198,158,0.35); }
+  .toc-links { list-style: none; margin: 0.3rem 0 0; padding-left: 0.9rem; border-left: 1px solid rgba(184,134,11,0.2); }
+  .toc-links a { display: block; font-size: 0.86rem; color: rgba(216,198,158,0.72); text-decoration: none; padding: 0.22rem 0; transition: color 0.15s; line-height: 1.3; }
+  .toc-links a:hover { color: var(--parchment); }
+  .toc-links a.active { color: var(--gold-light); }
+
+  /* ── ARTICLE ── */
+  .book { padding: 2.5rem 1.2rem 6rem; }
+  .sheet {
+    background: var(--parchment);
+    background-image: linear-gradient(160deg, var(--parchment) 0%, var(--parchment-dark) 55%, var(--parchment) 100%);
+    box-shadow: 0 6px 40px var(--shadow), inset 0 1px 0 rgba(255,255,255,0.5);
+    border: 1px solid var(--parchment-darker);
+    max-width: 760px; margin: 0 auto; padding: 3.5rem clamp(1.4rem, 5vw, 4rem);
+  }
+
+  .book-header { text-align: center; margin-bottom: 2.5rem; }
+  .book-header h1 { font-family: 'Cinzel', serif; font-size: 2.6rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); line-height: 1.05; }
+  .book-header .lead { font-style: italic; color: var(--ink-faint); font-size: 1.02rem; margin-top: 0.6rem; }
+  .divider { display: flex; align-items: center; gap: 1rem; margin: 1.2rem auto; max-width: 340px; }
+  .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+  .divider-diamond { width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; }
+
+  /* Chapter */
+  .chapter { padding-top: 2rem; scroll-margin-top: 1rem; }
+  .chapter + .chapter { border-top: 1px solid var(--parchment-darker); margin-top: 3rem; }
+  .chapter-kicker { font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); display: block; margin-bottom: 0.4rem; }
+  .chapter h2 { font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 800; color: var(--ink); line-height: 1.05; letter-spacing: 0.02em; }
+  .chapter-lead { font-style: italic; color: var(--ink-soft); font-size: 1.08rem; margin-top: 0.5rem; margin-bottom: 1.6rem; }
+
+  /* Section (Ort) */
+  .ort { scroll-margin-top: 1rem; padding-top: 1.6rem; }
+  .ort h3 { font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 600; color: var(--ink); margin-bottom: 0.2rem; letter-spacing: 0.02em; }
+  .ort .ort-sub { font-style: italic; font-size: 0.9rem; color: var(--ink-faint); margin-bottom: 0.9rem; }
+
+  /* Body prose */
+  .prose p { font-size: 1.12rem; line-height: 1.78; color: var(--ink); margin-bottom: 1.1rem; text-align: justify; -webkit-hyphens: auto; hyphens: auto; }
+  .prose p.dropcap::first-letter { font-family: 'Cinzel', serif; font-size: 3.1rem; font-weight: 800; float: left; line-height: 0.82; padding: 0.12em 0.12em 0 0; color: var(--gold); }
+  .prose em { font-style: italic; }
+  .prose .quote { font-style: italic; color: var(--ink-soft); border-left: 2px solid var(--parchment-darker); padding-left: 1rem; margin: 1.1rem 0; }
+
+  /* Historical aside */
+  .hist {
+    background: rgba(26,58,74,0.06);
+    border: 1px solid rgba(26,58,74,0.18);
+    border-left: 4px solid var(--sea);
+    border-radius: 3px; padding: 1rem 1.2rem 1.05rem; margin: 1.5rem 0;
+  }
+  .hist-label { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sea); font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+  .hist-label .anchor { font-size: 0.95rem; }
+  .hist p { font-size: 1.0rem; line-height: 1.65; color: var(--ink-soft); margin-bottom: 0.6rem; text-align: left; }
+  .hist p:last-child { margin-bottom: 0; }
+
+  /* Pending chapter */
+  .pending-note { font-style: italic; color: var(--ink-faint); font-size: 1.02rem; background: rgba(26,18,8,0.03); border: 1px dashed var(--parchment-darker); border-radius: 4px; padding: 1.2rem 1.4rem; }
+
+  .scroll-top { position: fixed; bottom: 1.8rem; right: 1.8rem; width: 42px; height: 42px; background: var(--gold); border: none; cursor: pointer; font-size: 1.2rem; color: var(--ink); display: none; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,0.5); transition: background 0.2s, transform 0.2s; }
+  .scroll-top:hover { background: var(--gold-light); transform: translateY(-2px); }
+  .scroll-top.show { display: flex; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .toc { position: static; height: auto; border-right: none; border-bottom: 1px solid rgba(184,134,11,0.18); padding: 1.8rem 1.5rem; }
+    .toc-links { display: none; }
+    .book { padding: 1.5rem 0.6rem 5rem; }
+    .sheet { padding: 2rem 1.2rem; }
+    .book-header h1 { font-size: 2rem; }
+    .prose p { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ══════════ TABLE OF CONTENTS ══════════ -->
+  <nav class="toc">
+    <div class="toc-brand">Codex</div>
+    <div class="toc-sub">Weltatlas & historische Einordnung</div>
+
+    <div class="toc-group">
+      <a class="toc-chapter" href="#grimsgate">I · Grimsgate</a>
+      <ul class="toc-links">
+        <li><a href="#grimsgate-stadt">Die Stadt am Konvoi</a></li>
+        <li><a href="#heuer">Zur letzten Heuer</a></li>
+        <li><a href="#hafenmeisterei">Die Hafenmeisterei</a></li>
+        <li><a href="#lagerhaeuser">Die Lagerhäuser</a></li>
+        <li><a href="#markt">Marktplatz & Krämerladen</a></li>
+        <li><a href="#bordell">Das Haus abseits der Docks</a></li>
+      </ul>
+    </div>
+
+    <div class="toc-group">
+      <a class="toc-chapter pending" href="#golden-lion">II · Golden Lion</a>
+    </div>
+
+    <div class="toc-group">
+      <a class="toc-chapter pending" href="#schatzinsel">III · Die Schatzinsel</a>
+    </div>
+  </nav>
+
+  <!-- ══════════ BOOK ══════════ -->
+  <div class="book">
+    <article class="sheet">
+
+      <header class="book-header">
+        <h1>Codex</h1>
+        <div class="divider"><div class="divider-line"></div><div class="divider-diamond"></div><div class="divider-line"></div></div>
+        <p class="lead">Ein Weltatlas zum Nachschlagen und Schmökern —<br>die Orte des Abenteuers und die Geschichte hinter ihnen.</p>
+      </header>
+
+      <!-- ─────────── KAPITEL I: GRIMSGATE ─────────── -->
+      <section class="chapter" id="grimsgate">
+        <span class="chapter-kicker">Kapitel I</span>
+        <h2>Grimsgate</h2>
+        <p class="chapter-lead">Eine englische Hafenstadt, die über ihre Verhältnisse lebt — und diese Woche über sich selbst hinauswächst.</p>
+
+        <div class="ort prose" id="grimsgate-stadt">
+          <p class="dropcap">Grimsgate hat es nie zu etwas Eigenem gebracht — kein Marinehafen, keine Residenz, keine Kathedrale, über die man in London spräche. Und doch ist die Stadt unentbehrlich, aus einem einzigen Grund: ein tiefer, windgeschützter Naturhafen genau an der richtigen Stelle der Küste. Was Grimsgate groß macht, macht immer jemand anderes — die Konvois, die hier zusammenlaufen, ehe sie in den Atlantik hinausstechen. Zwischen den Abfahrten döst die Stadt vor sich hin; läuft ein Geleitzug ein, platzt sie aus allen Nähten.</p>
+
+          <p>Diesmal ist es kein gewöhnlicher Handelszug. Was da draußen vor Anker liegt, ist eine Siedlungsflotte — der größte Verband, den Grimsgate je gesehen hat. Kein Krieg treibt diese Menschen übers Meer, kein Sold, keine Krone: drüben, in der Neuen Welt, wartet angeblich Land für jede Hand und Arbeit für jeden Rücken. Und das Beste, so raunt es durch jede Gasse — man muss nicht reich sein, um mitzukommen. Ein Platz an Deck genügt.</p>
+
+          <aside class="hist">
+            <div class="hist-label"><span class="anchor">⚓</span> Historisch — Warum überhaupt im Verband?</div>
+            <p>Allein zu segeln war in diesen Jahren ein kalkuliertes Risiko. Der Atlantik gehörte niemandem und allen: spanische Guardas, französische Kaper, nordafrikanische Korsaren und schlicht Piraten ohne Papiere. Deshalb fuhr man im Geleitzug, oft unter der Auflage eines bewaffneten Begleitschiffs.</p>
+            <p>Dass ein solcher Beschützer selbst ein Freibeuter mit Kaperbrief sein konnte, war keine Ausnahme, sondern gelebte Grauzone: Ein Kaperbrief machte aus einem Piraten über Nacht einen <em>„ehrbaren"</em> Dienstleister der Krone. Man nahm, wen man kriegen konnte.</p>
+          </aside>
+
+          <p>Und so hängt über Grimsgate eine seltsam dichte Luft, in der drei Stimmungen dicht nebeneinander wohnen. Da ist die <em>fiebrige Euphorie</em> derer, die gehen — Menschen, die Haus und Handwerk verkauft haben und in ein Leben bei null aufbrechen, als wäre es ein Fest. Da ist die <em>stille Angst</em> der Bleibenden, die sich gegen das Versprechen von Sonne und Freiheit wappnen müssen und laut erklären, warum Dableiben das Klügere sei. Und da ist der <em>Frust</em> der Abgewiesenen, die zu spät kamen: Die Schiffe sind voll, das Fenster schließt sich, und der Zorn sucht sich ein Ventil.</p>
+
+          <aside class="hist">
+            <div class="hist-label"><span class="anchor">⚓</span> Historisch — Ein Platz an Deck als Währung</div>
+            <p><em>„Nicht reich sein müssen"</em> war wörtlich gemeint. Wer die Überfahrt nicht zahlen konnte, verkaufte die einzige Ware, die er besaß: seine Arbeitskraft. Per Vertrag — <em>indenture</em> — verpflichtete man sich zu vier bis sieben Jahren Dienst bei einem Herrn drüben, im Tausch gegen Passage, Kost und ein Versprechen auf Land oder Werkzeug am Ende der Dienstzeit.</p>
+            <p>Zehntausende sind so nach Barbados und Virginia gekommen; über weite Strecken waren die Verdingten die eigentliche Arbeitskraft, die die frühen Kolonien überhaupt trug. Für manche war es der Aufbruch in ein neues Leben — für viele der Beginn einer Knechtschaft, die sie nie abbezahlten.</p>
+          </aside>
+
+          <p>Nichts davon ist politisch, nichts welterschütternd. Für jeden einzelnen aber ist es eine Weichenstellung: bleiben, wer man ist — oder sich drüben noch einmal ganz neu würfeln.</p>
+        </div>
+
+        <!-- Zur letzten Heuer -->
+        <div class="ort prose" id="heuer">
+          <h3>Zur letzten Heuer</h3>
+          <p class="ort-sub">Die raue Hafenkneipe, in der man anheuert — und mancher zum letzten Mal an Land trinkt.</p>
+
+          <p>Der Name ist ein Versprechen und eine Warnung zugleich. Stammgäste kennt „Zur letzten Heuer" kaum; die meisten, die hier trinken, sieht man Jahre nicht wieder, manche nie. Wer eine Heuer sucht, landet früher oder später an einem dieser klebrigen Tische — und wer eine Mannschaft füllen will, ebenfalls. Der Rum ist billig, das Licht ist trüb, und die Übergänge zwischen einem freundlichen Angebot und einer Falle sind fließend.</p>
+
+          <aside class="hist">
+            <div class="hist-label"><span class="anchor">⚓</span> Historisch — Wie eine Mannschaft entstand</div>
+            <p>Schiffe wurden selten aus freien Stücken voll. Die Kriegsmarine schickte <em>Pressgangs</em> aus, die Männer schlicht von der Straße oder aus der Schänke weg zwangsrekrutierten. Auf der zivilen Seite besorgten das die <em>Crimps</em>: Wirte und Vermittler, die einen Mann mit Kredit, Rum und Spielschulden so lange umgarnten, bis er einen Vertrag unterschrieb, um seine Schulden „abzuarbeiten".</p>
+            <p>Aus dieser Praxis stammt das spätere Wort <em>Shanghaiing</em> — jemanden betrunken oder verschuldet an Bord zu bringen. Ein gezinktes Würfelspiel, an dessen Ende die Anheuerung als Schuldentilgung steht, ist keine Erfindung: Es ist genau der Mechanismus, mit dem halbe Mannschaften zusammenkamen.</p>
+          </aside>
+        </div>
+
+        <!-- Hafenmeisterei -->
+        <div class="ort prose" id="hafenmeisterei">
+          <h3>Die Hafenmeisterei</h3>
+          <p class="ort-sub">Aktenstaub statt Amtswürde — und doch die Ordnungsmacht des Hafens.</p>
+
+          <p>Ein bescheidener Verwaltungsbau, mehr Aktenstaub als Amtswürde. Hier werden Anlegerechte vergeben, Fracht verzeichnet, Papiere gestempelt. Hafenmeister <em>Bartholomew Ashworth</em> sitzt meist hinter einem überladenen Schreibtisch, den Blick eher auf die eigenen Fingernägel gerichtet als auf die Besucher — ein Mann aus gutem Hause, der es nie zu etwas Größerem brachte und sich seit dreißig Jahren mit Frachtpapieren begnügt. Phlegmatisch, auf Fassade bedacht, aber nicht dumm. Sein junger Gehilfe im Hintergrund ist eifrig, überfordert und plaudert regelmäßig aus, was er besser für sich behielte.</p>
+
+          <aside class="hist">
+            <div class="hist-label"><span class="anchor">⚓</span> Historisch — Wer im Hafen die Ordnung hielt</div>
+            <p>Ein Hafen war ein Verwaltungsraum. Hafenmeister und Zoll kontrollierten, wer wo ankern durfte, welche Ladung an Bord ging und ob die Papiere eines Schiffes stimmten. Ein Schiff ohne saubere Registrierung fiel auf — nicht unbedingt als Verbrechen, aber als Unstimmigkeit, die ein pflichtbewusster Beamter notierte.</p>
+            <p>Gerade das macht ein <em>nicht gelistetes</em> Kriegsschiff mitten im Konvoi zu einer stillen Auffälligkeit: kein Alarm, aber ein loser Faden, an dem jemand ziehen könnte.</p>
+          </aside>
+        </div>
+
+        <!-- Lagerhäuser -->
+        <div class="ort prose" id="lagerhaeuser">
+          <h3>Die Lagerhäuser</h3>
+          <p class="ort-sub">Von außen Chaos, im Kern ein Uhrwerk: hier wird der Konvoi beladen.</p>
+
+          <p>Von außen wirkt es wie ein einziges Durcheinander — Kisten, Fässer, Männer, die sich im Laufschritt kreuzen. Wer genauer hinsieht, erkennt das Uhrwerk dahinter: Jeder Handgriff sitzt, denn der Konvoi muss beladen sein, ehe die Flut günstig steht, und dafür bleibt keine Minute für Ablenkung. Wachen an den Toren lassen Fremde kaum durch; die Belader antworten einsilbig, wenn überhaupt.</p>
+
+          <aside class="hist">
+            <div class="hist-label"><span class="anchor">⚓</span> Historisch — Proviant für den Atlantik</div>
+            <p>Eine Ozeanüberquerung war zuerst eine Rechenaufgabe. Für Wochen ohne Landsicht brauchte es Pökelfleisch in Salzfässern, Schiffszwieback (Hartkeks, der Monate hielt), getrocknete Erbsen, und vor allem Fässer über Fässer mit Wasser und Bier — Wasser verdarb, Bier hielt länger.</p>
+            <p>Einen ganzen Siedlungsverband zu verproviantieren war Schwerstarbeit gegen die Zeit: Was am Kai vergessen wurde, fehlte auf dem offenen Meer unwiderruflich.</p>
+          </aside>
+        </div>
+
+        <!-- Markt & Krämer -->
+        <div class="ort prose" id="markt">
+          <h3>Marktplatz & Krämerladen</h3>
+          <p class="ort-sub">Der lauteste Ort der Stadt — und ein Laden, der ausverkauft, bevor die Lichter ausgehen.</p>
+
+          <p>Der Marktplatz ist der lauteste Ort in Grimsgate. Händler rufen ihre Ware aus, Kisten mit Fisch, Obst und getrocknetem Fleisch stapeln sich neben improvisierten Ständen, und zwischen den Käufern schieben sich Männer in Seemannskleidung — manche mit dem Abzeichen ihres Schiffes an der Jacke, die meisten einfach durstig nach frischer Ware vor der nächsten Fahrt. Gesprächsfetzen wehen vorbei: Klagen über Preise, Gerüchte über die nächste Abfahrt, ein Streit um verdorbene Ware.</p>
+
+          <p>Ein paar Gassen weiter steht der <em>Krämerladen</em>, vollgestopft bis unter die Decke mit Seil, Werkzeug, Konserven, Ersatzkleidung — allem, was man kurz vor einer Abfahrt noch braucht und vergessen hat. Der Krämer kennt jeden Winkel auswendig. Er ist in diesen Tagen resigniert-pragmatisch und verramscht seinen Bestand zu Schleuderpreisen, denn er weiß, was kommt: <span class="quote">„Frag mich nicht nach 'nem Schiff, frag mich, was du noch brauchst, bevor's zu spät ist — das hier wird nach morgen keiner mehr kaufen wollen."</span> Fährt der Konvoi, ist die Stadt tot, bis der nächste kommt.</p>
+
+          <aside class="hist">
+            <div class="hist-label"><span class="anchor">⚓</span> Historisch — Was man in die Neue Welt mitnahm</div>
+            <p>Auswanderer rüsteten sich gegen eine Welt, in der es nichts zu kaufen gab. Nägel und Äxte, Sägen und Spaten, Saatgut, Stoff und Nadeln, ein Kessel, ein Beil — Werkzeuge waren drüben bares Geld, oft wertvoller als Münzen. Wer klug packte, nahm mit, was sich in der Wildnis nicht selbst herstellen ließ.</p>
+          </aside>
+        </div>
+
+        <!-- Bordell -->
+        <div class="ort prose" id="bordell">
+          <h3>Das Haus abseits der Docks</h3>
+          <p class="ort-sub">Rote Vorhänge, gedämpftes Licht — und eine Frau, die es fester im Griff hat als mancher Kapitän sein Schiff.</p>
+
+          <p>Etwas abseits der Stadt, von außen unauffällig, drinnen wärmer und aufwendiger eingerichtet als der ganze Rest von Grimsgate: rote Vorhänge, gedämpftes Licht, und der Lärm der Docks bleibt vor der Tür. <em>Constance Wrey</em> führt das Haus mit ruhiger, unmissverständlicher Autorität — nichts geschieht hier ohne ihr Wissen. Im Empfangsbereich sitzen oft dieselben zwei, drei Crew-Gesichter, die das Haus wie ein zweites Zuhause behandeln.</p>
+
+          <aside class="hist">
+            <div class="hist-label"><span class="anchor">⚓</span> Historisch — Ein fester Bestandteil der Hafenstadt</div>
+            <p>Wo Seeleute mit Sold an Land gingen, gab es Häuser wie dieses — allgegenwärtig und selbstverständlich in jeder Hafenstadt. Für die Frauen, die darin arbeiteten, war das Leben hart und oft gefährlich; ein straff und klug geführtes Haus bot dagegen ein Maß an Schutz, das die Gasse nicht kannte.</p>
+            <p>Eine Madame wie Constance war darum mehr als eine Wirtin: Sie war Ordnungsmacht, Bank und Nachrichtenbörse zugleich. Wer alle kommen und gehen sieht, weiß in einer Hafenstadt am meisten.</p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ─────────── KAPITEL II: GOLDEN LION ─────────── -->
+      <section class="chapter" id="golden-lion">
+        <span class="chapter-kicker">Kapitel II</span>
+        <h2>Golden Lion</h2>
+        <p class="chapter-lead">Das stolze kleine Kriegsschiff, das als Geleitschutz auftritt — und mehr Kanonen führt, als ein Begleiter je bräuchte.</p>
+        <p class="pending-note">Dieses Kapitel folgt. Wenn Grimsgate im gewünschten Ton steht, ziehen wir das Schiff nach demselben Muster nach: Fließtext zu Deck, Crew und Wesen der Golden Lion, dazu die historische Einordnung — vom Leben an Bord einer Brigantine bis zur Frage, warum ausgerechnet ein Freibeuter den Konvoi „beschützt".</p>
+      </section>
+
+      <!-- ─────────── KAPITEL III: SCHATZINSEL ─────────── -->
+      <section class="chapter" id="schatzinsel">
+        <span class="chapter-kicker">Kapitel III</span>
+        <h2>Die Schatzinsel</h2>
+        <p class="chapter-lead">Ein Schiffswrack am Strand, ein Stamm im Dschungel, eine Wasserhöhle voller Gold — und ein Kapitän, der genau hierher wollte.</p>
+        <p class="pending-note">Dieses Kapitel folgt. Sobald die Insel-Stationen ausgearbeitet sind, wandern sie hierher — mit der historischen Farbe von Wracks, unkartierten Küsten und der Begegnung zweier Welten.</p>
+      </section>
+
+    </article>
+  </div>
+</div>
+
+<button class="scroll-top" id="scrollTop" aria-label="Nach oben" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Aktiven TOC-Eintrag hervorheben, während man liest
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('.toc-links a'));
+    var map = {};
+    links.forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el) map[id] = a;
+    });
+    var targets = Object.keys(map).map(function (id) { return document.getElementById(id); });
+
+    if ('IntersectionObserver' in window && targets.length) {
+      var current = null;
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) current = e.target.id;
+        });
+        links.forEach(function (a) { a.classList.remove('active'); });
+        if (current && map[current]) map[current].classList.add('active');
+      }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+      targets.forEach(function (t) { obs.observe(t); });
+    }
+
+    // Back-to-top-Knopf
+    var btn = document.getElementById('scrollTop');
+    window.addEventListener('scroll', function () {
+      if (window.scrollY > 600) btn.classList.add('show');
+      else btn.classList.remove('show');
+    }, { passive: true });
+  })();
+</script>
+
+</body>
+</html>
