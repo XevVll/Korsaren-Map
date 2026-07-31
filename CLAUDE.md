@@ -5,6 +5,10 @@ Kurzer technischer Leitfaden für dieses Repo. Die eigentliche Story-/Design-Dok
 und Abschnitt 17 „Arbeitsweise". Dieses Dokument hier ist rein technisch/prozessual und hält
 zusätzlich einen laufenden Changelog.
 
+> **Laufender Arbeitsstand (WIP):** Der **Codex** (`codex.html`) und der **Schatzinsel-Szenen-
+> Durchgang** sind gerade in Arbeit. Einstiegspunkt, nächster Schritt und Arbeitsweise dafür
+> stehen in **`ARBEITSSTAND.md`** — dort weiterlesen, bevor an diesem Strang gearbeitet wird.
+
 ## Projekt in Kürze
 
 Statische GM/Spieler-Toolseite für eine Piraten/Kaperfahrer-Pen&Paper-Kampagne („Korsaren"),
@@ -71,6 +75,20 @@ Hendrik entwickelt Story-Inhalte selbst — keine proaktiven Inhaltsvorschläge 
 Bei Story-Lücken lieber `[OFFEN]` in der Bibel vermerken als selbst etwas erfinden.
 
 ## Changelog
+
+### 2026-07-31
+- Neuer **Codex/Weltatlas** (`codex.html`): eigenständige GM-Schmöker-/Nachschlage-Seite
+  (Pergament-Optik wie `besatzung.html`, Kapitel-TOC mit Lese-Fortschritt, responsiv).
+  Kapitel I Grimsgate + II Golden Lion vollständig, je mit abgesetzten „⚓ Historisch"-Kästen;
+  Schatzinsel als Platzhalter-Kapitel III. Inhalt konsistent aus den Szenen-/Regie-Daten gezogen.
+- **Golden Lion Schiffstyp korrigiert:** Brigantine → **kleine Fregatte** (Bibel 3.1) in
+  `codex.html` und `besatzung.html` (Harwicks Rolle)
+- Regie-Referenz-Hinweis (`.ort-hinweis`) von 12,5 px auf 14 px vergrößert (Lesbarkeit am Tisch)
+- **Schatzinsel-Szenen-Durchgang** gestartet (Grimsgate-Stil, Stimmung + Leute je Station):
+  Station 1 (Strand) im Panel — `SZENEN_REGIE["4.1"]` (Grundstimmung + 4 Crew-Ghosts) und
+  `ORTE["schiffswrack"].npcs` (Schmied). Fortschritt/nächster Schritt in `ARBEITSSTAND.md`
+- Neues **Text-Prinzip** (Hendrik): Stimmungstexte geben Information/Stimmung, die Interpretation
+  ist Sache der Spieler (verwandt mit Bibel 2.8) — siehe `ARBEITSSTAND.md`
 
 ### 2026-07-30
 - Live-Sichtbarkeits-Schalter für Marker (`hiddenMarkersLive/{sceneId}/{markerId}`): SL kann
