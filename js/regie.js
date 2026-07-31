@@ -220,9 +220,9 @@ const ORTE = {
     }
   },
   "golden_lion": {
-    personen: "–",
-    kurz: "Ein stolzes kleines Kriegsschiff, mitten im Konvoi vor Anker. Noch nicht ausformuliert.",
-    ortHinweis: "",
+    personen: "James Harwick · Cormac Daly · Bartholomew Ashworth (nur nach vorherigem Hafenmeisterei-Besuch)",
+    kurz: "Ankunft am Anleger. Ashworth stellt Harwick wegen der nicht registrierten Golden Lion zur Rede, danach Übergabe an Cormac und zügiges Ablegen.",
+    ortHinweis: "Die Ankunft an Bord hängt vom Rekrutierungsweg ab (Heuer, Bibel 9.1):\n\n— Regulär angeheuert (Francesco/Tom/Zwillinge-Erfolg): zu Fuß, früh am nächsten Morgen.\n— Wat (Zwangsrekrutierung): wacht erst auf, wenn das Schiff schon unterwegs ist — verpasst die Szene unten komplett.\n— Zwillinge-Ohnmacht: kommt schon am Vorabend an Bord, direkt aus der Kneipenszene heraus (siehe Heuer/Zwillinge).\n\nFür alle, die morgens zu Fuß ankommen: War vorher ein Spieler in der Hafenmeisterei (Nachfrage oder Sonderfall), steht Ashworth bereits am Anleger und befragt hitzig die rumlungernde Crew nach dem Kapitän — die Golden Lion ist ja nicht registriert. Harwick kommt heraus, wickelt ihn mit Münzen und Charme ab: freundliches, einladendes Lächeln. Die Miene fällt ihm kurz, sobald Ashworth abzieht — aber nur Amtspersonen gegenüber, nie den Spielern. Er begrüßt die Neuen, stellt sie Cormac vor, übergibt sie ihm. Kurz danach wird abgelegt.\n\n(Beim Sonderfall zusätzlich: die Wache erkennt den Spieler wieder, der sie zum Schiff geführt hat → persönlicher Rufmalus, siehe Hafenmeisterei.)",
     interaktionen: {}
   },
 
@@ -602,14 +602,6 @@ const SZENEN_REGIE = {
         beduerfnis: "Dem Jungen ein Andenken mitgeben — oder das Versprechen, dass jemand auf ihn achtgibt."
       }
     ]
-  },
-
-  // Golden-Lion-Ankunft. stimmung beschreibt die Boarding-Situation je
-  // Rekrutierungsweg (Bibel 9.1) plus die Ashworth/Harwick/Cormac-Szene für
-  // alle, die morgens zu Fuß ankommen.
-  "2.1": {
-    charaktere: ["harwick", "cormac"],
-    stimmung: "Die Ankunft an Bord hängt vom Rekrutierungsweg ab (Heuer, Bibel 9.1):\n\n— Regulär angeheuert (Francesco/Tom/Zwillinge-Erfolg): zu Fuß, früh am nächsten Morgen.\n— Wat (Zwangsrekrutierung): wacht erst auf, wenn das Schiff schon unterwegs ist — verpasst die Szene unten komplett.\n— Zwillinge-Ohnmacht: kommt schon am Vorabend an Bord, direkt aus der Kneipenszene heraus (siehe Heuer/Zwillinge).\n\nFür alle, die morgens zu Fuß ankommen: War vorher ein Spieler in der Hafenmeisterei (Nachfrage oder Sonderfall), steht Ashworth bereits am Anleger und befragt hitzig die rumlungernde Crew nach dem Kapitän — die Golden Lion ist ja nicht registriert. Harwick kommt heraus, wickelt ihn mit Münzen und Charme ab: freundliches, einladendes Lächeln. Die Miene fällt ihm kurz, sobald Ashworth abzieht — aber nur Amtspersonen gegenüber, nie den Spielern. Er begrüßt die Neuen, stellt sie Cormac vor, übergibt sie ihm. Kurz danach wird abgelegt.\n\n(Beim Sonderfall zusätzlich: die Wache erkennt den Spieler wieder, der sie zum Schiff geführt hat → persönlicher Rufmalus, siehe Hafenmeisterei.)"
   },
 
   // Schatzinsel-Landung. stimmung = Grundton der ERSTEN Station (Strand/Wrack);
