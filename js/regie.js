@@ -640,6 +640,26 @@ const ORTE = {
         ]
       }
     }
+  },
+
+  "lager": {
+    personen: "James Harwick · Cormac Daly",
+    interaktionen: {
+      "jagd_in_der_daemmerung": {
+        title: "Jagd in der Dämmerung",
+        kurz: "Cormac hält die Stimmung hoch, während Harwick sich zurückzieht, und schickt die Spieler auf Wildschwein-Jagd — Geschicklichkeit zum Schießen, Mechanik zum Nachladen, mehrere Versuche bis zur völligen Dunkelheit. Danach: nächtliches Erwachen, der Thahal-Kontakt kündigt sich an (siehe eigene, noch offene Interaktion).",
+        details: "Die Männer erreichen einen geeigneten Platz und schlagen ihr Lager auf. Einer aus der Crew fragt etwas ängstlich, ob es hier giftige Schlangen oder Ähnliches gibt.\n\nHarwick hat sich etwas zurückgezogen. Cormac erkennt das und hält die Meute in Schach. Er ermuntert sie: Hier gebe es nur dicke Käfer und ein paar Spinnen. Unzählig viel Obst — und, dabei grinst er sie an (das Grinsen erreicht seine Augen allerdings nie) — vor allem Wildschwein.\n\n„Bereitet ein Feuer vor. Die Thahal werden uns heute nicht versorgen.“ Er deutet auf die Spieler. „Schnappt euch zwei Musketen und stabile Säbel und erlegt uns ein Schwein.“\n\nWegen der beginnenden Dämmerung braucht es Proben, die beim Jagen helfen — keine leichte Aufgabe. Wer glaubhaft macht, Übung im Schießen zu haben, kann mit einer Geschicklichkeits-Probe feuern. Ein Fehlschuss verlangt eine Mechanik-Probe zum Nachladen — sonst ist das Schwein weg. Mehrere Versuche sind möglich, bis die Dunkelheit so dicht ist, dass man die eigene Hand vor Augen nicht mehr sieht.\n\nKommen die Spieler ohne erlegtes Tier zurück — und kommen sie auch nicht auf die Idee, wenigstens Früchte zu sammeln —, sinkt die Stimmung im Camp weiter.\n\nTief in der Nacht raschelt es im Gebüsch. Niemand hat Wachen eingeteilt. Nur wer auf Wahrnehmung würfelt, wird davon wach. (SL-Hinweis: wie die Spieler reagieren, bleibt bewusst offen.)\n\nEs ist der junge Mann aus dem Dorf, der aus dem Dschungel kommt. Wer jetzt wach ist, sieht: Harwick sitzt noch immer am erloschenen Feuer.",
+        trigger: [
+          { id: "lager_bezogen", label: "Crew erreicht den Lagerplatz, jemand fragt ängstlich nach giftigen Tieren" },
+          { id: "cormac_haelt_stimmung", label: "Cormac hält die Stimmung hoch, während Harwick sich zurückzieht" },
+          { id: "jagdauftrag", label: "Cormac schickt die Spieler mit Musketen/Säbeln auf Wildschwein-Jagd" },
+          { id: "jagd_proben", label: "Geschicklichkeit zum Schießen, Mechanik zum Nachladen, mehrere Versuche bis zur Dunkelheit" },
+          { id: "jagd_erfolglos", label: "Ohne Beute und ohne gesammeltes Obst sinkt die Stimmung weiter" },
+          { id: "raunen_nachts", label: "Rascheln im Gebüsch tief in der Nacht — nur bei Wahrnehmung wach" },
+          { id: "junge_mann_erscheint", label: "Der junge Mann aus dem Dorf kommt aus dem Dschungel, Harwick sitzt noch am erloschenen Feuer" }
+        ]
+      }
+    }
   }
 };
 
