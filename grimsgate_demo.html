@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grimsgate – Vorschau</title>
+<style>
+  :root {
+    --bg: #0f0c08;
+    --ink: #e6ddc7;
+    --ink-dim: #a89d81;
+    --gold: #c9a24b;
+    --line: #3a2a18;
+    --panel: #1a130b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    background: var(--bg);
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--ink);
+    overflow: hidden;
+  }
+
+  /* ---------- Bühne ---------- */
+  #stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #mapWrap {
+    position: relative;
+    max-width: 100%; max-height: 100%;
+    line-height: 0;
+  }
+  #mapImage {
+    display: block;
+    max-width: 100vw; max-height: 100vh;
+    width: auto; height: auto;
+    opacity: 0;
+    transition: opacity .6s ease;
+    user-select: none; -webkit-user-drag: none;
+  }
+  #mapImage.loaded { opacity: 1; }
+
+  /* ---------- Marker ---------- */
+  .marker {
+    position: absolute;
+    width: 26px; height: 26px;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+  }
+  .marker .pin {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e8c876, var(--gold) 60%, #8a6a2a 100%);
+    border: 2px solid #1a1308;
+    box-shadow: 0 0 0 3px rgba(201,162,75,0.25), 0 2px 6px rgba(0,0,0,0.5);
+    animation: pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(201,162,75,0.25), 0 2px 6px rgba(0,0,0,0.5); }
+    50%      { box-shadow: 0 0 0 7px rgba(201,162,75,0.08), 0 2px 6px rgba(0,0,0,0.5); }
+  }
+  .marker:hover .pin { transform: scale(1.15); }
+  .marker .label {
+    position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+    white-space: nowrap;
+    background: rgba(15,12,8,0.9);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 16px;
+    padding: 5px 13px;
+    border-radius: 4px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .15s ease;
+  }
+  .marker:hover .label { opacity: 1; }
+
+  /* ---------- Overlay / Modal ---------- */
+  #overlay {
+    position: fixed; inset: 0;
+    background: rgba(8,6,4,0.86);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 30px;
+  }
+  #overlay.open { display: flex; }
+  #overlayCard {
+    max-width: 720px; width: 100%;
+    max-height: 88vh;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+  #overlayImgWrap {
+    width: 100%;
+    background: #000;
+    line-height: 0;
+    max-height: 55vh;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #overlayImgWrap img { width: 100%; height: auto; display: block; }
+  #overlayBody { padding: 22px 26px 26px; overflow-y: auto; }
+  #overlayTitle { font-size: 22px; color: var(--gold); margin: 0 0 10px; font-weight: 400; }
+  #overlayDesc { font-size: 14.5px; line-height: 1.6; color: var(--ink); margin: 0; }
+  #overlayClose {
+    position: absolute; top: 14px; right: 18px;
+    background: none; border: none; color: var(--ink-dim);
+    font-size: 22px; cursor: pointer; line-height: 1;
+  }
+  #overlayClose:hover { color: var(--ink); }
+
+  /* ---------- Titel-Banner ---------- */
+  #demoBanner {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+    z-index: 50;
+    font-size: 13px; color: var(--ink-dim);
+    background: rgba(15,12,8,0.7);
+    padding: 6px 16px; border-radius: 20px;
+    border: 1px solid var(--line);
+    letter-spacing: .04em;
+    pointer-events: none;
+  }
+
+  /* ---------- Audio-Steuerung ---------- */
+  #audioControl {
+    position: fixed; bottom: 16px; right: 16px; z-index: 60;
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(15,12,8,0.75);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 8px 14px 8px 10px;
+    backdrop-filter: blur(2px);
+  }
+  #muteBtn {
+    background: none; border: none; cursor: pointer;
+    font-size: 18px; line-height: 1; color: var(--ink);
+    padding: 2px; width: 24px; text-align: center;
+  }
+  #muteBtn:hover { color: var(--gold); }
+  #volumeSlider { width: 90px; accent-color: var(--gold); cursor: pointer; }
+
+  /* ---------- Würfel (lokal, nicht mit der laufenden Kampagne geteilt) ---------- */
+  #diceControls {
+    position: fixed; bottom: 16px; left: 16px; z-index: 350;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: rgba(15,12,8,0.75);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 8px 14px;
+    backdrop-filter: blur(2px);
+    font-size: 12.5px;
+  }
+  #diceNameLabel { color: var(--ink-dim); cursor: pointer; white-space: nowrap; }
+  #diceNameLabel:hover { color: var(--gold); }
+  #diceD100Btn, #diceForm button {
+    font-family: inherit; font-size: 12.5px;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink); border-radius: 3px;
+    padding: 5px 10px; cursor: pointer;
+  }
+  #diceD100Btn:hover, #diceForm button:hover { border-color: var(--gold); color: var(--gold); }
+  #diceForm { display: flex; align-items: center; gap: 6px; }
+  #diceForm input {
+    width: 42px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 6px;
+    -moz-appearance: textfield;
+  }
+  #diceForm input::-webkit-outer-spin-button,
+  #diceForm input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  #diceFeed {
+    position: fixed; top: 16px; left: 16px; z-index: 350;
+    display: flex; flex-direction: column; gap: 6px;
+    max-width: 320px;
+  }
+  .dice-toast {
+    background: rgba(15,12,8,0.85);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-size: 12.5px; color: var(--ink);
+    transition: opacity .4s ease;
+  }
+  .dice-toast.fade { opacity: 0; }
+</style>
+</head>
+<body>
+
+  <div id="demoBanner">Grimsgate — Vorschau</div>
+
+  <div id="stage">
+    <div id="mapWrap">
+      <img id="mapImage" alt="Karte von Grimsgate">
+      <!-- Marker werden hier per JS eingefügt -->
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div id="overlayCard" style="position:relative;">
+      <button id="overlayClose" aria-label="Schließen">✕</button>
+      <div id="overlayImgWrap"><img id="overlayImg" alt=""></div>
+      <div id="overlayBody">
+        <h2 id="overlayTitle"></h2>
+        <p id="overlayDesc"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="audioControl">
+    <button id="muteBtn" title="Ton an/aus">🔇</button>
+    <input type="range" id="volumeSlider" min="0" max="100" value="50">
+  </div>
+  <audio id="bgAudio" loop preload="auto" src="Grimgate1.ogg"></audio>
+
+  <script src="js/scenes.js"></script>
+  <script>
+    // ---------- Marker & Overlay (Golden Lion bewusst ausgeschlossen) ----------
+    const scene = SCENES['1.1'];
+    const markers = scene.markers.filter(function (m) { return m.id !== 'golden_lion'; });
+
+    const mapImageEl = document.getElementById('mapImage');
+    const mapWrapEl = document.getElementById('mapWrap');
+    const overlayEl = document.getElementById('overlay');
+    const overlayImgWrap = document.getElementById('overlayImgWrap');
+    const overlayImg = document.getElementById('overlayImg');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayDesc = document.getElementById('overlayDesc');
+
+    mapImageEl.addEventListener('load', function () { mapImageEl.classList.add('loaded'); });
+    mapImageEl.src = scene.background;
+
+    markers.forEach(function (marker) {
+      const el = document.createElement('div');
+      el.className = 'marker';
+      el.style.top = marker.top + '%';
+      el.style.left = marker.left + '%';
+      el.innerHTML = '<div class="pin"></div><div class="label">' + marker.title + '</div>';
+      el.onclick = function () { openOverlay(marker); };
+      mapWrapEl.appendChild(el);
+    });
+
+    function openOverlay(marker) {
+      overlayTitle.textContent = marker.title || '';
+      overlayDesc.textContent = marker.desc || '';
+      if (marker.img) {
+        overlayImgWrap.classList.remove('empty');
+        overlayImg.style.display = '';
+        overlayImg.src = marker.img;
+        overlayImg.alt = marker.title || '';
+      } else {
+        overlayImg.style.display = 'none';
+      }
+      overlayEl.classList.add('open');
+    }
+    function closeOverlay() { overlayEl.classList.remove('open'); }
+    document.getElementById('overlayClose').addEventListener('click', closeOverlay);
+    overlayEl.addEventListener('click', function (e) { if (e.target === overlayEl) closeOverlay(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeOverlay(); });
+
+    // ---------- Audio (fest auf Grimgate1.ogg, kein Firebase) ----------
+    const bgAudio = document.getElementById('bgAudio');
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const VOL_KEY = 'korsaren_demo_volume', MUTE_KEY = 'korsaren_demo_muted';
+
+    let savedVolume = parseInt(localStorage.getItem(VOL_KEY), 10);
+    if (isNaN(savedVolume)) savedVolume = 50;
+    let isMuted = localStorage.getItem(MUTE_KEY) !== 'false'; // Default: stumm, wie karte.html
+    volumeSlider.value = savedVolume;
+
+    function applyAudioState() {
+      bgAudio.volume = savedVolume / 100;
+      bgAudio.muted = isMuted;
+      muteBtn.textContent = isMuted ? '🔇' : '🔊';
+    }
+    applyAudioState();
+    bgAudio.play().catch(function () { /* Autoplay blockiert, ignorieren */ });
+
+    muteBtn.addEventListener('click', function () {
+      isMuted = !isMuted;
+      localStorage.setItem(MUTE_KEY, String(isMuted));
+      applyAudioState();
+    });
+    volumeSlider.addEventListener('input', function (e) {
+      savedVolume = parseInt(e.target.value, 10);
+      localStorage.setItem(VOL_KEY, String(savedVolume));
+      applyAudioState();
+    });
+
+    let wasExplicitlyMuted = localStorage.getItem(MUTE_KEY) === 'true';
+    function unlockOnFirstInteraction() {
+      if (!wasExplicitlyMuted) {
+        isMuted = false;
+        applyAudioState();
+      }
+      bgAudio.play().catch(function () {});
+    }
+    document.addEventListener('click', unlockOnFirstInteraction, { once: true });
+    document.addEventListener('keydown', unlockOnFirstInteraction, { once: true });
+
+    // ---------- Würfel (rein lokal in diesem Browser-Tab, kein Firebase - ----------
+    // teilt sich also NICHT mit der laufenden Kampagne oder mit anderen
+    // Spielern, die diese Demo-Seite parallel offen haben).
+    const NAME_KEY = 'korsaren_demo_playername';
+    const diceControlsEl = document.createElement('div');
+    diceControlsEl.id = 'diceControls';
+    diceControlsEl.innerHTML =
+      '<div id="diceNameLabel" title="Namen ändern">Würfle als: –</div>' +
+      '<button id="diceD100Btn" type="button">🎲 1×100</button>' +
+      '<form id="diceForm">' +
+        '<input id="diceCount" type="number" min="1" max="20" value="1">' +
+        '<span>×</span>' +
+        '<input id="diceSides" type="number" min="2" max="1000" value="20">' +
+        '<button type="submit">Würfeln</button>' +
+      '</form>';
+    document.body.appendChild(diceControlsEl);
+
+    const diceFeedEl = document.createElement('div');
+    diceFeedEl.id = 'diceFeed';
+    document.body.appendChild(diceFeedEl);
+
+    const diceNameLabelEl = document.getElementById('diceNameLabel');
+    function getSavedName() { return (localStorage.getItem(NAME_KEY) || '').trim() || null; }
+    function updateNameLabel(name) { diceNameLabelEl.textContent = 'Würfle als: ' + (name || '–'); }
+    function promptForName() {
+      const input = window.prompt('Dein Spielername für den Würfel-Verlauf:', getSavedName() || '');
+      if (input === null) return null;
+      const trimmed = input.trim().slice(0, 24);
+      if (!trimmed) return null;
+      localStorage.setItem(NAME_KEY, trimmed);
+      updateNameLabel(trimmed);
+      return trimmed;
+    }
+    function ensurePlayerName() { return getSavedName() || promptForName(); }
+    updateNameLabel(getSavedName());
+    diceNameLabelEl.addEventListener('click', promptForName);
+
+    function addToast(text) {
+      const node = document.createElement('div');
+      node.className = 'dice-toast';
+      node.textContent = text;
+      diceFeedEl.appendChild(node);
+      setTimeout(function () { node.classList.add('fade'); }, 60000);
+      setTimeout(function () { if (node.parentNode) node.parentNode.removeChild(node); }, 60400);
+    }
+
+    function submitRoll(count, sides) {
+      const name = ensurePlayerName();
+      if (!name) return;
+      count = Math.min(20, Math.max(1, count));
+      sides = Math.min(1000, Math.max(2, sides));
+      const results = [];
+      for (let i = 0; i < count; i++) results.push(Math.floor(Math.random() * sides) + 1);
+      const total = results.reduce(function (a, b) { return a + b; }, 0);
+      const detail = results.length > 1 ? ' (' + results.join(', ') + ')' : '';
+      addToast(name + ' würfelt ' + count + '×' + sides + ': ' + total + detail);
+    }
+
+    document.getElementById('diceD100Btn').addEventListener('click', function () { submitRoll(1, 100); });
+    document.getElementById('diceForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const count = parseInt(document.getElementById('diceCount').value, 10);
+      const sides = parseInt(document.getElementById('diceSides').value, 10);
+      if (isNaN(count) || isNaN(sides)) return;
+      submitRoll(count, sides);
+    });
+  </script>
+</body>
+</html>
