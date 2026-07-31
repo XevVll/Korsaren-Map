@@ -604,6 +604,46 @@ const SZENEN_REGIE = {
     ]
   },
 
+  // Golden Lion (Basis). Ghosts = generischer Statisten-Pool aus der ~120
+  // Mann starken Besatzung, frei platzierbar, plot-neutral (Claude-Aufschlag,
+  // von Hendrik freigegeben).
+  "2.1": {
+    stimmung: "Gut hundert Mann auf engem Raum — kein Handelsschiff, bei dem man nach einer Woche jedes Gesicht kennt. Über und unter Deck greifen Routinen ineinander: Wachablösung, Kommandos, das ewige Schrubben, Nachziehen, Instandhalten, das ein Kriegsschiff vom Frachter unterscheidet. Tauwerk knarrt, Rufe hallen über die Decks, irgendwo wird immer gerade etwas geschleppt, geflickt oder verstaut. Wer neu an Bord ist, verliert sich leicht in der Menge — die meisten Gesichter sieht man genau einmal, tauscht ein Wort, verschwindet wieder in der Mannschaft. Nach außen ein braver Geleitschutz; wer genau hinsieht, erkennt den Takt einer Kampfmannschaft darunter.",
+    ghosts: [
+      {
+        name: "Amos Hale",
+        rolle: "Altgedienter Toppmann, seit 20 Jahren auf See",
+        verfassung: "Nichts überrascht ihn mehr, kommentiert alles trocken und ungefragt.",
+        beduerfnis: "Seine Pfeife, seine Ruhe, und dass niemand ihn nach seiner Meinung zu Dingen fragt, die ihn nichts angehen."
+      },
+      {
+        name: "Toby Rennick",
+        rolle: "Grüner Rekrut, erste Fahrt",
+        verfassung: "Überängstlich bemüht, alles richtig zu machen, hält sich meist zu nah an erfahreneren Leuten auf.",
+        beduerfnis: "Nicht als Landratte auffallen — und wenigstens einmal für etwas gelobt werden."
+      },
+      {
+        name: "Corwin Ashby",
+        rolle: "Abergläubischer Zimmermannsgehilfe",
+        verfassung: "Sieht in jedem Zufall ein Omen, murmelt Beschwörungen gegen Unglück.",
+        beduerfnis: "Dass seine Warnungen ernst genommen werden — oder wenigstens niemand ihn dafür auslacht."
+      },
+      {
+        name: "Jonas Teague",
+        rolle: "Verschuldeter Kartenspieler",
+        verfassung: "Nervös-fahrig, schuldet halbem Unterdeck Geld, redet sich mit Versprechen heraus.",
+        beduerfnis: "Irgendwo schnell an Münzen kommen, bevor die Sache eskaliert.",
+        koerperlich: true
+      },
+      {
+        name: "Edmund Grey",
+        rolle: "Heimwehkranker Familienvater",
+        verfassung: "Wehmütig, hält an einem abgegriffenen Andenken von zuhause fest, erzählt bei jeder Gelegenheit von seinen Kindern.",
+        beduerfnis: "Jemand, der ihm zuhört — oder verspricht, im Zweifel eine Nachricht heimzubringen."
+      }
+    ]
+  },
+
   // Schatzinsel-Landung. stimmung = Grundton der ERSTEN Station (Strand/Wrack);
   // die weiteren Insel-Stationen (Dschungelpfad, Dorf der Thahal, Nachtlager,
   // Wasserhöhle) folgen im laufenden Szenen-Durchgang. Ghosts hier = generische
