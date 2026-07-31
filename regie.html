@@ -489,6 +489,28 @@
     padding: 60px 24px; text-align: center; color: var(--ink-faint); font-size: 13.5px;
   }
 
+  /* Rechte Detail-Spalte im Pergament-Look: heller Hintergrund, dunkle
+     Schrift (augenfreundlicher beim vielen Lesen, gleiche Palette wie das
+     Crew-Manifest). Die CSS-Variablen werden NUR hier lokal überschrieben —
+     alle verschachtelten Elemente (Stimmung, Steckbriefe, Regie-Hinweis,
+     Interaktionen, Notizen) erben die hellen Werte automatisch. Die Szenen-
+     und Orte-Spalten links bleiben dunkel (Navigation, Kontrast). */
+  #col-detail {
+    --bg: #e9ddc0;
+    --panel: #f4ecda;
+    --panel-2: #ece0c6;
+    --line: #cebf98;
+    --ink: #241a0e;
+    --ink-dim: #5a4a2e;
+    --ink-faint: #8a7550;
+    --gold: #8a5e12;
+    --accent: #9a3018;
+    --live: #3d6e34;
+    --live-dim: #c8dcc0;
+    background: #dccdaa;
+    color: var(--ink);
+  }
+
   ::-webkit-scrollbar { width: 9px; }
   ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
