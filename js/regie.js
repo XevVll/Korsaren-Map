@@ -598,6 +598,27 @@ const ORTE = {
         ]
       }
     }
+  },
+
+  "zwischenstation": {
+    personen: "James Harwick · Cormac Daly · Ezra Coombe",
+    interaktionen: {
+      "unterwegs_zum_dorf": {
+        title: "Auf dem Weg zum Dorf",
+        kurz: "Reiner Erzählmoment, kein Wurf (außer optional Wahrnehmung) — Harwick lässt Metallschmuck ablegen, löst Ezra Coombes festsitzenden Ehering mit einem Schreckmoment, Cormac deutet beinahe einen früheren Verlust Harwicks an, Wildschwein-Fehlalarm am Ende.",
+        details: "Die Gruppe ist schon eine Weile unterwegs, als Harwick auf dem Weg bittet, sämtlichen Metallschmuck auszuziehen und zu verstauen. Er scheint es ernst zu meinen und kontrolliert jeden persönlich. (GM-Hinweis: Das ist keine allgemeine Vorsicht, sondern eine gezielte Gegenmaßnahme — Harwick weiß bereits von den Gerüchten, dass der neue Häuptling der Crew einen Fluch zuschreibt, weil sie selbst Metallschmuck trägt, was der Thahal-Theologie widerspricht. Er versucht, genau diesen Verdacht zu entschärfen, bevor er am Dorf ankommt.)\n\nEzra Coombe hat seinen Ehering noch an der Hand und versucht, ihn vor Harwick zu verstecken. Dieser starrt ihn ernst an, bis Ezra versucht, den Ring vom Finger zu lösen. Doch der sitzt fest. Ezra zuckt mit den Schultern: „Den habe ich seit ihrem Tod nicht mehr abgenommen“ — und lächelt verlegen.\n\nHarwick schaut ernst zu Cormac und zieht dann mit einem Ruck seinen Degen. Selbst Cormac zuckt einen Moment zusammen — bis er Harwicks Gesicht sieht und sich wieder entspannt.\n\nHarwick zerrt Ezras Hand zu sich und schneidet ein Stück von dessen Hemd ab — alles in einer Bewegung. Ezra kneift die Augen zusammen und schreit kurz auf, bis er merkt, dass Harwick ihn nicht verletzt hat.\n\nHarwick steckt den Degen zurück, fädelt den Stoff durch den Ring und bindet ihn eng um Ezras Finger. Mit dem anderen Ende umkreist er den Finger in die Gegenrichtung und wickelt den Stoff dabei ab — der Ring bewegt sich Stück für Stück über den Finger. Ezra gerät kurz ins Taumeln, ist aber froh, noch in einem Stück zu sein. Als der Ring ab ist, küsst er ihn und schaut mit einer Mischung aus Furcht und Erleichterung zu Harwick.\n\nAls sich dieser mit einem leichten Lächeln und einem Klopfen auf die Schulter abwendet, sagt Ezra zur Seite: „Für eine Sekunde dachte ich…“ Cormac legt den Kopf schräg: „Für eine Sekunde dachtest du was? Kapitän Harwick hat noch nie jemanden aus seiner Crew verloren!“ Nach kurzem Stocken schaut er zu Boden und fasst sich an die Seite: „Na ja, fast…“, mehr zu sich selbst.\n\nEin Spieler mit guter Wahrnehmung sieht, wie die Miene des Kapitäns für einen Moment entgleist — bevor er sich fängt und ernst, gerade nach vorne geht. Im ernsten Ton: „Weiter geht's…“ (GM-Hinweis: unausgesprochene Anspielung auf seine tote Tochter — die Kernprämisse der Kampagne. Bleibt für die Spieler unerklärt.)\n\nCormacs sonst so kraftvolle Gestalt wirkt jetzt behutsam. Er folgt dem Kapitän, man hört ihn vorsichtig fragen: „War das mit dem Degen wirklich nötig?“\n\nAuf einmal ein Rascheln! Viele machen sich kampfbereit, Spannung liegt in der Luft. Auch Cormac fängt sich kurz, dann lacht er: „Entspannt euch! Hier gibt's nur Wildschweine. Die sind keine Gefahr.“ (GM-Hinweis: bewusstes Setup — Cormacs Einschätzung wird auf dem Rückweg widerlegt, wenn der echte Wildschwein-Angriff passiert, siehe ARBEITSSTAND.md 5. Wer verletzt wird, ist dort weiterhin offen.)",
+        trigger: [
+          { id: "metallschmuck_angesagt", label: "Harwick lässt die Gruppe Metallschmuck ablegen, kontrolliert jeden" },
+          { id: "ring_festgeklemmt", label: "Ezra Coombes Ehering sitzt fest, er versucht ihn zu verstecken" },
+          { id: "degen_schreckmoment", label: "Harwick zieht abrupt den Degen — auch Cormac zuckt zusammen" },
+          { id: "ring_geloest", label: "Harwick löst den Ring mit dem Tuchtrick, ohne Ezra zu verletzen" },
+          { id: "cormacs_beinahe_verrat", label: "Cormacs \"Naja, fast...\" — Andeutung auf einen früheren Verlust" },
+          { id: "wahrnehmung_maske", label: "Nur bei guter Wahrnehmung: Harwicks Fassung rutscht kurz" },
+          { id: "cormacs_nachfrage", label: "Cormac fragt leise, ob der Degen wirklich nötig war" },
+          { id: "wildschwein_fehlalarm", label: "Rascheln im Gebüsch — Fehlalarm, nur Wildschweine" }
+        ]
+      }
+    }
   }
 };
 
