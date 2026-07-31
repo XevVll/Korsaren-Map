@@ -75,7 +75,8 @@ const SCHATZINSEL_SCENES = {
         id: "hoehle",
         top: 58, left: 14,
         title: "Die Wasserhöhle",
-        desc: "In die zerklüfteten Klippen an der Westseite der Insel fressen sich zwei Öffnungen, die sich im Inneren zu einer einzigen, weitläufigen Höhle verbinden — die trennende Wand ist längst der Brandung zum Opfer gefallen. Nur mit dem Boot und bei ablaufendem Wasser ist der Zugang zu wagen."
+        desc: "In die zerklüfteten Klippen an der Westseite der Insel fressen sich zwei Öffnungen, die sich im Inneren zu einer einzigen, weitläufigen Höhle verbinden — die trennende Wand ist längst der Brandung zum Opfer gefallen. Nur mit dem Boot und bei ablaufendem Wasser ist der Zugang zu wagen.",
+        img: "images/interior_hoehle.webp"
       },
       {
         // Erst NACH dem ersten Dorfbesuch relevant/aufzuschlagen, nicht auf
