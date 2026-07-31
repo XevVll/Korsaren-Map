@@ -554,6 +554,48 @@ const ORTE = {
           { id: "crew_verlaesst_schiff", label: "Crew verlässt langsam das Schiff (Leitern/Frachtraum)" },
           { id: "gruppe_zusammengestellt", label: "Harwick stellt eine kleine Gruppe zusammen, ordert Leute zu sich" }
         ]
+      },
+      "dirk_payoff": {
+        title: "Dirks Zielinstrument",
+        kurz: "Nur für den EINEN Spieler, der Dirk beim Batteriedeck (Bibel 10.4) überzeugt hat — SL weiß, wer das war. Kniffliges Handwerksproblem, großer Ruf-Gewinn bei Erfolg.",
+        details: "Etwas abseits vom Trubel, dort wo das Werkzeug liegt, winkt Dirk den Spieler heran — knapp, ohne Umschweife. Aus einem ölig glänzenden Lederbeutel holt er ein kleines Messinginstrument hervor, ein Schusswinkelmesser, wie es auf keinem Handelsschiff zu finden ist. Der Zeiger ist verbogen, das Gehäuse eingedrückt — vom Sturm, oder vom Sturz danach. Seine Finger sind zu grob für die Feinarbeit, seine Werkzeuge hier am Strand zu roh. Er schiebt es dem Spieler wortlos hin. Erst auf Nachfrage, einsilbig: „Von meinem ersten Schiff. Kriegsmarine. Vor eurer Zeit.“ Mehr sagt er nicht — es ist bereits mehr, als er sonst über sich verliert.\n\nErfolg (Handwerk/Geschick-Probe): Das Instrument lässt sich wieder ausrichten. Dirk prüft es lange, bevor er nickt — dann, kaum hörbar: „Hätte nicht gedacht, dass hier einer weiß, wie man sowas anfasst.“ Für einen Moment ist die harte Schale weg. Großer Ruf-Gewinn bei Dirk.\n\nMisserfolg: Das Instrument bleibt kaputt. Dirk nimmt es zurück, zuckt mit den Schultern, sagt nichts weiter dazu. Kein Malus — er hat nichts anderes erwartet.",
+        trigger: [
+          { id: "dirk_sucht_auf", label: "Dirk sucht den Spieler abseits vom Trubel auf" },
+          { id: "problem_gezeigt", label: "Zeigt das beschädigte Zielinstrument, bittet indirekt um Hilfe" },
+          { id: "erfolg_aufgetaut", label: "Reparatur gelingt — Dirk taut kurz auf, großer Ruf-Gewinn" },
+          { id: "misserfolg_kein_malus", label: "Reparatur gelingt nicht — Dirk nimmt es hin, kein Malus" }
+        ]
+      },
+      "loser_balken": {
+        title: "Der lose Balken",
+        kurz: "Ein Baumstamm gerät an der Seilwinde außer Kontrolle und schwingt auf einen Spieler zu. Weicht er aus, trifft es Sam Oakley stattdessen — daraus folgt eine Erste-Hilfe-Probe.",
+        details: "Ein frisch gefällter Stamm hängt in der Seilwinde, halb hochgezogen zum Trockengestell. Das Tau ist nass, die Knoten improvisiert. Ein Ruck — die Winde rutscht durch, der Stamm schwingt lose durch die Luft, direkt auf einen der Spieler zu. Nur wenige Schritte hinter ihm arbeitet Sam Oakley, in seine Aufgabe vertieft, den Rücken zur Gefahr.\n\nWeicht der Spieler aus (Körper/Reflex-Probe): Er selbst kommt unversehrt davon — der Stamm schwingt weiter und trifft Sam an Schulter oder Rücken. Er geht zu Boden, blutet aus einer Platzwunde, humpelt fortan. Jetzt zählt schnelles Handeln: Ohne Erste Hilfe (Probe) blutet die Wunde unschön weiter, wird aber nicht lebensbedrohlich; bei Erfolg ist Sam rasch versorgt und dankbar — kleiner Ruf-Gewinn.\n\nWirft sich der Spieler stattdessen dazwischen, um Sam aus der Bahn zu ziehen oder den Stamm selbst abzufangen (schwerere Probe): Bei Erfolg werden beide verschont — spürbarer Ruf-Gewinn bei der Crew, die das mitbekommt. Bei Misserfolg trifft es stattdessen den Spieler selbst.",
+        trigger: [
+          { id: "ausser_kontrolle", label: "Balken gerät an der Winde außer Kontrolle, schwingt auf einen Spieler zu" },
+          { id: "ausgewichen", label: "Spieler weicht aus — Sam Oakley wird getroffen" },
+          { id: "erste_hilfe", label: "Erste-Hilfe-Probe an Sam — Erfolg/Misserfolg" },
+          { id: "eingegriffen", label: "Spieler wirft sich dazwischen, versucht Sam zu schützen oder den Stamm abzufangen" },
+          { id: "beide_verschont", label: "Erfolg beim Eingreifen — beide verschont, Ruf-Gewinn bei der Crew" },
+          { id: "spieler_getroffen", label: "Misserfolg beim Eingreifen — Spieler selbst wird getroffen" }
+        ]
+      },
+      "wat_holzfaellen": {
+        title: "Wat beim Holzhacken",
+        kurz: "Reiner Rollenspiel-Moment, kein Wurf — Wat zeigt beim Holzfällen eine ruhige, kompetente Seite, ein Kontrast zu seinem Auftritt in der Taverne.",
+        details: "Am Waldrand, wo das Holz gefällt wird, führt Wat den Trupp — ruhig, methodisch, ganz anders als der Mann aus der Kneipe. Er zeigt, wo die Axt ansetzen muss, korrigiert mit knappen Handbewegungen statt Worten. Kämpft jemand sichtlich mit dem Gewicht oder trifft daneben, übernimmt er kurz selbst, ohne ein Wort des Spotts — und gibt das Werkzeug danach kommentarlos zurück.",
+        trigger: [
+          { id: "beobachtet", label: "Spieler arbeitet mit der Holzfäll-Gruppe / beobachtet Wat" },
+          { id: "hilft_leise", label: "Wat hilft still jemandem, der mit der Arbeit kämpft, ohne Spott" }
+        ]
+      },
+      "josiahs_feuerstelle": {
+        title: "Josiahs Feuerstelle",
+        kurz: "Niedrigschwelliger Rollenspiel-Moment, kein Wurf — Josiah bittet um Hilfe beim Bau einer improvisierten Feuerstelle.",
+        details: "Josiah klatscht in die Hände und schaut sich nach Freiwilligen um: „Kein Feuer, kein Essen — und ohne Essen macht mir hier keiner mehr die Arbeit!“ Wer hilft, bekommt sein loses, aufmunterndes Geplauder ab — und die feste Zusage, als Erster an die Pfanne zu kommen, sobald es wieder etwas zu kochen gibt.",
+        trigger: [
+          { id: "angesprochen", label: "Josiah bittet aktiv um Hilfe beim Feuerstellenbau" },
+          { id: "geholfen", label: "Spieler hilft mit — kleiner warmer Moment mit Josiah" }
+        ]
       }
     }
   }
