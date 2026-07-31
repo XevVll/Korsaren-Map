@@ -529,6 +529,18 @@ const ORTE = {
         trigger: []
       }
     }
+  },
+
+  "schiffswrack": {
+    personen: "Der Schmied (am improvisierten Amboss) · Reparaturcrew",
+    npcs: [
+      {
+        name: "Der Schmied",
+        rolle: "Schiffsschmied, leitet die Reparatur am Strand",
+        verfassung: "Ruhig und geübt, konzentriert am improvisierten Amboss — das Herz der Reparatur.",
+        beduerfnis: "Kohle, Metall und Platz zum Arbeiten; natürlicher Anlaufpunkt für alles, was geschmiedet oder gerichtet werden muss."
+      }
+    ]
   }
 };
 
@@ -588,6 +600,40 @@ const SZENEN_REGIE = {
         rolle: "Näherin, verwitwet",
         verfassung: "Tapferes Lächeln über echter Angst — ihr einziger Sohn geht morgen und kommt wohl nie zurück.",
         beduerfnis: "Dem Jungen ein Andenken mitgeben — oder das Versprechen, dass jemand auf ihn achtgibt."
+      }
+    ]
+  },
+
+  // Schatzinsel-Landung. stimmung = Grundton der ERSTEN Station (Strand/Wrack);
+  // die weiteren Insel-Stationen (Dschungelpfad, Dorf der Thahal, Nachtlager,
+  // Wasserhöhle) folgen im laufenden Szenen-Durchgang. Ghosts hier = generische
+  // Crew bei den Reparaturen. Personen-Aufschlag, noch nicht final geschärft.
+  "4.1": {
+    stimmung: "Fester Boden nach dem Sturm — für die meisten an Bord grenzt das an reines Glück. Der Strand ist voller Betrieb: Balken werden herangeschleppt, der Schmied schlägt am improvisierten Amboss Beschläge zurecht, Leitern lehnen am Rumpf. Die Golden Lion liegt auf der Seite in der sandigen Bucht, der vordere Mast gebrochen, Tauwerk und Trümmer über den Sand verstreut. Ringsum dichter, grüner Dschungel — Vogelrufe, Insektensurren, feuchte Wärme. Unbekanntes Land hinter der Brandung.",
+    ghosts: [
+      {
+        name: "Eliot Pike",
+        rolle: "Matrose, heil durch den Sturm gekommen",
+        verfassung: "Aufgekratzt, redselig, kann kaum stillsitzen vor Erleichterung.",
+        beduerfnis: "Jemand, der die Erleichterung mit ihm teilt — erzählt jedem, wie knapp es war."
+      },
+      {
+        name: "Abel Crane",
+        rolle: "Matrose, in der Sturmnacht übel zugerichtet",
+        verfassung: "Erschöpft, eine Hand bandagiert, sitzt abseits im Sand.",
+        beduerfnis: "Ruhe und Wasser — oder jemanden, der ihm einen Handgriff abnimmt."
+      },
+      {
+        name: "Malachi Fenn",
+        rolle: "Decksmann, dem der Landstrich nicht geheuer ist",
+        verfassung: "Unruhig, blickt immer wieder zum Dschungelrand, bleibt nah am Rumpf.",
+        beduerfnis: "Ein Zeichen, dass hier alles mit rechten Dingen zugeht — hält sich lieber beim Schiff."
+      },
+      {
+        name: "Sam Oakley",
+        rolle: "Zimmermannsgehilfe, mitten in der Reparatur",
+        verfassung: "Angespannt, wortkarg, keine Zeit für Gespräche.",
+        beduerfnis: "Werkzeug und Hände — der Rumpf muss dicht werden."
       }
     ]
   }
