@@ -98,6 +98,47 @@
   }
   .char-toggle input { accent-color: var(--gold); cursor: pointer; }
   .char-toggle.active { color: var(--ink); }
+  .char-more-btn {
+    font-family: inherit; font-size: 12px;
+    background: transparent; border: 1px dashed var(--line);
+    color: var(--ink-faint); border-radius: 3px;
+    padding: 3px 10px; cursor: pointer; white-space: nowrap;
+    transition: border-color .12s, color .12s;
+  }
+  .char-more-btn:hover { border-color: var(--gold); color: var(--ink); }
+
+  /* ---------- Werkzeug-Balken + einklappbares Fach ---------- */
+  #toolbarStrip {
+    display: flex; align-items: center; gap: 16px;
+    padding: 6px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+  }
+  #toolDrawerToggle {
+    font-family: inherit; font-size: 12px;
+    background: transparent; border: 1px solid var(--line);
+    color: var(--ink-dim); border-radius: 3px;
+    padding: 4px 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: border-color .12s, color .12s;
+  }
+  #toolDrawerToggle:hover { border-color: var(--gold); color: var(--ink); }
+  #toolDrawerToggle .chev { font-size: 10px; transition: transform .15s; }
+  #toolDrawerToggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  #timerTicker { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  #timerTickerTime {
+    font-family: 'Georgia', serif; font-size: 17px; letter-spacing: 1px; color: var(--gold);
+    min-width: 78px;
+  }
+  #timerTickerAlert {
+    display: none; font-size: 11.5px; color: #e0a08e;
+    border: 1px solid var(--accent); border-radius: 12px; padding: 2px 9px;
+    animation: markPulse 1.6s ease-in-out infinite;
+  }
+  #timerTickerAlert.on { display: inline-block; }
+  #toolDrawer { display: none; border-bottom: 1px solid var(--line); }
+  #toolDrawer.open { display: block; }
+  #toolDrawer #charBar { border-bottom: none; }
 
   /* ---------- Live-Vorschau (Spieleransicht) ---------- */
   /* Schwebendes Widget unten rechts statt volle Breite, damit die
@@ -238,7 +279,7 @@
     flex: 1;
     min-height: 0;
   }
-  .col { overflow-y: auto; border-right: 1px solid var(--line); }
+  .col { overflow-y: auto; border-right: 1px solid var(--line); padding-bottom: 76px; }
   .col:last-child { border-right: none; }
   .col-head {
     position: sticky; top: 0; z-index: 2;
@@ -461,28 +502,41 @@
     <div class="status" id="status">Verbinde mit Firebase…</div>
   </header>
 
-  <div id="soundBar">
-    <span id="soundBarLabel">Szene: –</span>
-    <span class="soundBarIcon">🎵</span>
-    <input type="text" id="soundLinkInput" placeholder="Dateiname der Audiodatei einfügen (z.B. storm1.ogg)…">
-    <span class="save-hint" id="soundLinkHint"></span>
+  <!-- Schlanker Balken direkt unter dem Header: Toggle für das Werkzeug-Fach
+       (Sound/Timer/Charaktere) + immer sichtbarer Timer-Ticker, damit fällige
+       Merker auch bei eingeklapptem Fach signalisiert werden. -->
+  <div id="toolbarStrip">
+    <button id="toolDrawerToggle" aria-expanded="false">⚙ Werkzeuge <span class="chev">▾</span></button>
+    <div id="timerTicker" title="Stoppuhr (Details im Werkzeug-Fach)">
+      <span id="timerTickerTime">00:00:00</span>
+      <span id="timerTickerAlert" title="Ein Zeit-Merker ist fällig">⏰ Merker fällig</span>
+    </div>
   </div>
 
-  <div id="timerBar">
-    <span id="timerDisplay">00:00:00</span>
-    <button class="timer-btn" id="timerStartPause">Start</button>
-    <button class="timer-btn" id="timerReset">Reset</button>
-    <form id="timerMarkForm">
-      <input type="text" id="timerMarkLabel" placeholder="Label, z.B. Junge/Wat">
-      <input type="number" id="timerMarkMinutes" placeholder="Min" min="0">
-      <button type="submit" class="timer-btn">+ Merker</button>
-    </form>
-    <div id="timerMarks"></div>
-  </div>
+  <div id="toolDrawer">
+    <div id="soundBar">
+      <span id="soundBarLabel">Szene: –</span>
+      <span class="soundBarIcon">🎵</span>
+      <input type="text" id="soundLinkInput" placeholder="Dateiname der Audiodatei einfügen (z.B. storm1.ogg)…">
+      <span class="save-hint" id="soundLinkHint"></span>
+    </div>
 
-  <div id="charBar">
-    <span id="charBarLabel">Charaktere in dieser Szene:</span>
-    <div id="charCheckboxes"></div>
+    <div id="timerBar">
+      <span id="timerDisplay">00:00:00</span>
+      <button class="timer-btn" id="timerStartPause">Start</button>
+      <button class="timer-btn" id="timerReset">Reset</button>
+      <form id="timerMarkForm">
+        <input type="text" id="timerMarkLabel" placeholder="Label, z.B. Junge/Wat">
+        <input type="number" id="timerMarkMinutes" placeholder="Min" min="0">
+        <button type="submit" class="timer-btn">+ Merker</button>
+      </form>
+      <div id="timerMarks"></div>
+    </div>
+
+    <div id="charBar">
+      <span id="charBarLabel">Charaktere in dieser Szene:</span>
+      <div id="charCheckboxes"></div>
+    </div>
   </div>
 
   <div id="previewWidget">
@@ -1134,6 +1188,8 @@
     // Zeitpunkte, damit sich später verzweigende Handlungsstränge nicht
     // gegenseitig ins Gehege kommen.
     const timerDisplayEl = document.getElementById('timerDisplay');
+    const timerTickerTimeEl = document.getElementById('timerTickerTime');
+    const timerTickerAlertEl = document.getElementById('timerTickerAlert');
     const timerStartPauseBtn = document.getElementById('timerStartPause');
     const timerResetBtn = document.getElementById('timerReset');
     const timerMarkForm = document.getElementById('timerMarkForm');
@@ -1165,10 +1221,18 @@
       timerDisplayEl.textContent = formatElapsed(elapsedSec);
 
       const elapsedMin = elapsedSec / 60;
+      let anyDue = false;
       timerMarksEl.querySelectorAll('.timer-mark').forEach(function (el) {
         const targetMin = parseFloat(el.dataset.minutes);
-        el.classList.toggle('due', elapsedMin >= targetMin);
+        const due = elapsedMin >= targetMin;
+        el.classList.toggle('due', due);
+        if (due) anyDue = true;
       });
+
+      // Timer-Ticker im Werkzeug-Balken spiegeln (immer sichtbar, auch bei
+      // eingeklapptem Fach) - damit ein fälliger Merker nicht übersehen wird.
+      timerTickerTimeEl.textContent = timerDisplayEl.textContent;
+      timerTickerAlertEl.classList.toggle('on', anyDue);
     }
 
     function renderTimerBar() {
@@ -1322,19 +1386,38 @@
       charCheckboxesEl.innerHTML = '';
       if (typeof CHARACTERS === 'undefined' || !charBarScene) return;
 
-      if (!db) {
-        CHARACTERS.forEach(function (ch) {
-          charCheckboxesEl.appendChild(buildCharToggle(ch, false));
+      // Kontextbezogen: Ist für die Szene eine charaktere-Liste in
+      // SZENEN_REGIE hinterlegt, zeigen wir nur diese Figuren (plus einen
+      // "+ weitere"-Knopf für den Rest). Fehlt die Liste, werden wie bisher
+      // ALLE Figuren gezeigt (abwärtskompatibel). Bereits aktive Figuren
+      // erscheinen immer, auch wenn sie nicht in der Liste stehen - sonst
+      // wäre ein sichtbares Portrait ohne zugehörige Checkbox verwirrend.
+      const szeneRegie = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[charBarScene] : null;
+      const relevant = (szeneRegie && Array.isArray(szeneRegie.charaktere)) ? szeneRegie.charaktere : null;
+
+      function renderList(active, showAll) {
+        charCheckboxesEl.innerHTML = '';
+        const primary = (relevant && !showAll)
+          ? CHARACTERS.filter(function (ch) { return relevant.indexOf(ch.id) !== -1 || !!active[ch.id]; })
+          : CHARACTERS;
+        primary.forEach(function (ch) {
+          charCheckboxesEl.appendChild(buildCharToggle(ch, !!active[ch.id]));
         });
-        return;
+        if (relevant && !showAll && primary.length < CHARACTERS.length) {
+          const moreBtn = document.createElement('button');
+          moreBtn.type = 'button';
+          moreBtn.className = 'char-more-btn';
+          moreBtn.textContent = '+ weitere (' + (CHARACTERS.length - primary.length) + ')';
+          moreBtn.onclick = function () { renderList(active, true); };
+          charCheckboxesEl.appendChild(moreBtn);
+        }
       }
+
+      if (!db) { renderList({}, false); return; }
 
       db.ref('sceneCharacters/' + fbKey(charBarScene)).once('value').then(function (snap) {
         if (charBarScene !== viewState.szene) return; // Szene wurde inzwischen gewechselt
-        const active = snap.val() || {};
-        CHARACTERS.forEach(function (ch) {
-          charCheckboxesEl.appendChild(buildCharToggle(ch, !!active[ch.id]));
-        });
+        renderList(snap.val() || {}, false);
       });
     }
 
@@ -1350,6 +1433,29 @@
       });
       return label;
     }
+
+    // ---------- Werkzeug-Fach (Sound/Timer/Charaktere ein-/ausklappbar) ----------
+    // Spart vertikalen Platz für die Inhaltsspalten. Der Timer-Ticker im
+    // Balken darüber bleibt sichtbar, auch wenn das Fach zu ist. Zustand
+    // (offen/zu) in localStorage, damit er über Reloads erhalten bleibt.
+    (function initToolDrawer() {
+      const drawer = document.getElementById('toolDrawer');
+      const toggle = document.getElementById('toolDrawerToggle');
+      if (!drawer || !toggle) return;
+      const OPEN_KEY = 'korsaren_tooldrawer_open';
+      function apply(open) {
+        drawer.classList.toggle('open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+      let open = false;
+      try { open = localStorage.getItem(OPEN_KEY) === '1'; } catch (e) {}
+      apply(open);
+      toggle.addEventListener('click', function () {
+        const nowOpen = !drawer.classList.contains('open');
+        apply(nowOpen);
+        try { localStorage.setItem(OPEN_KEY, nowOpen ? '1' : '0'); } catch (e) {}
+      });
+    })();
   </script>
 
 </body>

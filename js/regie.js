@@ -544,11 +544,18 @@ const ORTE = {
 //              (koerperlich: true markiert einen Ghost, an dem sich ein
 //              kampflustiger Spieler gefahrlos reiben kann - fehlt es,
 //              ist der Ghost rein sozial).
+//   charaktere - optionale Liste von CHARACTERS-IDs (characters.js), die in
+//              dieser Szene relevant sind. Steuert die kontextbezogene
+//              Charakter-Leiste im Admin-Panel: ist das Feld gesetzt, zeigt
+//              die Leiste nur diese Figuren (plus einen "+ weitere"-Knopf für
+//              den Rest). Fehlt es, werden wie bisher ALLE Figuren gezeigt
+//              (abwärtskompatibel).
 // Verankerte NPCs (an EINEM Ort) stehen dagegen in ORTE[ortId].npcs.
 // Angezeigt wird beides im Admin-Panel (regie.html): stimmung+ghosts über
 // den Szenen-Kopf in der Orte-Spalte, npcs im jeweiligen Ort-Detail.
 const SZENEN_REGIE = {
   "1.1": {
+    charaktere: ["francesco", "tom", "wat"], // in Grimsgate präsente Crew-Portraits (Taverne-Rekrutierer, Bibel 9.1)
     stimmung: "Grimsgate lebt über seine Verhältnisse. Im Hafen liegt der größte Geleitzug, den die Stadt je gesehen hat — keine Handelsflotte, sondern eine Siedlungsfahrt in die Neue Welt. Wer drüben von Bord geht, dem versprechen sie Land, Arbeit für jede Hand, ein Leben, das bei null beginnt — und man muss nicht einmal reich sein, ein Platz an Deck genügt. Die halbe Stadt redet von nichts anderem. Man spürt es an jeder Ecke: die fiebrige Euphorie derer, die morgen gehen und alles hinter sich lassen; die stille Angst derer, die bleiben und sich gegen das Versprechen von Sonne und Freiheit wappnen müssen; der Frust derer, die mitwollten — doch die Schiffe sind voll. Nichts davon ist Politik oder ferne Macht. Für jeden Einzelnen steht ganz persönlich der nächste Schritt auf dem Spiel: bleiben, wer man ist — oder sich in ein paar Wochen drüben völlig neu würfeln.",
     ghosts: [
       {
