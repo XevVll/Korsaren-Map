@@ -68,7 +68,7 @@ const SCHATZINSEL_SCENES = {
         id: "stammesdorf",
         top: 24, left: 59,
         title: "Das Dorf am knorrigen Baum",
-        desc: "Vom Dorfeingang aus öffnet sich der Blick auf eine Lichtung voller kunstvoll gebauter Hütten — Holz und geflochtenes Palmblatt, in organisch geschwungenen Formen, die an die Bäume selbst erinnern, hochgestelzt gegen die Feuchtigkeit des Bodens. Keine zwei Hütten gleichen sich: manche tragen Terrassen, manche stapeln sich übereinander, verbunden durch schmale Hängebrücken. In der Mitte thront ein tempelartiger Bau aus Stein und bemaltem Holz. Seitlich im Hintergrund steht ein halb abgestorbener, knorriger Baum mit kahlen Ästen. Rauch steigt von mehreren Feuerstellen auf, Stimmen und das Klappern von Kochgeschirr mischen sich mit den Geräuschen des Waldes. Die Bewohner tragen schlichten Schmuck aus Holz, nirgends blitzt Metall auf. Kinder laufen zwischen den Hütten, während wachsame Blicke jedem Schritt der Fremden folgen.",
+        desc: "Zwischen kunstvoll gebauten Hütten aus Holz und Palmblatt, in geschwungenen, fast organischen Formen, öffnet sich die Lichtung um einen tempelartigen Steinbau. Kein Stück Metall ist zu sehen — Schmuck und Werkzeug sind durchweg aus Holz gearbeitet. Am Fuß der Freitreppe steht der Häuptling, unbewegt, den Blick wenig freundlich auf die Fremden gerichtet.",
         img: "images/interior_stammesdorf.webp"
       },
       {
