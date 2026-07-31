@@ -68,7 +68,7 @@ const SCHATZINSEL_SCENES = {
         id: "stammesdorf",
         top: 24, left: 59,
         title: "Das Dorf am knorrigen Baum",
-        desc: "Ein schmaler Pfad führt vom Dschungelrand auf eine Lichtung, überragt von einem gewaltigen, halb abgestorbenen Baum mit kahlen, weit ausladenden Ästen. Zwischen den umliegenden Bäumen hängen Hütten aus Holz und geflochtenem Palmblatt, über schmale Hängebrücken miteinander verbunden. Ein reich verziertes Gebäude aus Stein und bemaltem Holz thront auf einer kleinen Freitreppe in der Mitte der Lichtung. Rauch steigt von mehreren Feuerstellen auf, Stimmen und das Klappern von Kochgeschirr mischen sich mit den Geräuschen des Waldes. Kinder laufen zwischen den Hütten, während wachsame Blicke der Bewohner jedem Schritt der Fremden folgen.",
+        desc: "Vom Dorfeingang aus öffnet sich der Blick auf eine Lichtung voller kunstvoll gebauter Hütten — Holz und geflochtenes Palmblatt, in organisch geschwungenen Formen, die an die Bäume selbst erinnern, hochgestelzt gegen die Feuchtigkeit des Bodens. Keine zwei Hütten gleichen sich: manche tragen Terrassen, manche stapeln sich übereinander, verbunden durch schmale Hängebrücken. In der Mitte thront ein tempelartiger Bau aus Stein und bemaltem Holz. Seitlich im Hintergrund steht ein halb abgestorbener, knorriger Baum mit kahlen Ästen. Rauch steigt von mehreren Feuerstellen auf, Stimmen und das Klappern von Kochgeschirr mischen sich mit den Geräuschen des Waldes. Die Bewohner tragen schlichten Schmuck aus Holz, nirgends blitzt Metall auf. Kinder laufen zwischen den Hütten, während wachsame Blicke jedem Schritt der Fremden folgen.",
         img: "images/interior_stammesdorf.webp"
       },
       {
@@ -88,7 +88,7 @@ const SCHATZINSEL_SCENES = {
         id: "lager",
         top: 27, left: 52,
         title: "Nachtlager am Dorfrand",
-        desc: "Zwischen den Bäumen am Waldrand stehen mehrere Zeltplanen im Halbkreis um ein Lagerfeuer, dessen Licht tief in die Nacht hinausflackert. Laternen hängen an improvisierten Pfosten und werfen unruhige Schatten auf Werkzeug, aufgerolltes Tauwerk und Kisten. Einige sitzen erschöpft auf Hockern und Kisten, andere arbeiten noch im Laternenschein weiter — Seile werden geflochten, Klingen gewetzt. Dahinter liegt der Dschungel vollkommen dunkel und still.",
+        desc: "Eine drückende Stille liegt über dem improvisierten Lager. Am Feuer starrt Cormac seit geraumer Zeit den Kapitän an, der gedankenverloren seinen Degen betrachtet. Dahinter liegt der Dschungel vollkommen dunkel und still.",
         img: "images/interior_lager.webp"
       }
     ]
