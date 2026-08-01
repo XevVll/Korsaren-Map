@@ -1372,17 +1372,26 @@ dafür, dass die **künstliche Verknappung** (30 Minuten bis Wat, 60 Minuten bis
   wiederkehrend?
 - Ob die Tochter tatsächlich wiederbelebt wird
 - Reveal, dass die vermeintlich zufällige Strandungs-Insel nach dem Sturm in Wahrheit
-  Harwicks über Tom angesteuertes Ziel war (siehe 10.11, Oberdeck-Höhepunkt) — die Schatzinsel
-  existiert jetzt als Szene (`4.1`, siehe 13.2) mit einem ersten Ort (Schiffswrack), aber noch
-  ohne diesen Reveal als Inhalt — hängt weiterhin an der Schatzinsel-Ausarbeitung
+  Harwicks über Tom angesteuertes Ziel war (siehe 10.11, Oberdeck-Höhepunkt) — hat jetzt einen
+  ersten GM-Hinweis in der Landungs-Interaktion (`ORTE.schiffswrack`, Tom/Harwick-Blickkontakt
+  beim Auflaufen), bleibt für die Spieler aber weiterhin unausgesprochen. Ob/wie es je
+  explizit aufgelöst wird, ist offen.
 
 ### Inhalte
 - Ausformulierung der Hafenmeisterei-Szene (blockiert nichts mehr, Schiffskarte ist fertig)
 - Der unqualifizierte Schiffs-„Medicus" als NPC
-- Dirks Payoff-Szene **nach** dem Sturm (Idee vorhanden, noch nicht ausformuliert)
-- Restliche Story-Knoten ausbauen: Schatzinsel (technischer Ort „Schiffswrack" existiert
-  bereits, siehe 13.2 — Höhle, knorriger Baum und Felsformationen sowie jeglicher GM-Inhalt
-  in `regie.js` fehlen noch), Artefaktbucht, Grabesinsel
+- Schatzinsel-Ausarbeitung: 4 von 5 Stationen haben jetzt GM-Inhalt in `regie.js`
+  (Schiffswrack, Dschungelpfad, Dorf, Nachtlager) — nur die Wasserhöhle (`hoehle`) hat noch
+  keinen GM-Inhalt (Referenzbild existiert bereits). Artefaktbucht und Grabesinsel bleiben
+  vollständig offen.
+- Konkrete Mechanik der drei Siegel-Routen (Diebstahl/Aufhetzen/Gewalt) — bisher nur benannt,
+  nicht ausgestaltet. Diebstahl/Aufhetzen laufen über den Thahal-Helfer (der junge Mann aus
+  der Dorf-Ankunfts-Szene, ruft dort „Vanthei!" und wird zurückgehalten) — er soll die Gruppe
+  nachts im Nachtlager heimlich kontaktieren, diese Kontakt-Szene selbst ist aber noch nicht
+  geschrieben.
+- Wildschwein-Angriff auf dem Rückweg über den Dschungelpfad (wer verletzt wird, ist offen) —
+  hat jetzt eine Vorausdeutung beim Hinweg (Cormacs „die sind keine Gefahr"), die eigentliche
+  Angriffsszene fehlt aber noch.
 - Schaden aus der Kanonen-Szene (Sturm) muss auf der Schatzinsel noch konkret ausgestaltet
   werden (kann gefährlich werden oder von der Schatzsuche ausschließen — Details offen)
 
@@ -1408,6 +1417,19 @@ dafür, dass die **künstliche Verknappung** (30 Minuten bis Wat, 60 Minuten bis
 > Referenzbild und `island1.ogg` eingebaut; neue Szene `4.1` mit erstem Ort (Schiffswrack)
 > angelegt (siehe 13.2) — zunächst versehentlich als `3.2` (Kollision mit der
 > Schiffs-Nummerierung), korrigiert auf `4.1`.
+
+> **Erledigt (01.08.2026):** Golden-Lion-Ankunft ausformuliert (Ashworth/Harwick/Cormac-
+> Szene am Anleger, `ORTE.golden_lion`), Golden Lion (2.1) bekam Stimmung + 5 Ghosts für die
+> ~120-Mann-Besatzung. Dirks Sturm-Payoff eingelöst (siehe 10.4) — nicht mehr offen. Der
+> Schatzinsel-Szenen-Durchgang ist deutlich vorangekommen: Landung am Schiffswrack (inkl.
+> Tom/Harwick-Reveal-Andeutung), Zurückgebliebenen-Szene (loser Balken mit
+> Ausweichen-vs-Eingreifen-Wahl + Erste-Hilfe, Wat-/Josiah-Rollenspielmomente),
+> Dschungelpfad (Metallschmuck-Verbot als gezielte Gegenmaßnahme gegen den Fluch-Verdacht,
+> Ezra Coombes Ehering, Cormacs Beinahe-Verrat über Harwicks toten Tochter,
+> Wildschwein-Vorausdeutung), Dorf-Ankunft (Häuptling Ta'ahal — Titel, kein Eigenname —
+> weist Harwick alias „Vanthei" öffentlich zurück, Dorf erkennbar gespalten), Nachtlager
+> (Jagd auf ein Wildschwein mit echten Geschicklichkeits-/Mechanik-Proben). Codex Kapitel
+> III um „Das Volk der Thahal" erweitert, Höhlen-Referenzbild eingebaut.
 
 ### Technik
 _(aktuell keine offenen Punkte — die frühere Lücke „Fehlerbehandlung für fehlende Bilder"

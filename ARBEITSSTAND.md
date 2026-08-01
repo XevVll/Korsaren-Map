@@ -1,6 +1,6 @@
 # Arbeitsstand (WIP) — Codex & Schatzinsel-Durchgang
 
-Stand: 2026-07-31. Dieses Dokument hält den laufenden Arbeitsstrang fest, damit wir an genau
+Stand: 2026-08-01. Dieses Dokument hält den laufenden Arbeitsstrang fest, damit wir an genau
 dieser Stelle weitermachen können. Rein prozessual/inhaltlich — der Kampagnen-Kanon steht in
 `KAMPAGNEN-BIBEL.md`, die technische Projekt-Doku in `CLAUDE.md`.
 
@@ -48,6 +48,20 @@ Zwei zusammenhängende Stränge:
 - **Regie-Hinweis** (`.ort-hinweis`) von 12,5 px auf 14 px vergrößert. (PR #32)
 - **Schatzinsel Station 1** im Admin-Panel: `SZENEN_REGIE["4.1"]` (Strand-Grundstimmung + 4
   Crew-Ghosts) und `ORTE["schiffswrack"].npcs` (der Schmied). (PR #35)
+- **Golden-Lion-Ankunft** (`ORTE.golden_lion`): Ashworth/Harwick/Cormac-Szene am Anleger,
+  verknüpft mit Hafenmeisterei/Heuer. **Golden Lion (2.1):** Stimmung + 5 Ghosts für die
+  Besatzung.
+- **Zurückgebliebenen-Szene am Schiff** (`ORTE.schiffswrack`): Landung, Dirks Sturm-Payoff
+  (10.4) eingelöst, loser Balken (Ausweichen-vs-Eingreifen + Erste Hilfe), Wat/Josiah.
+- **Dschungelpfad** (`ORTE.zwischenstation`): Metallschmuck-Verbot, Ezra Coombes Ehering,
+  Cormacs Beinahe-Verrat, Wildschwein-Vorausdeutung.
+- **Dorf-Ankunft** (`ORTE.stammesdorf`): Häuptling Ta'ahal weist Harwick alias "Vanthei"
+  öffentlich zurück, Dorf erkennbar gespalten (Thahal-Helfer identifiziert, s.u.).
+- **Nachtlager** (`ORTE.lager`): Jagd auf ein Wildschwein (Geschicklichkeits-/Mechanik-Proben).
+- **Codex Kapitel III** um "Das Volk der Thahal" erweitert (Höhlenwache, Bevölkerung,
+  Baumfrucht-Ökonomie). **Höhlen-Referenzbild** eingebaut.
+- Neue eigenständige **Spieler-Demo-Seite** `grimsgate_demo.html` (ohne Golden Lion, ohne
+  Firebase).
 
 ## 4. Wo wir weitermachen — der Schatzinsel-Durchgang
 
@@ -56,33 +70,44 @@ Die Insel (Szene `4.1`) hat **fünf Stationen** in fester Expeditionsreihenfolge
 
 | # | Station (Marker) | Status |
 |---|---|---|
-| 1 | **Strand / gestrandete Golden Lion** (`schiffswrack`) | Stimmung ✅ abgesegnet · Leute = Aufschlag, noch nicht final |
-| 2 | **Der Pfad zum toten Baum** / Dschungelpfad (`zwischenstation`) | **← NÄCHSTER SCHRITT** |
-| 3 | **Das Dorf am knorrigen Baum** / Thahal (`stammesdorf`) | offen |
-| 4 | **Nachtlager am Dorfrand** (`lager`) | offen |
-| 5 | **Die Wasserhöhle** (`hoehle`) | offen |
+| 1 | **Strand / gestrandete Golden Lion** (`schiffswrack`) | ✅ Landung + Zurückgebliebenen-Szene fertig |
+| 2 | **Der Pfad zum toten Baum** / Dschungelpfad (`zwischenstation`) | ✅ fertig |
+| 3 | **Das Dorf am knorrigen Baum** / Thahal (`stammesdorf`) | ✅ Ankunft/Zurückweisung fertig — weitere Dorf-Interaktionen (Handel/Verhandlung) noch offen |
+| 4 | **Nachtlager am Dorfrand** (`lager`) | Jagd-Teil ✅ fertig · **← NÄCHSTER SCHRITT:** Thahal-Kontakt-Szene (Diebstahl/Aufhetzen) noch offen |
+| 5 | **Die Wasserhöhle** (`hoehle`) | offen (Referenzbild existiert bereits) |
 
-**Station 1 im Detail (bereits im Repo, `regie.js`):**
-- Grundstimmung: der Strand nach dem Sturm, Reparaturbetrieb, das Wrack auf der Seite, ringsum
-  unbekannter Dschungel. (Info-statt-Deutung-Ton.)
-- Ghosts (generische Crew, noch zu schärfen): **Eliot Pike** (erleichtert/redselig), **Abel Crane**
-  (erschöpft/verletzt), **Malachi Fenn** (misstraut dem Landstrich), **Sam Oakley** (Reparatur,
-  keine Zeit). Verankert: **Der Schmied** am Amboss.
-- Strand = **Standlager der Zurückgebliebenen** (wer nicht mit in den Dschungel geht, hat hier über
-  die Reparaturen körperliche/praktische Anknüpfung).
-- Optionaler 5. Ghost noch offen: jemand, der am Waldrand Wasser/Früchte sammelt → Brücke ins
-  Inselinnere.
+**Etablierte Namen/Fakten (neu seit 31.07.):**
+- **Vanthei** — Thahal-Name/Beiname für Harwick ("Ihr Getreuer"), von den Dorfbewohnern
+  geraunt, vom Häuptling öffentlich mit Abscheu benutzt.
+- **Ta'ahal** — kein Eigenname, sondern der Titel jedes Thahal-Anführers (von "Thahal"/
+  "Bewahrer" abgeleitet, "der, der erhält").
+- **Der Thahal-Helfer** = der junge Mann aus der Dorf-Ankunfts-Szene (ruft "Vanthei!", wird
+  zurückgehalten) — soll die Gruppe im Nachtlager nachts heimlich kontaktieren. Für die
+  Spieler bisher nur als Sympathie erkennbar, kein Name.
+- **Ezra Coombe** (bereits als Bordell-Stammgast etabliert) ist der Ehering-Träger im
+  Dschungelpfad — trauert um seine tote Frau, kein Widerspruch zum Bordellbesuch (2.2).
 
-**Beim Weitermachen:** ggf. Station-1-Leute mit Hendrik final schärfen, dann Station 2
-(Dschungelpfad) angehen — Grundstimmung, dann Leute. Danach Stationen 3–5.
+**Station 1 im Detail (Ghosts, noch zu schärfen):** **Eliot Pike** (erleichtert/redselig),
+**Abel Crane** (erschöpft/verletzt), **Malachi Fenn** (misstraut dem Landstrich), **Sam
+Oakley** (Reparatur, keine Zeit — jetzt auch Ziel des losen Balkens). Verankert: **Der
+Schmied** am Amboss. Optionaler 5. Ghost weiterhin offen: jemand, der am Waldrand Wasser/
+Früchte sammelt.
+
+**Beim Weitermachen:** Thahal-Kontakt-Szene im Nachtlager (Station 4) fertigstellen —
+Diebstahl/Aufhetzen-Mechanik ist noch inhaltlich leer, nur die Namen stehen fest. Danach
+Station 5 (Höhle) und die übrigen Dorf-Interaktionen.
 
 ## 5. Offene Story-Punkte (brauchen Hendriks Entscheidung, an der jeweiligen Station)
 
-- Genaue **Dorf-/Siegel-Begegnung** — die drei Routen **Diebstahl / Aufhetzen / Gewalt** (Zugang
-  zu Diebstahl/Aufhetzen läuft über den Thahal-Helfer im Nachtlager, Station 4). Schwierigkeit legt
+- Genaue **Thahal-Kontakt-Szene im Nachtlager** — wie spricht der Helfer die Spieler an, was
+  bietet er konkret an, welches Risiko trägt er selbst? Die drei Routen **Diebstahl /
+  Aufhetzen / Gewalt** sind weiterhin nur benannt, nicht ausgestaltet. Schwierigkeit legt
   Hendrik am Tisch fest, kein Code-Trigger.
-- **Wer beim Wildschwein-Angriff verletzt wird** (passiert auf dem RÜCKweg über den Dschungelpfad).
-- Konkrete **Zurückgebliebenen-Szene** am Schiff (welche Crew, welche Proben).
+- **Wer beim Wildschwein-Angriff verletzt wird** (passiert auf dem RÜCKweg über den
+  Dschungelpfad) — jetzt mit Vorausdeutung versehen (Cormacs "die sind keine Gefahr" beim
+  Hinweg), Angriffsszene selbst fehlt noch.
+- Weitere Dorf-Interaktionen (Handel/Verhandlung mit dem Häuptling, falls die Spieler das
+  direkt versuchen) — bisher nur die Ankunfts-/Zurückweisungsszene geschrieben.
 
 ## 6. Datei-Wegweiser
 
