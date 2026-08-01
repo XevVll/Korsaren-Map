@@ -26,10 +26,10 @@
 // schiffswrack -> zwischenstation -> stammesdorf -> (danach erst) lager.
 // Fünf Marker: Schiffswrack (Strand, unten rechts), Zwischenstation (Pfad
 // landeinwärts, Höhe des toten Baums), Stammesdorf (beim knorrigen Baum,
-// oben mittig), Höhle (Felshöhlen an der Westklippe, unten links) und
-// Nachtlager (dicht neben dem Dorf, erst nach dem ersten Dorfbesuch
-// relevant) - Positionen anhand von images/schatzinsel.webp geschätzt,
-// bei Bedarf im Admin-Panel live nachjustieren.
+// oben mittig), Nachtlager (dicht neben dem Dorf, erst nach dem ersten
+// Dorfbesuch relevant) und Höhle (Felshöhlen an der Westklippe, unten
+// links) - Positionen anhand von images/schatzinsel.webp geschätzt, bei
+// Bedarf im Admin-Panel live nachjustieren.
 //
 // Alle fünf Marker haben inzwischen eigene Referenzbilder (Gemini-Pipeline,
 // KAMPAGNEN-BIBEL 14) und ausformulierte Beschreibungen.
@@ -72,13 +72,6 @@ const SCHATZINSEL_SCENES = {
         img: "images/interior_stammesdorf.webp"
       },
       {
-        id: "hoehle",
-        top: 58, left: 14,
-        title: "Die Wasserhöhle",
-        desc: "In die zerklüfteten Klippen an der Westseite der Insel fressen sich zwei Öffnungen, die sich im Inneren zu einer einzigen, weitläufigen Höhle verbinden — die trennende Wand ist längst der Brandung zum Opfer gefallen. Nur mit dem Boot und bei ablaufendem Wasser ist der Zugang zu wagen.",
-        img: "images/interior_hoehle.webp"
-      },
-      {
         // Erst NACH dem ersten Dorfbesuch relevant/aufzuschlagen, nicht auf
         // dem Hinweg (siehe Ablaufreihenfolge oben). Funktional künftig
         // wichtig: hier kontaktiert der Thahal-Helfer die Spieler nachts
@@ -90,6 +83,13 @@ const SCHATZINSEL_SCENES = {
         title: "Nachtlager am Dorfrand",
         desc: "Eine drückende Stille liegt über dem improvisierten Lager. Am Feuer starrt Cormac seit geraumer Zeit den Kapitän an, der gedankenverloren seinen Degen betrachtet. Dahinter liegt der Dschungel vollkommen dunkel und still.",
         img: "images/interior_lager.webp"
+      },
+      {
+        id: "hoehle",
+        top: 58, left: 14,
+        title: "Die Wasserhöhle",
+        desc: "In die zerklüfteten Klippen an der Westseite der Insel fressen sich zwei Öffnungen, die sich im Inneren zu einer einzigen, weitläufigen Höhle verbinden — die trennende Wand ist längst der Brandung zum Opfer gefallen. Nur mit dem Boot und bei ablaufendem Wasser ist der Zugang zu wagen.",
+        img: "images/interior_hoehle.webp"
       }
     ]
   }
