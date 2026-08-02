@@ -544,7 +544,7 @@ const ORTE = {
   },
 
   "schiffswrack": {
-    personen: "Der Schmied (am improvisierten Amboss) · Reparaturcrew",
+    personen: "Der Schmied (am improvisierten Amboss) · Reparaturcrew · Silas Pott (Schiffsarzt) · Ezra Coombe (situativ, verletzt)",
     npcs: [
       {
         name: "Der Schmied",
@@ -619,6 +619,22 @@ const ORTE = {
           { id: "haendler_kommt", label: "Ein Thahal-Händler sucht das Wrack auf" },
           { id: "handel_tuch_werkzeug", label: "Handel: Dorf-Gegenstände gegen Tuch und Werkzeug" },
           { id: "oberflaechliche_infos", label: "Händler plaudert nur oberflächlich über die Insel" }
+        ]
+      },
+      "eber_und_wundbrand": {
+        title: "Der Eber und der Wundbrand",
+        kurz: "Auf dem Rückweg vom Dorf erwischt ein Wildschwein Ezra Coombe (2 Treffer erlegen es). Zurück am Schiff verweigert Schiffsarzt Silas Pott aus Angst um seinen Posten die nötige Amputation — Wundbrand und Sepsis zwingen zum dringenden Kurs auf einen Hafen.",
+        details: "Auf dem Rückweg raschelt es plötzlich im Gebüsch — ein großer Eber stürmt aus dem Unterholz auf die Gruppe zu. Er erwischt Ezra Coombe, der in hohem Bogen zu Boden fliegt.\n\nDas Tier bleibt kampfbereit stehen. Die Spieler haben jetzt die Chance, es anzugreifen — zwei Treffer reichen, um es zu erlegen. Erlegt, kann die Crew das Fleisch mitnehmen, was die angeschlagene Stimmung im Lager spürbar hebt.\n\nEzra selbst ist schwer verletzt und muss getragen werden — den Rest des Weges zurück zum Schiff.\n\nDort übernimmt Silas Pott die Versorgung der Verletzten — er hat schon einige nach dem Sturm behandelt und gilt als Schiffsarzt, so unqualifiziert er auch sein mag. Hat ein Spieler selbst medizinische Erfahrung, entsteht schnell ein Gegenpol: Silas spürt, dass dieser Spieler vermutlich der bessere Arzt wäre — und das ängstigt ihn. Er lässt sich kaum von der körperlichen Arbeit abnehmen, außer dem gelegentlichen Amputieren.\n\nSchlägt der Spieler eine Amputation vor oder greift generell ein, spielt sich Silas auf: Er könne diese kleine Verletzung auch ohne Amputation heilen, erklärt er Harwick und Cormac gegenüber — und macht unmissverständlich klar, dass er sich von „diesen dilettantischen Spielern“ nicht dreinreden lassen will.\n\nDas ist der Auftakt zur Katastrophe: Wundbrand setzt ein, die Sepsis wandert bereits den Oberschenkel hoch. Ein erfahrener Spieler erkennt eindeutig: Das Bein muss ab. Doch es geht nicht am Oberschenkel — die Hauptschlagader lässt sich hier nicht sauber abklemmen. An Bord der Golden Lion fehlen sowohl das nötige Werkzeug als auch die Arznei dafür.\n\nEs bleibt keine Wahl: Ein Hafen muss dringend angesteuert werden.",
+        trigger: [
+          { id: "eber_greift_an", label: "Ein Wildschwein stürmt aus dem Gebüsch, erwischt Ezra Coombe" },
+          { id: "kampf_gegen_eber", label: "Kampf gegen den Eber — 2 Treffer erlegen ihn" },
+          { id: "eber_erbeutet", label: "Erlegtes Schwein hebt die Stimmung im Lager" },
+          { id: "silas_uebernimmt", label: "Silas Pott übernimmt die Versorgung der Verletzten" },
+          { id: "gegenpol_spieler", label: "Gegenpol zum medizinisch erfahrenen Spieler — Silas fürchtet um seinen Posten" },
+          { id: "silas_verweigert", label: "Silas verweigert die Amputation, spielt sich vor Harwick/Cormac auf" },
+          { id: "wundbrand_sepsis", label: "Wundbrand setzt ein, Sepsis wandert den Oberschenkel hoch" },
+          { id: "amputation_unmoeglich", label: "Amputation am Oberschenkel technisch unmöglich (Hauptschlagader)" },
+          { id: "kurs_auf_hafen", label: "Ein Hafen muss dringend angesteuert werden" }
         ]
       }
     }
