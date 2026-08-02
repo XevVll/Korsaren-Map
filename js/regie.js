@@ -288,7 +288,7 @@ const ORTE = {
     // Cormac und Ned (Juli 2026, Inhalt von Hendrik).
     szenenUeberschreibungen: {
       "3.1": {
-        personen: "Cormac Daly · Ned Sharpe (situativ, stürzt) · Tom Fletcher (kommt später dazu)",
+        personen: "Cormac Daly · Ned Sharpe (situativ, stürzt) · Tom Fletcher (kommt später dazu) · Wat Crozier (situativ, rettet einen Spieler)",
         kurz: "Cormac ruft Befehle, schickt die geschicktesten Spieler zum Segel-Einschnüren hoch. Ned rutscht am Bug aus und wird übers Deck geschliffen — auffangbar. Später eskaliert es weiter: Mast reißt, Tom kommt vom Achterdeck dazu und steuert das Schiff per Anker auf eine Insel zu.",
         ortHinweis: "Regen peitscht fast waagerecht über das Deck, Blitze zerreißen den Himmel. Cormac steht mitten im Chaos und ruft Befehle — die Segel sind noch zu weit draußen, es droht, den Mast abzureißen, wenn sie nicht bald eingeschnürt werden.\n\nKommen Spieler in seine Nähe, schickt er die zwei mit dem höchsten Geschick-Wert hoch in die Takelage (siehe Interaktion \"Segel einschnüren\").\n\nEin paar Minuten später (SL-Ermessen) eskaliert die Lage weiter: Der Mast reißt trotzdem, das Ruder klemmt, und Tom kommt vom Achterdeck aufs Oberdeck — siehe Interaktion \"Der Höhepunkt des Sturms\"."
       }
@@ -339,6 +339,18 @@ const ORTE = {
           { id: "ausgeloest", label: "Ned rutscht aus und wird übers Deck geschliffen" },
           { id: "aufgefangen", label: "Aufgefangen → Freund fürs Leben (großer Ruf-Gewinn bei Ned)" },
           { id: "nicht_aufgefangen", label: "Nicht aufgefangen" }
+        ]
+      },
+      "wat_rettung_sturm": {
+        title: "Wat — Rettung über Bord",
+        kurz: "SL bestimmt gezielt einen Spieler (keine Probe, keine Wahl) — er geht über Bord, bis Wat ihn im letzten Moment packt und zurückzieht. Reiner Erzählmoment, kein Wurf.",
+        nurSzenen: ["3.1"],
+        details: "Ein Spieler — vom Spielleiter gezielt bestimmt, keine Probe, keine Wahl — bekommt etwas gegen den Kopf oder wird von einer Welle erwischt. Alles wird schwarz und kalt. Über Bord zu gehen ist in diesem Sturm ein Todesurteil.\n\nDoch dann: etwas schließt sich fest wie ein Schraubstock um Arm oder Bein. Mit einem Ruck wird der Spieler zurück in die Realität gerissen — schmerzhaft, roh. Wats Gesicht erscheint an der Reling, der Griff eisern.\n\nFür besseren Halt hat er sich sogar selbst losgebunden. (GM-Hinweis: Ein erfahrener Seemann sichert sich bei einem solchen Sturm eigentlich immer irgendwo fest, um nicht selbst über Bord zu gehen — Wat gibt genau das auf, um den Spieler zu erreichen.) Er zieht den Spieler zurück an Bord.\n\nStatt sich selbst wieder zu sichern, nutzt er das Seil, um den Spieler festzuzurren — und eilt sofort weiter, um mit einem anderen Seemann Taue zum Absichern des Hauptmasts zu spannen.",
+        trigger: [
+          { id: "spieler_ueber_bord", label: "SL bestimmt einen Spieler — er geht über Bord, alles wird schwarz" },
+          { id: "wats_griff", label: "Etwas packt Arm/Bein fest wie ein Schraubstock — Wat zieht ihn zurück" },
+          { id: "wat_bindet_sich_los", label: "Wat hat sich für besseren Halt selbst losgebunden, um zu retten" },
+          { id: "spieler_gesichert", label: "Wat zurrt den Spieler fest, statt sich selbst zu sichern, und eilt weiter zum Hauptmast" }
         ]
       },
       "einschaetzungen": {
