@@ -596,6 +596,18 @@ const ORTE = {
           { id: "angesprochen", label: "Josiah bittet aktiv um Hilfe beim Feuerstellenbau" },
           { id: "geholfen", label: "Spieler hilft mit — kleiner warmer Moment mit Josiah" }
         ]
+      },
+      "josiahs_geschichte_haendler": {
+        title: "Josiahs Geschichte & der Händler",
+        kurz: "Für die Zurückgebliebenen (nicht ins Dorf mitgegangen): Josiah erzählt eine stark verkürzte, zweite-Hand-Version von Vanthei/Jessica. Kein Sorathi, kein Wat-Geheimnis, kein emotionaler Moment. Ein Thahal-Händler bringt etwas oberflächlichen Insel-Kontakt.",
+        details: "Josiah erzählt am Feuer, warmherzig wie immer: Harwick ist den Thahal seit Jahren als „Vanthei“ bekannt, ein Freund, der mit ihnen handelt — er lagert dort angeblich glänzendes Gut, das eines Tages der Inselgöttin übergeben werden soll, sobald genug davon zusammengekommen ist. Es gab eine Tochter, Jessica, die vor einigen Jahren gestorben ist. Mehr weiß — oder sagt — Josiah dazu nicht.\n\nNichts von alldem erreicht die Tiefe der Geschichte, die sich gerade im Dorf abspielt: Sorathi, Wats Verbindung zu ihm, der Moment, in dem Harwicks Fassung bricht — das bleibt allein denen vorbehalten, die mitgegangen sind.\n\nTrotzdem bleibt der Strand nicht ganz ohne Thahal-Kontakt: Ein Händler aus dem Dorf sucht das Wrack auf, tauscht dort hergestellte Gegenstände gegen Tuch und Werkzeug. Er ist freundlich, geschäftsmäßig, und plaudert nebenbei ein wenig über die Insel — nichts, was er nicht auch einem x-beliebigen Fremden erzählen würde.",
+        trigger: [
+          { id: "josiah_erzaehlt", label: "Josiah erzählt die verkürzte Vanthei/Jessica-Geschichte am Feuer" },
+          { id: "grobe_eckpunkte_nur", label: "Nur grobe Eckpunkte — kein Sorathi, kein Wat-Geheimnis, keine Emotion" },
+          { id: "haendler_kommt", label: "Ein Thahal-Händler sucht das Wrack auf" },
+          { id: "handel_tuch_werkzeug", label: "Handel: Dorf-Gegenstände gegen Tuch und Werkzeug" },
+          { id: "oberflaechliche_infos", label: "Händler plaudert nur oberflächlich über die Insel" }
+        ]
       }
     }
   },
