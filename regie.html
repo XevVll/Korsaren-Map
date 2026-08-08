@@ -102,7 +102,7 @@
     --vlive: #3d6b3d; --vlive-soft: rgba(61,107,61,.15);
     --vwarn: #a8661e; --vwarn-soft: rgba(168,102,30,.14);
     --vpaper: #fffaf0;
-    display: grid; grid-template-columns: minmax(200px,15rem) 1.3fr 1fr minmax(150px,12rem);
+    display: grid; grid-template-columns: minmax(200px,15rem) 1.3fr 1fr minmax(175px,13.5rem);
     grid-template-rows: minmax(0,1fr) auto;
     flex: 1; min-height: 0;
     background: var(--vbg); color: var(--vink); font-size: 1rem;
@@ -118,6 +118,11 @@
   .v-rail { grid-row: 1/2; background: var(--vpanel); border-left: 1px solid var(--vline); overflow-y: auto; padding-bottom: 0.8rem; }
   .v-rail-head { padding: 0.56rem 0.8rem 0.32rem; font-size: 0.76rem; letter-spacing: 1.2px; color: var(--vink-faint); text-transform: uppercase; }
   .v-rail-sub { padding: 0.4rem 0.8rem 0.16rem; font-size: 0.68rem; letter-spacing: .6px; text-transform: uppercase; color: var(--vink-faint); opacity: .85; }
+  /* flex:1 + min-width:0 nötig, damit lange Wörter (z.B. "SPIELERCHARAKTERE")
+     im schmalen Rail-Feld umbrechen statt seitlich abgeschnitten zu werden -
+     ohne min-width:0 verweigert ein Flex-Kind das Schrumpfen unter seine
+     Inhaltsbreite. */
+  .v-rail-sub-label { flex: 1; min-width: 0; overflow-wrap: break-word; }
   .v-rail-item { display: flex; align-items: center; gap: 0.4rem; width: 100%; text-align: left; background: none; border: none; border-left: 2px solid transparent; padding: 0.24rem 0.8rem; cursor: pointer; color: var(--vink-dim); font-size: 0.86rem; font-family: inherit; }
   .v-rail-item:hover { background: var(--vpanel3); color: var(--vink); }
   .v-rail-item.inA { border-left-color: var(--vgold); color: var(--vgold); background: var(--vgold-soft); }
@@ -154,7 +159,8 @@
   .v-chk .box:hover { border-color: var(--vgold); }
   .v-chk .box.on { background: var(--vlive); border-color: var(--vlive); color: #f4ecda; }
   .v-chk-main { flex: 1; min-width: 0; }
-  .v-chk .lbl { display: block; }
+  .v-chk-lbl-row { display: flex; align-items: baseline; gap: 6px; }
+  .v-chk .lbl { display: block; flex: 1; min-width: 0; }
   .v-chk.on .lbl { color: var(--vink-dim); text-decoration: line-through; text-decoration-color: var(--vink-faint); }
   .v-chk .pencil { flex: none; background: none; border: none; color: var(--vink-faint); cursor: pointer; font-size: 0.8rem; padding: 0 2px; }
   .v-chk .pencil:hover, .v-chk .pencil.has { color: var(--vgold); }
@@ -182,7 +188,10 @@
   .v-variant-btn { font-family: inherit; font-size: 0.84rem; background: var(--vpanel); border: 1px solid var(--vline); color: var(--vink-dim); border-radius: 3px; padding: 5px 10px; cursor: pointer; margin: 0 6px 6px 0; }
   .v-variant-btn:hover { border-color: var(--vink-faint); color: var(--vink); }
   .v-variant-btn.active { border-color: var(--vgold); color: var(--vgold); background: var(--vgold-soft); }
-  .v-live-btn { font-family: inherit; font-size: 0.76rem; background: transparent; border: 1px solid var(--vline); color: var(--vink-faint); border-radius: 3px; padding: 3px 8px; cursor: pointer; margin-left: 6px; }
+  /* feste Breite + nowrap, damit "live" und "live setzen" gleich groß
+     bleiben statt je nach Textlänge unterschiedlich breit zu sein oder
+     (bei "live setzen") im schmalen Baum umzubrechen */
+  .v-live-btn { flex: none; width: 5.4rem; white-space: nowrap; text-align: center; font-family: inherit; font-size: 0.72rem; background: transparent; border: 1px solid var(--vline); color: var(--vink-faint); border-radius: 3px; padding: 3px 4px; cursor: pointer; margin-left: 6px; }
   .v-live-btn:hover { border-color: var(--vaccent); color: var(--vaccent); }
   .v-live-btn.is-live { border-color: var(--vlive); color: var(--vlive); }
 
@@ -202,7 +211,7 @@
   .v-ruf-name { flex: 1; min-width: 0; }
   .v-ruf-tier { color: var(--vink-faint); font-size: 0.8rem; white-space: nowrap; }
 
-  .v-add-btn { background: none; border: 1px solid var(--vline-soft); color: var(--vink-dim); border-radius: 3px; width: 1.28rem; height: 1.28rem; line-height: 1; cursor: pointer; font-size: 0.88rem; }
+  .v-add-btn { flex: none; background: none; border: 1px solid var(--vline-soft); color: var(--vink-dim); border-radius: 3px; width: 1.28rem; height: 1.28rem; line-height: 1; cursor: pointer; font-size: 0.88rem; }
   .v-add-btn:hover { border-color: var(--vgold); color: var(--vgold); }
   .v-add-panel { margin: 0.32rem 0.8rem 0.8rem; padding: 0.64rem; background: var(--vpanel2); border: 1px solid var(--vline-soft); border-radius: 5px; }
   .v-add-sub { font-size: 0.76rem; letter-spacing: .4px; text-transform: uppercase; color: var(--vink-faint); margin: 0.48rem 0 0.32rem; }
