@@ -62,9 +62,9 @@ const ORTE = {
         kurz: "Rum, Charme, beschönigte Fahrt. Freiwilliger Zugang. Kein Ruf.",
         details: "Ein südländischer Mann, weißes Hemd, buntes Halstuch, spricht Spieler proaktiv an. Schenkt hochwertigen Rum aus eigener Flasche, beschönigt die Fahrt (schnelles Geld, kaum Risiko, fast Urlaub in den Tropen). Kein Druck, kein Zeitlimit.\n\n„Setz dich, mein Freund — der hier ist besser als alles, was du unten bestellen würdest.“\n\nNimmt der Spieler an → Anheuerung, gute Konditionen.\nLehnt ab → Francesco lässt locker, bleibt sichtbar (Fallback-Loop nach Tom).",
         trigger: [
-          { id: "angenommen", label: "Angebot angenommen" },
-          { id: "abgelehnt_1", label: "Angebot abgelehnt (erstes Mal)" },
-          { id: "fallback", label: "Fallback-Loop ausgelöst (nach Tom)" }
+          { id: "angenommen", label: "Angebot angenommen", info: "Ein südländischer Mann, weißes Hemd, buntes Halstuch, spricht proaktiv an, schenkt hochwertigen Rum aus eigener Flasche: „Setz dich, mein Freund — der hier ist besser als alles, was du unten bestellen würdest.“ Nimmt der Spieler an → Anheuerung, gute Konditionen." },
+          { id: "abgelehnt_1", label: "Angebot abgelehnt (erstes Mal)", info: "Lehnt der Spieler ab, lässt Francesco locker — bleibt aber sichtbar." },
+          { id: "fallback", label: "Fallback-Loop ausgelöst (nach Tom)", info: "Fallback-Loop: Francesco fängt den Spieler ein zweites Mal ab, nachdem auch Tom gescheitert ist (Gewinn feiern / Verlust ertränken)." }
         ]
       },
       "tom": {
@@ -72,10 +72,10 @@ const ORTE = {
         kurz: "Gezinktes Würfelspiel (Meiern-Regeln), Eskalation, Anheuerung als Schuldentilgung. Kein Ruf.",
         details: "Tom spielt mit ranghöheren Männern eines anderen Schiffes „Liar's Dice“ — jeder würfelt verdeckt (`!roll 2d6`), nennt dann laut ein Ergebnis, das er selbst gewürfelt haben will. Pasch schlägt Summe, (2,1)/„Mariner“ schlägt alles. Wer dem Vorgänger nicht glaubt, deckt auf: stimmt die Angabe, verliert der Zweifler; lügt der Vorgänger, verliert er. Tom hat gezinkte Würfel und lügt bei Bedarf schamlos weiter, auch wenn aufgedeckt wird.\n\nSpieler verliert 1-2× harmlos, Tom erhöht den Einsatz, lässt zwischendurch gewinnen, dann Alles-oder-Nichts.\n\n„Junge! Heute ist dein Glückstag! Du kannst doch jetzt nicht aufhören!“\n\nEchter Ausstieg vor dem finalen Einsatz jederzeit möglich. Verliert final → Angebot übersteigt den Verlust, Aufforderung mit an Bord zu kommen.",
         trigger: [
-          { id: "einstieg", label: "Spieler steigt ein" },
-          { id: "vorzeitig_aus", label: "Spieler steigt vorzeitig aus" },
-          { id: "finaler_verlust", label: "Finaler Verlust — Angebot gemacht" },
-          { id: "angebot_reaktion", label: "Angebot angenommen / abgelehnt" }
+          { id: "einstieg", label: "Spieler steigt ein", info: "Tom spielt mit ranghöheren Männern eines anderen Schiffes „Liar's Dice“ — jeder würfelt verdeckt, nennt dann laut ein Ergebnis, das er selbst gewürfelt haben will. Tom hat gezinkte Würfel und lügt bei Bedarf schamlos weiter." },
+          { id: "vorzeitig_aus", label: "Spieler steigt vorzeitig aus", info: "Ein echter Ausstieg vor dem finalen Einsatz ist jederzeit möglich." },
+          { id: "finaler_verlust", label: "Finaler Verlust — Angebot gemacht", info: "Spieler verliert 1-2× harmlos, Tom erhöht den Einsatz, lässt zwischendurch gewinnen, dann Alles-oder-Nichts: „Junge! Heute ist dein Glückstag! Du kannst doch jetzt nicht aufhören!“" },
+          { id: "angebot_reaktion", label: "Angebot angenommen / abgelehnt", info: "Verliert der Spieler final, übersteigt das Angebot den Verlust — Aufforderung, mit an Bord zu kommen." }
         ]
       },
       "zwillinge": {
@@ -83,11 +83,11 @@ const ORTE = {
         kurz: "Probe: Körper (alt. Auftreten). Einziger Weg mit Rufgewinn.",
         details: "Zwei baugleiche, laute Brüder ziehen komödiantisch Aufmerksamkeit auf sich, fordern zum Trinkspiel heraus. Schaulustige feuern an.\n\n„He, du da! Bist du ein Mann oder ein Fass mit Beinen? Zeig's uns!“\n\nProbe: Körper (Standhaltevermögen)\n— Guter Erfolg: Zwillinge begeistert, rufen es laut durch die Kneipe → Angebot + erhöhter Rufgewinn\n— Normaler Erfolg: besteht → Angebot + normaler Rufgewinn\n— Schlechter Erfolg: kostet 1 Körper, hält sich gerade so → Angebot trotzdem, kein Rufgewinn\n— Misserfolg: Ohnmacht — aber nicht nur der Spieler kippt. In der finalen Trinkrunde werden alle drei (Spieler + beide Zwillinge) gemeinsam bewusstlos. Der Wirt weckt sie irgendwann, wenn die Kneipe schon leer ist; alle drei können nur noch lachen und schwanken gemeinsam zum Schiff — noch am selben Abend, nicht erst am nächsten Morgen. Schlechte Konditionen, kein Ruf über diesen Weg — aber ein echtes Band zu den Zwillingen. Eine spürbare Beeinträchtigung danach liegt im Ermessen des SL, keine feste Mechanik.\n\nAlternative Probe: Auftreten (rhetorisch/unterhaltsam statt trinken)\n— Guter/Normaler Erfolg → gleiches Ergebnis wie Standhalten (Angebot + Ruf je nach Bandstufe)\n— Schlechter/Misserfolg → Zwillinge verlieren Interesse, kein Angebot über diesen Weg, aber auch kein Malus",
         trigger: [
-          { id: "koerper_gut", label: "Körper-Probe: Guter Erfolg" },
-          { id: "koerper_normal", label: "Körper-Probe: Normaler Erfolg" },
-          { id: "koerper_schlecht", label: "Körper-Probe: Schlechter Erfolg" },
-          { id: "auftreten_versucht", label: "Auftreten-Probe versucht (statt Trinken)" },
-          { id: "ohnmacht", label: "Misserfolg — Ohnmacht" }
+          { id: "koerper_gut", label: "Körper-Probe: Guter Erfolg", info: "„He, du da! Bist du ein Mann oder ein Fass mit Beinen? Zeig's uns!“ Guter Erfolg (Körper/Standhaltevermögen): Zwillinge begeistert, rufen es laut durch die Kneipe → Angebot + erhöhter Rufgewinn." },
+          { id: "koerper_normal", label: "Körper-Probe: Normaler Erfolg", info: "Normaler Erfolg: besteht → Angebot + normaler Rufgewinn." },
+          { id: "koerper_schlecht", label: "Körper-Probe: Schlechter Erfolg", info: "Schlechter Erfolg: kostet 1 Körper, hält sich gerade so → Angebot trotzdem, kein Rufgewinn." },
+          { id: "auftreten_versucht", label: "Auftreten-Probe versucht (statt Trinken)", info: "Alternative Probe: Auftreten (rhetorisch/unterhaltsam statt trinken) — guter/normaler Erfolg wie beim Standhalten, schlechter Erfolg/Misserfolg → Zwillinge verlieren Interesse, kein Angebot über diesen Weg, aber auch kein Malus." },
+          { id: "ohnmacht", label: "Misserfolg — Ohnmacht", info: "In der finalen Trinkrunde werden alle drei (Spieler + beide Zwillinge) gemeinsam bewusstlos. Der Wirt weckt sie, wenn die Kneipe schon leer ist; alle drei schwanken lachend zum Schiff, noch am selben Abend. Schlechte Konditionen, kein Ruf über diesen Weg — aber ein echtes Band zu den Zwillingen." }
         ]
       },
       "wat": {
@@ -95,8 +95,8 @@ const ORTE = {
         kurz: "Letzte Instanz. Nur wenn kein anderer Weg genutzt wurde. Kein Ruf.",
         details: "Verlässt der Spieler nachts die Kneipe, ohne einen der drei Wege angenommen zu haben: Überfall im Dunkeln, niedergeschlagen. Shanghaiing nach Drake'schem Vorbild.\n\nAufwachen am nächsten Morgen an Bord, ohne Erinnerung an den Übergang.",
         trigger: [
-          { id: "verlassen_ohne", label: "Spieler verlässt Kneipe nachts ohne Anheuerung" },
-          { id: "ueberfall", label: "Überfall ausgelöst" }
+          { id: "verlassen_ohne", label: "Spieler verlässt Kneipe nachts ohne Anheuerung", info: "Verlässt der Spieler nachts die Kneipe, ohne einen der drei Wege angenommen zu haben..." },
+          { id: "ueberfall", label: "Überfall ausgelöst", info: "...Überfall im Dunkeln, niedergeschlagen (Shanghaiing nach Drake'schem Vorbild). Aufwachen am nächsten Morgen an Bord, ohne Erinnerung an den Übergang." }
         ]
       }
     }
@@ -126,9 +126,9 @@ const ORTE = {
         kurz: "Nur auf aktive Nachfrage. Gehilfe verrät versehentlich die Kneipe, Ashworth bemerkt die Unstimmigkeit.",
         details: "Nur wenn der Spieler aktiv nachfragt (kein automatischer Trigger). Ashworth lässt sich die Schiffslisten geben, blättert lustlos:\n\n„Alle voll. Tut mir leid, mein Guter — falscher Zeitpunkt, um in Grimsgate anzuheuern.“\n\nSein Gehilfe, bisher stumm im Hintergrund, platzt dazwischen, zu eifrig, um nachzudenken:\n\n„Äh — Sir, 'Zur letzten Heuer' sucht doch noch, oder? Ich hab da gestern noch—“\n\nEr verstummt, wird rot, als ihm auffällt, was er gerade preisgegeben hat. Ashworth runzelt die Stirn, mehr verwirrt als misstrauisch:\n\n„'Zur letzten Heuer'? Welches Schiff heuert denn dort an? Steht mir nichts davon in der Meldeliste.“\n\nKleiner komödiantischer Moment: Ashworth durchschaut allmählich, dass sein Gehilfe selbst in der Kneipe war (vermutlich privat), ohne Konsequenzen für den Spieler. Für den Spieler bestätigt sich hier höchstens: Die Golden Lion ist nicht offiziell registriert — eine Information, kein Zugang. Kein direkter Schiffszugang über diesen Weg — die Information setzt aber trotzdem etwas in Gang: Ashworth lässt die Sache mit der nicht gelisteten Golden Lion nicht los und taucht am nächsten Morgen selbst am Anleger auf (siehe Szene 2.1).",
         trigger: [
-          { id: "nachfrage_aktiv", label: "Spieler fragt aktiv nach Anheuerung" },
-          { id: "gehilfe_verraet", label: "Gehilfe verrät \"Zur letzten Heuer\"" },
-          { id: "ashworth_unstimmigkeit", label: "Ashworth registriert Unstimmigkeit (Golden Lion nicht gelistet)" }
+          { id: "nachfrage_aktiv", label: "Spieler fragt aktiv nach Anheuerung", info: "Ashworth lässt sich die Schiffslisten geben, blättert lustlos: „Alle voll. Tut mir leid, mein Guter — falscher Zeitpunkt, um in Grimsgate anzuheuern.“" },
+          { id: "gehilfe_verraet", label: "Gehilfe verrät \"Zur letzten Heuer\"", info: "Der Gehilfe platzt dazwischen, zu eifrig: „Äh — Sir, 'Zur letzten Heuer' sucht doch noch, oder? Ich hab da gestern noch—“ Er verstummt, wird rot." },
+          { id: "ashworth_unstimmigkeit", label: "Ashworth registriert Unstimmigkeit (Golden Lion nicht gelistet)", info: "Ashworth runzelt die Stirn, mehr verwirrt als misstrauisch: „'Zur letzten Heuer'? Welches Schiff heuert denn dort an? Steht mir nichts davon in der Meldeliste.“ Kein direkter Schiffszugang über diesen Weg — aber Ashworth lässt die Sache nicht los und taucht am nächsten Morgen selbst am Anleger auf." }
         ]
       },
       "sonderfall": {
@@ -136,10 +136,10 @@ const ORTE = {
         kurz: "Ashworth schickt eine Wache mit, Konfrontation mit Harwick am nächsten Morgen.",
         details: "Wenn der Spieler die Hafenmeisterei aufsucht, bevor er in der Kneipe war: Ashworth registriert die Anfrage als ungewöhnlich (jemand, der offensichtlich anheuern will, aber kein Schiff nennen kann) und schickt diskret eine Wache los, die dem Spieler unauffällig folgt — mit dem Auftrag, herauszufinden, zu welchem Schiff er am Ende gehört. Nicht misstrauisch im Sinne von \"verdächtig\", eher pflichtbewusst-bürokratisch: Jemand ohne Schiff, der anheuern will, gehört registriert.\n\nAm nächsten Morgen erscheint Ashworth mit der Wache am Anleger der Golden Lion und stellt Harwick zur Rede — offiziell, aber nicht feindselig. Harwick löst die Situation routiniert mit Charme und/oder diskreter Bestechung, Ashworth zieht zufrieden ab. Für den Spieler bleibt das meist im Hintergrund, es sei denn, er wird von der Wache als derjenige erkannt, der sie hergeführt hat.\n\nErkennungsmechanik: Wahrnehmungs-Probe der Wache gegen Auftreten/Gewandtheit des Spielers (opponierter Wurf). Besteht die Wache, erinnert sie sich an das Gesicht. Konsequenz bei Erkennung: kleiner Rufmalus bei der Crew — der Spieler hat den Beamten persönlich zum Schiff geführt, das kommt nicht gut an. Kein hartes Strafsystem, eher sozialer Dämpfer.",
         trigger: [
-          { id: "besuch_vor_kneipe", label: "Spieler besucht Hafenmeisterei vor der Kneipe" },
-          { id: "wache_losgeschickt", label: "Wache wird losgeschickt" },
-          { id: "konfrontation_morgen", label: "Konfrontation am nächsten Morgen (Harwick löst es)" },
-          { id: "erkannt_rufmalus", label: "Spieler von Wache erkannt → Rufmalus" }
+          { id: "besuch_vor_kneipe", label: "Spieler besucht Hafenmeisterei vor der Kneipe", info: "Ashworth registriert die Anfrage als ungewöhnlich (jemand, der offensichtlich anheuern will, aber kein Schiff nennen kann)." },
+          { id: "wache_losgeschickt", label: "Wache wird losgeschickt", info: "Ashworth schickt diskret eine Wache los, die dem Spieler unauffällig folgt — mit dem Auftrag, herauszufinden, zu welchem Schiff er am Ende gehört. Pflichtbewusst-bürokratisch, nicht misstrauisch." },
+          { id: "konfrontation_morgen", label: "Konfrontation am nächsten Morgen (Harwick löst es)", info: "Am nächsten Morgen erscheint Ashworth mit der Wache am Anleger der Golden Lion und stellt Harwick zur Rede — offiziell, aber nicht feindselig. Harwick löst es routiniert mit Charme und/oder diskreter Bestechung." },
+          { id: "erkannt_rufmalus", label: "Spieler von Wache erkannt → Rufmalus", info: "Erkennungsmechanik: Wahrnehmungs-Probe der Wache gegen Auftreten/Gewandtheit des Spielers (opponierter Wurf). Bei Erkennung: kleiner Rufmalus bei der Crew — der Spieler hat den Beamten persönlich zum Schiff geführt." }
         ]
       }
     }
@@ -154,9 +154,9 @@ const ORTE = {
         kurz: "Optionale Wahrnehmungs-Probe (keine Erschwernis). Teaser auf die Golden Lion, Wink zur Hafenmeisterei.",
         details: "Am Rand der Lagerhäuser, halb hinter gestapelten Fässern, steht eine Wache im Gespräch mit einem auffällig gut gekleideten Mann — selbstsicheres Auftreten, ein Charme, der nicht so recht zur Nüchternheit des Ortes passen will (Harwick, dem Spieler zu diesem Zeitpunkt unbekannt). Die Wache wirkt zunächst angespannt, blättert in einem Papierstapel, schüttelt den Kopf — bis der Fremde ihm etwas zusteckt (Münzen? ein gefaltetes Papier? aus der Distanz nicht sicher zu erkennen) und die Wache sich sichtlich entspannt, nickend.\n\nNur wahrnehmbar, wenn der Spieler aktiv die Szenerie beobachtet (nicht automatisch, muss selbst aktiv werden). Probe: Wahrnehmung, keine Erschwernis.\n\nBei Erfolg schnappt der Spieler einen Gesprächsfetzen auf:\n„…die Golden Lion steht nirgends auf der Meldeliste, aber wenn Ihr sagt, das regelt sich…“\n\nDient als Wink zur nächsten Station (Hafenmeisterei) — die Meldeliste wird dort relevant.",
         trigger: [
-          { id: "probe_versucht", label: "Wahrnehmungsprobe versucht" },
-          { id: "erfolg_gehoert", label: "Erfolg — Gesprächsfetzen \"Golden Lion\" gehört" },
-          { id: "ignoriert", label: "Spieler ignoriert die Szene / würfelt nicht" }
+          { id: "probe_versucht", label: "Wahrnehmungsprobe versucht", info: "Am Rand der Lagerhäuser steht eine Wache im Gespräch mit einem auffällig gut gekleideten Mann (Harwick, dem Spieler unbekannt) — nur wahrnehmbar, wenn der Spieler aktiv beobachtet. Probe: Wahrnehmung, keine Erschwernis." },
+          { id: "erfolg_gehoert", label: "Erfolg — Gesprächsfetzen \"Golden Lion\" gehört", info: "Der Spieler schnappt auf: „…die Golden Lion steht nirgends auf der Meldeliste, aber wenn Ihr sagt, das regelt sich…“ — Wink zur nächsten Station (Hafenmeisterei)." },
+          { id: "ignoriert", label: "Spieler ignoriert die Szene / würfelt nicht", info: "Ohne aktive Beobachtung bleibt die Szene unbemerkt." }
         ]
       }
     }
@@ -199,11 +199,11 @@ const ORTE = {
         kurz: "Manche Frauen arbeiten für Wat. Fesselung, Fluchtoptionen vor Wats Ankunft.",
         details: "Manche Frauen im Haus arbeiten (mehr oder weniger freiwillig, mehr oder weniger für den Spieler erkennbar) für Wat. Lässt sich der Spieler auf eine ein, führt sie ihn in einen abgelegeneren Raum — dort wird er überrascht und festgehalten/gefesselt, bis Wat ihn abholen kommt.\n\nFluchtoptionen während der Fesselung:\n— Gutes Auftreten: Spieler redet sich frei, bevor Wat eintrifft — Frau lässt ihn ziehen, ggf. aus Mitleid, Zweifel oder weil er sie überzeugt, dass sich der Ärger nicht lohnt.\n— Freireden trotz Fesselung: Sind die Fesseln nicht sicher genug (Probe auf Körper/Geschick, Feinjustierung offen), kann sich der Spieler befreien, bevor Wat kommt.\n— Keine Flucht: Wat holt ihn ab → identisch zum \"Wat\"-Ausgang der Kneipe (Zwangsrekrutierung, Aufwachen an Bord).",
         trigger: [
-          { id: "einlassen", label: "Spieler lässt sich auf eine Frau ein" },
-          { id: "hinterraum", label: "Frau führt ihn in den Hinterraum" },
-          { id: "flucht_auftreten", label: "Fluchtversuch (Auftreten) — Erfolg/Misserfolg" },
-          { id: "flucht_fesseln", label: "Fluchtversuch (Fesseln lösen) — Erfolg/Misserfolg" },
-          { id: "wat_holt_ab", label: "Wat holt Spieler ab (keine Flucht)" }
+          { id: "einlassen", label: "Spieler lässt sich auf eine Frau ein", info: "Manche Frauen im Haus arbeiten (mehr oder weniger freiwillig, mehr oder weniger erkennbar) für Wat." },
+          { id: "hinterraum", label: "Frau führt ihn in den Hinterraum", info: "Sie führt ihn in einen abgelegeneren Raum — dort wird er überrascht und festgehalten/gefesselt, bis Wat ihn abholen kommt." },
+          { id: "flucht_auftreten", label: "Fluchtversuch (Auftreten) — Erfolg/Misserfolg", info: "Gutes Auftreten: Spieler redet sich frei, bevor Wat eintrifft — Frau lässt ihn ziehen, ggf. aus Mitleid, Zweifel oder weil er sie überzeugt." },
+          { id: "flucht_fesseln", label: "Fluchtversuch (Fesseln lösen) — Erfolg/Misserfolg", info: "Sind die Fesseln nicht sicher genug (Probe auf Körper/Geschick), kann sich der Spieler befreien, bevor Wat kommt." },
+          { id: "wat_holt_ab", label: "Wat holt Spieler ab (keine Flucht)", info: "Keine Flucht: Wat holt ihn ab → identisch zum \"Wat\"-Ausgang der Kneipe (Zwangsrekrutierung, Aufwachen an Bord)." }
         ]
       },
       "raubein": {
@@ -211,10 +211,10 @@ const ORTE = {
         kurz: "Grober Gast belästigt eine Frau. Physisches Eingreifen = Rufgewinn bei Ezra/Ned.",
         details: "Ein grober Gast belästigt eine der Frauen. Constance will ihn draußen haben, er eskaliert.\n\nZwei Zugänge:\n— Spieler sitzt im Empfangsbereich mit Ezra/Ned → bekommt es direkt mit\n— Spieler ist oben → hört den Tumult, kann herunterstürmen\n\nAuflösung:\n— Physisches Eingreifen (sofort): Kampf, Ezra+Ned helfen mit → Rufgewinn bei Ezra/Ned (einzige Variante mit Belohnung)\n— Soziale Lösung (Auftreten/Rhetorik, Deeskalation): neutral, kein Gewinn, kein Verlust\n— Nicht-Eingreifen: Constance oder ihre eigenen Männer regeln es selbst, ohne den Spieler → kleiner Rufmalus bei Ezra/Ned (Zögern wird als Desinteresse an der Crew-Gemeinschaft gewertet, nicht als Feigheit im engeren Sinn — nur unmittelbares Eingreifen zählt)",
         trigger: [
-          { id: "ausgeloest", label: "Raubein-Szene ausgelöst (Empfang oder von oben gehört)" },
-          { id: "physisch", label: "Physisches Eingreifen → Rufgewinn" },
-          { id: "sozial", label: "Soziale Lösung → neutral" },
-          { id: "kein_eingreifen", label: "Kein Eingreifen → Rufmalus" }
+          { id: "ausgeloest", label: "Raubein-Szene ausgelöst (Empfang oder von oben gehört)", info: "Ein grober Gast belästigt eine der Frauen. Constance will ihn draußen haben, er eskaliert." },
+          { id: "physisch", label: "Physisches Eingreifen → Rufgewinn", info: "Physisches Eingreifen (sofort): Kampf, Ezra+Ned helfen mit → Rufgewinn bei Ezra/Ned (einzige Variante mit Belohnung)." },
+          { id: "sozial", label: "Soziale Lösung → neutral", info: "Soziale Lösung (Auftreten/Rhetorik, Deeskalation): neutral, kein Gewinn, kein Verlust." },
+          { id: "kein_eingreifen", label: "Kein Eingreifen → Rufmalus", info: "Constance oder ihre eigenen Männer regeln es selbst, ohne den Spieler → kleiner Rufmalus bei Ezra/Ned (Zögern wird als Desinteresse gewertet)." }
         ]
       }
     }
@@ -247,9 +247,9 @@ const ORTE = {
         nurSzenen: ["3.1"],
         details: "Tom bleibt fest am Ruder — er kann und wird seinen Posten nicht verlassen, Harwick verlässt sich blind auf ihn. Kommen Spieler trotzdem in seine Nähe, hat er selbst jetzt noch einen lockeren Spruch auf den Lippen:\n\n„Halt dich fest, ich spring für dich bestimmt nicht ins Wasser!“\n\nCallback: Kam der Knoten-Streich (siehe Interaktion \"Der Knoten-Streich\") bei diesem Spieler gut an (Trigger \"durchschaut_witzig\" war gesetzt), spielt Tom zusätzlich darauf an.\n\nDa er selbst nicht vom Ruder weg kann, schickt er die Spieler stattdessen dorthin, wo gerade tatsächlich Hilfe gebraucht wird — er hat als Steuermann den besten Überblick übers Deck. Welche Stelle er nennt (Cormacs Segel-Notlage am Oberdeck, die losgerissene Kanone am Batteriedeck, oder der Wassereinbruch im Frachtraum), liegt im Ermessen des Spielleiters, z.B. je nachdem, was gerade noch ungelöst ist (vgl. Design-Prinzip \"Gutes Rollenspiel schlägt Mechanik\").\n\nBewusst keine Probe und kein Ruf-Effekt — reiner Charaktermoment, ähnlich wie Josiah in der Kombüse.",
         trigger: [
-          { id: "ausgeloest", label: "Moment ausgelöst (Spieler in Toms Nähe)" },
-          { id: "callback_gebracht", label: "Callback auf Knoten-Streich gebracht (falls zutreffend)" },
-          { id: "weitergeschickt", label: "Spieler zu einer Sturm-Stelle weitergeschickt" }
+          { id: "ausgeloest", label: "Moment ausgelöst (Spieler in Toms Nähe)", info: "Tom bleibt fest am Ruder — er kann und wird seinen Posten nicht verlassen. Kommen Spieler in seine Nähe: „Halt dich fest, ich spring für dich bestimmt nicht ins Wasser!“" },
+          { id: "callback_gebracht", label: "Callback auf Knoten-Streich gebracht (falls zutreffend)", info: "Kam der Knoten-Streich bei diesem Spieler gut an (Trigger \"durchschaut_witzig\"), spielt Tom zusätzlich darauf an." },
+          { id: "weitergeschickt", label: "Spieler zu einer Sturm-Stelle weitergeschickt", info: "Er schickt die Spieler dorthin, wo Hilfe gebraucht wird (Cormacs Segel-Notlage, die losgerissene Kanone, oder der Wassereinbruch) — SL-Ermessen, je nachdem was noch ungelöst ist. Bewusst keine Probe, kein Ruf-Effekt." }
         ]
       },
       "knoten_streich": {
@@ -258,10 +258,10 @@ const ORTE = {
         nichtInSzenen: ["3.1"], // setzt voraus, dass Tom entspannt am Ruder steht - im Sturm kämpft er laut Szenentext mit dem Ruder
         details: "Tom hält Kurs, wirkt dabei kaum bei der Sache. Er liest die Gruppe schnell und wendet sich beiläufig an den Spieler mit dem niedrigsten Seefahrt-Wert (objektiver Vergleich der Charakterbögen, kein Bauchgefühl).\n\n„Wir sind zu langsam. Lauf runter in den Frachtraum, hol mir ein paar Knoten mehr.“\n\nSpielt mit dem echten Fachbegriff (Geschwindigkeit wird per Logleine mit Knoten gemessen) — kein erfundener Unsinn, sondern Fachjargon als Falle. Ein erfahrener Seemann würde sofort erkennen, dass man Geschwindigkeit nicht „nachfüllen“ kann.\n\nReaktion des angesprochenen Spielers entscheidet:\n— Durchschaut den Witz, reagiert locker/witzig → kleiner Ruf-Plus bei Tom\n— Durchschaut, reagiert genervt/vorwurfsvoll → neutral\n— Ignoriert/geht nicht drauf ein → neutral\n— Läuft tatsächlich los, um Knoten zu holen → kleiner Ruf-Minus bei Tom\n\nVerbindung: Läuft der Spieler tatsächlich in den Frachtraum, trifft er dort je nach Timer-Stand entweder auf die versteckten Hände des Jungen oder einen leeren Raum (siehe Frachtraum-Bildvariante).",
         trigger: [
-          { id: "streich_ausgeloest", label: "Streich ausgelöst" },
-          { id: "durchschaut_witzig", label: "Durchschaut, reagiert witzig/locker → Ruf-Plus" },
-          { id: "durchschaut_genervt", label: "Durchschaut, reagiert genervt/ignoriert → neutral" },
-          { id: "losgelaufen", label: "Spieler läuft tatsächlich los → Ruf-Minus" }
+          { id: "streich_ausgeloest", label: "Streich ausgelöst", info: "Tom wendet sich an den Spieler mit dem niedrigsten Seefahrt-Wert: „Wir sind zu langsam. Lauf runter in den Frachtraum, hol mir ein paar Knoten mehr.“ Fachjargon als Falle — Geschwindigkeit lässt sich nicht „nachfüllen“." },
+          { id: "durchschaut_witzig", label: "Durchschaut, reagiert witzig/locker → Ruf-Plus", info: "Durchschaut den Witz, reagiert locker/witzig → kleiner Ruf-Plus bei Tom." },
+          { id: "durchschaut_genervt", label: "Durchschaut, reagiert genervt/ignoriert → neutral", info: "Durchschaut, reagiert genervt/vorwurfsvoll, oder ignoriert es → neutral." },
+          { id: "losgelaufen", label: "Spieler läuft tatsächlich los → Ruf-Minus", info: "Läuft tatsächlich los, um Knoten zu holen → kleiner Ruf-Minus bei Tom. Im Frachtraum trifft er je nach Timer-Stand entweder auf den versteckten Jungen oder einen leeren Raum." }
         ]
       },
       "ruder_halten": {
@@ -270,10 +270,10 @@ const ORTE = {
         nichtInSzenen: ["3.1"], // im Sturm hält Tom das Ruder selbst mit beiden Händen fest - er gibt es nicht kurz ab
         details: "Läuft ein Spieler los (z.B. wegen des Knoten-Streichs) und bleiben andere zurück, bittet Tom beiläufig einen zufälligen der Verbliebenen, kurz zu übernehmen — und verschwindet dann selbst.\n\n„Halt mal kurz, ja? Nur geradeaus. Bin gleich wieder da.“\n\n— Greift sofort zu, Seefahrt-Probe gelingt (bei Körper ≤2 zusätzlich Körper-Probe nötig, beide müssen gelingen) → Ruf-Plus bei Tom\n— Greift zu, Probe(n) misslingen, Kontrolle verloren (Ruder schlägt aus o.ä.) → Ruf-Minus bei Tom\n— Lehnt ab / zögert → neutral, kein Risiko",
         trigger: [
-          { id: "angefragt", label: "Tom fragt nach Ruder-Übernahme" },
-          { id: "angenommen_erfolg", label: "Angenommen, Probe(n) erfolgreich → Ruf-Plus" },
-          { id: "angenommen_misserfolg", label: "Angenommen, Kontrolle verloren → Ruf-Minus" },
-          { id: "abgelehnt", label: "Abgelehnt / gezögert → neutral" }
+          { id: "angefragt", label: "Tom fragt nach Ruder-Übernahme", info: "Tom bittet beiläufig einen zufälligen der Verbliebenen: „Halt mal kurz, ja? Nur geradeaus. Bin gleich wieder da.“ — und verschwindet selbst." },
+          { id: "angenommen_erfolg", label: "Angenommen, Probe(n) erfolgreich → Ruf-Plus", info: "Greift sofort zu, Seefahrt-Probe gelingt (bei Körper ≤2 zusätzlich Körper-Probe nötig, beide müssen gelingen) → Ruf-Plus bei Tom." },
+          { id: "angenommen_misserfolg", label: "Angenommen, Kontrolle verloren → Ruf-Minus", info: "Greift zu, Probe(n) misslingen, Kontrolle verloren (Ruder schlägt aus o.ä.) → Ruf-Minus bei Tom." },
+          { id: "abgelehnt", label: "Abgelehnt / gezögert → neutral", info: "Lehnt ab oder zögert → neutral, kein Risiko." }
         ]
       }
     }
@@ -300,10 +300,10 @@ const ORTE = {
         nurSzenen: ["3.1"],
         details: "Ein paar Minuten in den Sturm hinein (Zeitpunkt liegt im Ermessen des Spielleiters) eskaliert die Lage weiter: Der Mast reißt — obwohl die Segel eingezogen wurden (siehe Interaktion \"Cormac — Segel einschnüren\"), reicht das gegen die Wucht des Sturms nicht. Gleichzeitig verzieht sich irgendetwas am Achterdeck so, dass das Ruder klemmt (siehe Achterdeck) — Tom kann dort nichts mehr ausrichten und kommt aufs Oberdeck. Praktisch die gesamte wichtige Crew versammelt sich dort.\n\nJetzt zeigt sich, was wirklich in Tom steckt — er ist kaum wiederzuerkennen: Er springt übers Deck, schaut immer wieder auf seinen kleinen Kompass, zieht Seile über verschiedene Winden und bringt sie richtig zum Bug. Er lehnt sich über die Reling, zählt leise in sich hinein, checkt wieder den Kompass. Irgendwie hält er so den Kurs — durch gezieltes Anker lassen rechts oder links steuert er das Schiff auf eine tropische Insel zu.\n\nBewusst kein Wurf, keine Spieler-Aufgabe — das ist Toms Moment, den die Spieler nur miterleben.\n\nAuflösung: Irgendwann lichtet sich der Sturm. Die übrigen Segel werden gehisst, Tom und Cormac dirigieren die Crew wie ein Orchester.\n\nZukunfts-Notiz: Fast alle an Bord denken, sie seien einfach gestrandet — tatsächlich war das genau der Ort, den Harwick über Tom ansteuern ließ. Der Reveal ist Teil der noch auszuarbeitenden Schatzinsel-Inhalte, nicht dieser Interaktion.",
         trigger: [
-          { id: "mast_gerissen", label: "Mast reißt trotz eingezogener Segel" },
-          { id: "ruder_klemmt", label: "Ruder klemmt, Tom kommt aufs Oberdeck" },
-          { id: "tom_highlight", label: "Toms Anker-Manöver gezeigt (kein Wurf)" },
-          { id: "sturm_endet", label: "Sturm lichtet sich, Tom & Cormac dirigieren die Crew" }
+          { id: "mast_gerissen", label: "Mast reißt trotz eingezogener Segel", info: "Ein paar Minuten in den Sturm hinein eskaliert die Lage: Der Mast reißt — obwohl die Segel eingezogen wurden, reicht das gegen die Wucht des Sturms nicht." },
+          { id: "ruder_klemmt", label: "Ruder klemmt, Tom kommt aufs Oberdeck", info: "Gleichzeitig verzieht sich irgendetwas am Achterdeck so, dass das Ruder klemmt — Tom kann dort nichts mehr ausrichten und kommt aufs Oberdeck. Praktisch die gesamte wichtige Crew versammelt sich dort." },
+          { id: "tom_highlight", label: "Toms Anker-Manöver gezeigt (kein Wurf)", info: "Jetzt zeigt sich, was wirklich in Tom steckt: Er springt übers Deck, schaut immer wieder auf seinen Kompass, zieht Seile über verschiedene Winden. Durch gezieltes Anker lassen rechts oder links steuert er das Schiff auf eine tropische Insel zu. Bewusst kein Wurf, keine Spieler-Aufgabe — das ist Toms Moment." },
+          { id: "sturm_endet", label: "Sturm lichtet sich, Tom & Cormac dirigieren die Crew", info: "Irgendwann lichtet sich der Sturm. Die übrigen Segel werden gehisst, Tom und Cormac dirigieren die Crew wie ein Orchester." }
         ]
       },
       "harwick_blicke_sturm": {
@@ -312,9 +312,9 @@ const ORTE = {
         nurSzenen: ["3.1"],
         details: "Während an Deck der Höhepunkt des Sturms tobt, bleibt Harwick über seinen Karten in der Kapitänskajüte (siehe dortiger Sturm-Flavortext). Er schaut ernst hinaus.\n\nNur wahrnehmbar, wenn ein Spieler aktiv genau hinsieht (nicht automatisch). Probe: Wahrnehmung, keine Erschwernis.\n\nBei Erfolg bemerkt der Spieler vielsagende Blicke zwischen Harwick und seinen Offizieren — eine stille Verständigung, die andeutet, dass hier mehr im Gange ist, als es scheint. Kein Dialog, keine Erklärung an dieser Stelle, reine Vorahnung auf den späteren Reveal (dass die \"gestrandete\" Insel in Wahrheit Harwicks Ziel war).",
         trigger: [
-          { id: "probe_versucht", label: "Wahrnehmungsprobe versucht" },
-          { id: "erfolg_blicke", label: "Erfolg — vielsagende Blicke bemerkt" },
-          { id: "ignoriert", label: "Spieler ignoriert die Szene / würfelt nicht" }
+          { id: "probe_versucht", label: "Wahrnehmungsprobe versucht", info: "Harwick bleibt über seinen Karten in der Kapitänskajüte, schaut ernst hinaus. Nur wahrnehmbar, wenn ein Spieler aktiv genau hinsieht. Probe: Wahrnehmung, keine Erschwernis." },
+          { id: "erfolg_blicke", label: "Erfolg — vielsagende Blicke bemerkt", info: "Der Spieler bemerkt vielsagende Blicke zwischen Harwick und seinen Offizieren — eine stille Verständigung, die andeutet, dass hier mehr im Gange ist. Kein Dialog, keine Erklärung, reine Vorahnung." },
+          { id: "ignoriert", label: "Spieler ignoriert die Szene / würfelt nicht", info: "Ohne aktives Hinsehen bleibt der Moment unbemerkt." }
         ]
       },
       "cormac_segel_sturm": {
@@ -323,11 +323,11 @@ const ORTE = {
         nurSzenen: ["3.1"],
         details: "Cormac steht an Deck und ruft Befehle — die Segel sind noch zu weit draußen, der Mast droht abgerissen zu werden, wenn sie nicht bald eingeschnürt werden. Kommen Spieler in seine Nähe, schickt er die zwei mit dem höchsten Geschick-Wert hoch in die Takelage (objektiver Vergleich der Charakterbögen).\n\nDer Aufstieg in der Takelage ist bei diesem Wetter gefährlich — Regen und Wind reißen an den Spielern, während oben das Segel eingeschnürt werden muss.\n\nProbe: Geschick+10.\n\n— Guter Erfolg: beeindruckt Cormac sichtbar\n— Normaler/Schlechter Erfolg: geschafft, kein besonderer Kommentar → neutral\n— Misserfolg: [OFFEN] Konsequenz noch nicht festgelegt\n\nGleichzeitig würfeln die übrigen Spieler an Deck Körper-Proben, um sich festzuhalten.",
         trigger: [
-          { id: "ausgeloest", label: "Cormac schickt 2 Spieler hoch (höchstes Geschick)" },
-          { id: "aufstieg_gut", label: "Aufstieg: Guter Erfolg → beeindruckt Cormac" },
-          { id: "aufstieg_normal", label: "Aufstieg: Normaler/Schlechter Erfolg → neutral" },
-          { id: "aufstieg_misserfolg", label: "Aufstieg: Misserfolg" },
-          { id: "deck_koerper", label: "Übrige Spieler: Körper-Probe zum Festhalten gewürfelt" }
+          { id: "ausgeloest", label: "Cormac schickt 2 Spieler hoch (höchstes Geschick)", info: "Cormac ruft Befehle — die Segel sind noch zu weit draußen, der Mast droht abgerissen zu werden. Er schickt die zwei Spieler mit dem höchsten Geschick-Wert hoch in die Takelage (objektiver Vergleich der Charakterbögen)." },
+          { id: "aufstieg_gut", label: "Aufstieg: Guter Erfolg → beeindruckt Cormac", info: "Der Aufstieg in der Takelage ist bei diesem Wetter gefährlich. Probe: Geschick+10. Guter Erfolg: beeindruckt Cormac sichtbar." },
+          { id: "aufstieg_normal", label: "Aufstieg: Normaler/Schlechter Erfolg → neutral", info: "Normaler/Schlechter Erfolg: geschafft, kein besonderer Kommentar → neutral." },
+          { id: "aufstieg_misserfolg", label: "Aufstieg: Misserfolg", info: "Misserfolg: [OFFEN] Konsequenz noch nicht festgelegt." },
+          { id: "deck_koerper", label: "Übrige Spieler: Körper-Probe zum Festhalten gewürfelt", info: "Gleichzeitig würfeln die übrigen Spieler an Deck Körper-Proben, um sich festzuhalten." }
         ]
       },
       "ned_sturz_sturm": {
@@ -336,9 +336,9 @@ const ORTE = {
         nurSzenen: ["3.1"],
         details: "Ned Sharpe rutscht vorne am Bug aus und wird übers ganze Deck geschliffen. Spieler können versuchen, ihn aufzufangen (Probe: Körper oder Geschick, [OFFEN] welche genau bzw. ob wahlweise).\n\n— Aufgefangen: Ned hat einen Freund fürs Leben gewonnen — großer, dauerhafter Ruf-Gewinn bei Ned\n— Nicht aufgefangen: [OFFEN] Konsequenz noch nicht festgelegt",
         trigger: [
-          { id: "ausgeloest", label: "Ned rutscht aus und wird übers Deck geschliffen" },
-          { id: "aufgefangen", label: "Aufgefangen → Freund fürs Leben (großer Ruf-Gewinn bei Ned)" },
-          { id: "nicht_aufgefangen", label: "Nicht aufgefangen" }
+          { id: "ausgeloest", label: "Ned rutscht aus und wird übers Deck geschliffen", info: "Ned Sharpe rutscht vorne am Bug aus und wird übers ganze Deck geschliffen. Spieler können versuchen, ihn aufzufangen (Probe: Körper oder Geschick, [OFFEN] welche genau)." },
+          { id: "aufgefangen", label: "Aufgefangen → Freund fürs Leben (großer Ruf-Gewinn bei Ned)", info: "Aufgefangen: Ned hat einen Freund fürs Leben gewonnen — großer, dauerhafter Ruf-Gewinn bei Ned." },
+          { id: "nicht_aufgefangen", label: "Nicht aufgefangen", info: "Nicht aufgefangen: [OFFEN] Konsequenz noch nicht festgelegt." }
         ]
       },
       "wat_rettung_sturm": {
@@ -347,10 +347,10 @@ const ORTE = {
         nurSzenen: ["3.1"],
         details: "Ein Spieler — vom Spielleiter gezielt bestimmt, keine Probe, keine Wahl — bekommt etwas gegen den Kopf oder wird von einer Welle erwischt. Alles wird schwarz und kalt. Über Bord zu gehen ist in diesem Sturm ein Todesurteil.\n\nDoch dann: etwas schließt sich fest wie ein Schraubstock um Arm oder Bein. Mit einem Ruck wird der Spieler zurück in die Realität gerissen — schmerzhaft, roh. Wats Gesicht erscheint an der Reling, der Griff eisern.\n\nFür besseren Halt hat er sich sogar selbst losgebunden. (GM-Hinweis: Ein erfahrener Seemann sichert sich bei einem solchen Sturm eigentlich immer irgendwo fest, um nicht selbst über Bord zu gehen — Wat gibt genau das auf, um den Spieler zu erreichen.) Er zieht den Spieler zurück an Bord.\n\nStatt sich selbst wieder zu sichern, nutzt er das Seil, um den Spieler festzuzurren — und eilt sofort weiter, um mit einem anderen Seemann Taue zum Absichern des Hauptmasts zu spannen.",
         trigger: [
-          { id: "spieler_ueber_bord", label: "SL bestimmt einen Spieler — er geht über Bord, alles wird schwarz" },
-          { id: "wats_griff", label: "Etwas packt Arm/Bein fest wie ein Schraubstock — Wat zieht ihn zurück" },
-          { id: "wat_bindet_sich_los", label: "Wat hat sich für besseren Halt selbst losgebunden, um zu retten" },
-          { id: "spieler_gesichert", label: "Wat zurrt den Spieler fest, statt sich selbst zu sichern, und eilt weiter zum Hauptmast" }
+          { id: "spieler_ueber_bord", label: "SL bestimmt einen Spieler — er geht über Bord, alles wird schwarz", info: "Ein vom Spielleiter gezielt bestimmter Spieler (keine Probe, keine Wahl) bekommt etwas gegen den Kopf oder wird von einer Welle erwischt. Über Bord zu gehen ist in diesem Sturm ein Todesurteil." },
+          { id: "wats_griff", label: "Etwas packt Arm/Bein fest wie ein Schraubstock — Wat zieht ihn zurück", info: "Etwas schließt sich fest wie ein Schraubstock um Arm oder Bein. Mit einem Ruck wird der Spieler zurückgerissen — Wats Gesicht erscheint an der Reling, der Griff eisern." },
+          { id: "wat_bindet_sich_los", label: "Wat hat sich für besseren Halt selbst losgebunden, um zu retten", info: "Für besseren Halt hat er sich sogar selbst losgebunden (GM-Hinweis: ein erfahrener Seemann sichert sich eigentlich immer fest — Wat gibt genau das auf, um den Spieler zu erreichen)." },
+          { id: "spieler_gesichert", label: "Wat zurrt den Spieler fest, statt sich selbst zu sichern, und eilt weiter zum Hauptmast", info: "Statt sich selbst wieder zu sichern, nutzt er das Seil, um den Spieler festzuzurren — und eilt sofort weiter, um mit einem anderen Seemann Taue zum Absichern des Hauptmasts zu spannen." }
         ]
       },
       "einschaetzungen": {
@@ -359,12 +359,12 @@ const ORTE = {
         nichtInSzenen: ["3.1"], // Ruhiges Gespräch - passt nicht zum Sturm, in dem laut Szenentext alle mit den Segeln kämpfen
         details: "Fragt man Francesco gezielt nach jemandem, gibt er seine ehrliche Einschätzung — nie von sich aus, nur auf Nachfrage.\n\n— Harwick: warm, respektvoll, fast bewundernd\n— Cormac: freundlich-distanziert, \"zu streng\"\n— Wat: reserviert, spürbares Unbehagen, hält nicht viel von ihm\n— Tom: \"Der ehrlichste Betrüger, den er kennt\" — durchschaut ihn, mag ihn trotzdem\n— Josiah: \"Eine gute Seele\" — schlägt vor, ihn in der Kombüse zu besuchen, falls die Spieler ihn noch nicht kennen (organische Weiterleitung)\n— Dirk: \"Fast mit dem Schiff verwachsen\", lieber in Gesellschaft von Kanonen/Werkzeug als Menschen — bester Ansprechpartner bei Reparaturen, beeilt sich dabei nur, um die Spieler wieder loszuwerden",
         trigger: [
-          { id: "gefragt_harwick", label: "Nach Harwick gefragt" },
-          { id: "gefragt_cormac", label: "Nach Cormac gefragt" },
-          { id: "gefragt_wat", label: "Nach Wat gefragt" },
-          { id: "gefragt_tom", label: "Nach Tom gefragt" },
-          { id: "gefragt_josiah", label: "Nach Josiah gefragt (Kombüse-Hinweis gegeben)" },
-          { id: "gefragt_dirk", label: "Nach Dirk gefragt" }
+          { id: "gefragt_harwick", label: "Nach Harwick gefragt", info: "Harwick: warm, respektvoll, fast bewundernd." },
+          { id: "gefragt_cormac", label: "Nach Cormac gefragt", info: "Cormac: freundlich-distanziert, \"zu streng\"." },
+          { id: "gefragt_wat", label: "Nach Wat gefragt", info: "Wat: reserviert, spürbares Unbehagen, hält nicht viel von ihm." },
+          { id: "gefragt_tom", label: "Nach Tom gefragt", info: "Tom: \"Der ehrlichste Betrüger, den er kennt\" — durchschaut ihn, mag ihn trotzdem." },
+          { id: "gefragt_josiah", label: "Nach Josiah gefragt (Kombüse-Hinweis gegeben)", info: "Josiah: \"Eine gute Seele\" — schlägt vor, ihn in der Kombüse zu besuchen, falls die Spieler ihn noch nicht kennen." },
+          { id: "gefragt_dirk", label: "Nach Dirk gefragt", info: "Dirk: \"Fast mit dem Schiff verwachsen\", lieber in Gesellschaft von Kanonen/Werkzeug als Menschen — bester Ansprechpartner bei Reparaturen." }
         ]
       }
     }
@@ -380,10 +380,10 @@ const ORTE = {
         kurz: "Reaktion variiert je nachdem, wie der Spieler die Raubein-Szene im Bordell gelöst hat (oder ob er überhaupt dort war).",
         details: "Ned und Ezra reden über den Bordellbesuch, konkret über den Vorfall mit dem groben Gast und Constance' Reaktion darauf. Erkennen einen vorbeikommenden Spieler, falls der dort war — mit deutlich unterschiedlichem Ton je nach Ausgang:\n\n— War dort, hat physisch eingegriffen (Raubein-Szene, Bordell): warm, fast bewundernd — erzählen die Geschichte nochmal nach, mit kleinen Übertreibungen\n— War dort, hat sozial deeskaliert: anerkennend, ruhiger, würdigend, weniger überschwänglich\n— War dort, hat nicht eingegriffen: erkennen den Spieler, aber kühler — knapper, leicht distanzierter Kommentar, kein offener Vorwurf\n— War nicht dort: Ned wird sichtlich unangenehm berührt, wechselt das Thema — reine Verlegenheit, keine Folge",
         trigger: [
-          { id: "physisch", label: "Spieler hatte Raubein-Szene physisch gelöst → warm/bewundernd" },
-          { id: "sozial", label: "Spieler hatte sozial deeskaliert → anerkennend" },
-          { id: "nicht_eingegriffen", label: "War dort, nicht eingegriffen → kühl/distanziert" },
-          { id: "nicht_dort", label: "War nicht dort → Ned unangenehm, Themawechsel" }
+          { id: "physisch", label: "Spieler hatte Raubein-Szene physisch gelöst → warm/bewundernd", info: "War dort, hat physisch eingegriffen: warm, fast bewundernd — erzählen die Geschichte nochmal nach, mit kleinen Übertreibungen." },
+          { id: "sozial", label: "Spieler hatte sozial deeskaliert → anerkennend", info: "War dort, hat sozial deeskaliert: anerkennend, ruhiger, würdigend, weniger überschwänglich." },
+          { id: "nicht_eingegriffen", label: "War dort, nicht eingegriffen → kühl/distanziert", info: "War dort, hat nicht eingegriffen: erkennen den Spieler, aber kühler — knapper, leicht distanzierter Kommentar, kein offener Vorwurf." },
+          { id: "nicht_dort", label: "War nicht dort → Ned unangenehm, Themawechsel", info: "War nicht dort: Ned wird sichtlich unangenehm berührt, wechselt das Thema — reine Verlegenheit, keine Folge." }
         ]
       }
     }
@@ -411,8 +411,8 @@ const ORTE = {
         nichtInSzenen: ["3.1"],
         details: "Dirk arbeitet für sich an Kanonen und Werkzeug, einsilbig und abweisend bei reinem Small Talk.\n\nAuslöser: eine echte Mechanik-/Handwerks-Probe oder ein konkretes kaputtes Objekt, das der Spieler mitbringt oder anspricht — reines fachlich klingendes Gerede reicht nicht.\n\nBei Erfolg taut er kurz auf, einigermaßen interessiert — und merkt sich den Spieler intern. Kein sofortiger großer Lohn: Erst später, NACH der Sturm-Szene (eigener, noch auszuarbeitender Programmpunkt), kommt Dirk mit einem kniffligen mechanischen Problem auf genau diesen Spieler zu — dort besteht dann die Chance auf einen großen Ruf-Gewinn.\n\n> Korrektur (Juli 2026): Ursprünglich stand hier \"in der Sturm-Szene\" — Dirks Payoff liegt aber NACH dem Sturm, nicht während. Die Kanonen-Szene während des Sturms selbst (siehe Interaktion \"kanone_sturm\" unten) bleibt bewusst anonym, ohne Dirk namentlich zu erwähnen.",
         trigger: [
-          { id: "ausloeser_erfolgreich", label: "Mechanik-Probe/kaputtes Objekt erfolgreich → Dirk merkt sich Spieler" },
-          { id: "sturm_payoff", label: "NACH der Sturm-Szene: Dirk kommt auf Spieler zu → große Ruf-Chance" }
+          { id: "ausloeser_erfolgreich", label: "Mechanik-Probe/kaputtes Objekt erfolgreich → Dirk merkt sich Spieler", info: "Auslöser: eine echte Mechanik-/Handwerks-Probe oder ein konkretes kaputtes Objekt, das der Spieler mitbringt. Bei Erfolg taut Dirk kurz auf, einigermaßen interessiert — und merkt sich den Spieler intern." },
+          { id: "sturm_payoff", label: "NACH der Sturm-Szene: Dirk kommt auf Spieler zu → große Ruf-Chance", info: "Kein sofortiger Lohn: Erst später, NACH der Sturm-Szene, kommt Dirk mit einem kniffligen mechanischen Problem auf genau diesen Spieler zu — dort besteht die Chance auf einen großen Ruf-Gewinn (siehe \"Dirks Zielinstrument\", Schiffswrack)." }
         ]
       },
       "kanone_sturm": {
@@ -421,10 +421,10 @@ const ORTE = {
         nurSzenen: ["3.1"],
         details: "Nur relevant in der Sturm-Szene (3.1). Eine Kanone hat sich losgerissen und rollt bei jeder Welle bedrohlich hin und her (siehe Sturm-Flavortext des Batteriedecks).\n\nBewusst keine Namen, keine vorweggenommenen Handlungen im Flavortext — die Spieler wissen zu diesem Zeitpunkt nicht, wessen Position das ist oder wer die Aktion leitet. Dirk hilft zwar mit und ruft Anweisungen, wird aber nicht genannt.\n\nMehrere Spieler können gemeinsam beitragen, es muss nicht einer allein schaffen. Mindestens 3 kumulative erfolgreiche Körperproben nötig, um die Kanone zurück auf den Sockel zu stemmen.\n\n— Normaler oder Guter Erfolg zählt als ein Erfolg\n— Guter Erfolg zählt DOPPELT — reiner Fluff-Moment, keine mechanische Zusatzregel: Die Wucht beeindruckt sichtbar die umstehende Crew. Fällt irgendwann ein Guter Erfolg, braucht es danach nur noch einen weiteren normalen Erfolg\n— Misserfolg → 1 Schadenspunkt (von der Kanone gestreift / auf nassem Deck hingeschlagen)\n\nKein Ruf-Fokus — bleibt anonym im Chaos des Sturms.\n\nZukunfts-Notiz: Schaden aus dieser Szene bleibt bestehen und wirkt sich später auf der Schatzinsel aus — kann dort gefährlich werden oder einen Spieler ganz von der Schatzsuche ausschließen. Details folgen, wenn die Insel-Stationen ausgearbeitet werden.",
         trigger: [
-          { id: "erfolg_gewertet", label: "Normaler/Guter Erfolg gewertet" },
-          { id: "erfolg_gut_doppelt", label: "Guter Erfolg → zählt doppelt (Fluff)" },
-          { id: "kanone_gesichert", label: "3 Erfolge erreicht → Kanone gesichert" },
-          { id: "misserfolg_schaden", label: "Misserfolg → 1 Schadenspunkt (wirkt sich später auf Schatzinsel aus)" }
+          { id: "erfolg_gewertet", label: "Normaler/Guter Erfolg gewertet", info: "Mindestens 3 kumulative erfolgreiche Körperproben nötig, um die Kanone zurück auf den Sockel zu stemmen. Mehrere Spieler können gemeinsam beitragen." },
+          { id: "erfolg_gut_doppelt", label: "Guter Erfolg → zählt doppelt (Fluff)", info: "Guter Erfolg zählt DOPPELT — reiner Fluff-Moment: Die Wucht beeindruckt sichtbar die umstehende Crew. Fällt ein Guter Erfolg, braucht es danach nur noch einen weiteren normalen Erfolg." },
+          { id: "kanone_gesichert", label: "3 Erfolge erreicht → Kanone gesichert", info: "Die Kanone ist zurück auf dem Sockel gestemmt." },
+          { id: "misserfolg_schaden", label: "Misserfolg → 1 Schadenspunkt (wirkt sich später auf Schatzinsel aus)", info: "Misserfolg → 1 Schadenspunkt (von der Kanone gestreift / auf nassem Deck hingeschlagen). Zukunfts-Notiz: Schaden bleibt bestehen und wirkt sich später auf der Schatzinsel aus." }
         ]
       },
       "trewin_kater": {
@@ -433,9 +433,9 @@ const ORTE = {
         nichtInSzenen: ["3.1"], // Kater-Szene passt nicht zum Sturm-Chaos mit der losgerissenen Kanone am selben Ort
         details: "Die Trewin-Zwillinge sind hier anzutreffen, ihr Zustand hängt vom Ausgang des Trinkspiels in der Taverne ab:\n\n— Gewonnen (Spieler hat sie unter den Tisch gesoffen): über Kreuz übereinander in einer Hängematte verkeilt, stöhnen vor Übelkeit, zanken sich gegenseitig an, dass der andere Platz machen soll — können sich kaum bewegen\n— Verloren: triumphierend, spöttisch gegenüber dem Spieler\n— Nie angetreten: neutral, ignorieren den Spieler weitgehend",
         trigger: [
-          { id: "gewonnen", label: "Spieler hat Zwillinge besiegt → Kater-Szene" },
-          { id: "verloren", label: "Spieler hat verloren → triumphierend/spöttisch" },
-          { id: "nie_angetreten", label: "Nie angetreten → neutral" }
+          { id: "gewonnen", label: "Spieler hat Zwillinge besiegt → Kater-Szene", info: "Gewonnen (Spieler hat sie unter den Tisch gesoffen): über Kreuz übereinander in einer Hängematte verkeilt, stöhnen vor Übelkeit, zanken sich, dass der andere Platz machen soll." },
+          { id: "verloren", label: "Spieler hat verloren → triumphierend/spöttisch", info: "Verloren: triumphierend, spöttisch gegenüber dem Spieler." },
+          { id: "nie_angetreten", label: "Nie angetreten → neutral", info: "Nie angetreten: neutral, ignorieren den Spieler weitgehend." }
         ]
       }
     }
@@ -451,11 +451,11 @@ const ORTE = {
         kurz: "Nur der erste Spieler, der den Raum betritt. Mechanik-Probe: Guter Erfolg = Ruf-Plus, Misserfolg = Ruf-Malus, beide mittleren Bänder neutral.",
         details: "Der erste Spieler, der die Werkstatt betritt, wird ohne Umschweife eingespannt:\n\n„Schnapp dir den Fuchsschwanz und gib mir das auf 30 Zoll raus.“\n\n(Fuchsschwanz = Handsäge, benannt nach der spitz zulaufenden Blattform.) Der Mann am Tisch reicht ein Kanthol, schaut kaum auf, bleibt bei seiner eigenen Arbeit.\n\nMechanik-Probe:\n— Guter Erfolg: Schnitt exakt auf Maß, kurzes Nicken → Ruf-Gewinn\n— Normaler Erfolg: brauchbar, kein Kommentar → neutral\n— Schlechter Erfolg: sichtbar daneben, wortlos beiseitegelegt → neutral\n— Misserfolg: Kanthol splittert oder grob falsches Maß — einziger Moment, in dem er wirklich aufsieht → Ruf-Malus\n\nNachkommende Spieler bekommen keine eigene Aufgabe. Auf Nachfrage: „Wir kommen zurecht, geh zu Cormac, wenn du Arbeit suchst.“",
         trigger: [
-          { id: "erster_eingespannt", label: "Erster Spieler eingespannt" },
-          { id: "guter_erfolg", label: "Guter Erfolg → Ruf-Plus" },
-          { id: "normaler_erfolg", label: "Normaler Erfolg → neutral" },
-          { id: "schlechter_erfolg", label: "Schlechter Erfolg → neutral" },
-          { id: "misserfolg", label: "Misserfolg → Ruf-Malus" }
+          { id: "erster_eingespannt", label: "Erster Spieler eingespannt", info: "Der erste Spieler, der die Werkstatt betritt, wird ohne Umschweife eingespannt: „Schnapp dir den Fuchsschwanz und gib mir das auf 30 Zoll raus.“ Der Mann am Tisch reicht ein Kanthol, schaut kaum auf." },
+          { id: "guter_erfolg", label: "Guter Erfolg → Ruf-Plus", info: "Guter Erfolg: Schnitt exakt auf Maß, kurzes Nicken → Ruf-Gewinn." },
+          { id: "normaler_erfolg", label: "Normaler Erfolg → neutral", info: "Normaler Erfolg: brauchbar, kein Kommentar → neutral." },
+          { id: "schlechter_erfolg", label: "Schlechter Erfolg → neutral", info: "Schlechter Erfolg: sichtbar daneben, wortlos beiseitegelegt → neutral." },
+          { id: "misserfolg", label: "Misserfolg → Ruf-Malus", info: "Misserfolg: Kanthol splittert oder grob falsches Maß — einziger Moment, in dem er wirklich aufsieht → Ruf-Malus. Nachkommende Spieler bekommen keine eigene Aufgabe: „Wir kommen zurecht, geh zu Cormac, wenn du Arbeit suchst.“" }
         ]
       }
     }
@@ -471,8 +471,8 @@ const ORTE = {
         kurz: "Geschick- oder Geheim-Probe. Erfolg = nichts passiert, Misserfolg = Gemecker + Ruf-Malus für alle anwesenden Spieler.",
         details: "Spieler, die das Unterdeck durchqueren, während dort geschlafen wird, würfeln auf Geschick oder Geheim.\n\n— Erfolg: nichts, unauffällig durch\n— Misserfolg: Gemecker von den Gestörten, Ruf-Malus für alle anwesenden Spieler (nicht nur für den Verursacher)",
         trigger: [
-          { id: "erfolg", label: "Erfolg → unauffällig durch" },
-          { id: "misserfolg", label: "Misserfolg → Gemecker, Ruf-Malus für alle Anwesenden" }
+          { id: "erfolg", label: "Erfolg → unauffällig durch", info: "Erfolg: nichts, unauffällig durch." },
+          { id: "misserfolg", label: "Misserfolg → Gemecker, Ruf-Malus für alle Anwesenden", info: "Misserfolg: Gemecker von den Gestörten, Ruf-Malus für alle anwesenden Spieler (nicht nur für den Verursacher)." }
         ]
       }
     }
@@ -499,10 +499,10 @@ const ORTE = {
         nichtInSzenen: ["3.1"], // T+30 (spätestens Wat) liegt vor T+60 (Sturm) - Subplot ist bis dahin immer durch
         details: "Ist die Bildvariante \"Standard\" aktiv und durchsucht ein Spieler gezielt den Raum (z.B. „ich durchsuche den Raum“), wird der Junge ohne Probe gefunden.\n\nDanach, drei mögliche Verläufe:\n— Spieler holen ihn aus dem Frachtraum heraus → Wat bekommt es mit, die Konfrontationsszene an Deck (Pfad B) startet\n— Spieler lassen ihn dort, gehen aber vor T+30 direkt zu Josiah, Francesco, Cormac oder Tom → Wat findet ihn nicht\n— Spieler lassen ihn dort, unternehmen lange Zeit nichts → er findet irgendwann aus Hunger von selbst zu Josiah\n\nSL-Ermessen: Ob und wie hart Pfad B (Wat-Konfrontation) tatsächlich ausfällt, liegt im Spielraum des Spielleiters — abhängig z.B. davon, ob die Gruppe Wat schon kennengelernt hat, ob eine härtere Version gerade der Charakterbildung nützt, oder ob die Gruppe ohnehin aggressiv gestimmt ist und eskalieren würde. Keine feste Regel, reine Spielleiter-Freiheit (vgl. Design-Prinzip \"Gutes Rollenspiel schlägt Mechanik\").",
         trigger: [
-          { id: "gefunden", label: "Junge im Frachtraum gefunden" },
-          { id: "rausgeholt", label: "Spieler holen ihn raus → Wat bemerkt es, Pfad B startet" },
-          { id: "vertrauensperson", label: "Josiah/Francesco/Cormac/Tom vor T+30 informiert → Wat findet ihn nicht" },
-          { id: "untaetig", label: "Spieler bleiben untätig → Junge findet von selbst zu Josiah" }
+          { id: "gefunden", label: "Junge im Frachtraum gefunden", info: "Ist die Bildvariante \"Standard\" aktiv und durchsucht ein Spieler gezielt den Raum, wird der Junge ohne Probe gefunden." },
+          { id: "rausgeholt", label: "Spieler holen ihn raus → Wat bemerkt es, Pfad B startet", info: "Spieler holen ihn aus dem Frachtraum heraus → Wat bekommt es mit, die Konfrontationsszene an Deck (Pfad B) startet." },
+          { id: "vertrauensperson", label: "Josiah/Francesco/Cormac/Tom vor T+30 informiert → Wat findet ihn nicht", info: "Spieler lassen ihn dort, gehen aber vor T+30 direkt zu Josiah, Francesco, Cormac oder Tom → Wat findet ihn nicht." },
+          { id: "untaetig", label: "Spieler bleiben untätig → Junge findet von selbst zu Josiah", info: "Spieler lassen ihn dort, unternehmen lange Zeit nichts → er findet irgendwann aus Hunger von selbst zu Josiah." }
         ]
       },
       "knoten_streich": {
@@ -511,7 +511,7 @@ const ORTE = {
         nichtInSzenen: ["3.1"], // dito - Frachtraum-Varianten spielen im Sturm keine Rolle mehr, siehe "wassereinbruch_sturm"
         details: "Siehe Achterdeck-Interaktion „Knoten-Streich“: Tom schickt den Spieler mit dem niedrigsten Seefahrt-Wert in den Frachtraum, um „ein paar Knoten mehr“ zu holen. Trifft der Spieler dort ein, hängt der Zustand von der aktiven Bildvariante ab — versteckter Junge (Standard) oder leerer Raum (Leer).",
         trigger: [
-          { id: "angekommen", label: "Spieler wegen Knoten-Streich im Frachtraum angekommen" }
+          { id: "angekommen", label: "Spieler wegen Knoten-Streich im Frachtraum angekommen", info: "Trifft der Spieler dort ein, hängt der Zustand von der aktiven Bildvariante ab — versteckter Junge (Standard) oder leerer Raum (Leer)." }
         ]
       },
       "wassereinbruch_sturm": {
@@ -520,10 +520,10 @@ const ORTE = {
         nurSzenen: ["3.1"],
         details: "Nur relevant in der Sturm-Szene (3.1) — löst die Frachtraum-Varianten (Standard/Leer) für diese Szene ab, der blinde Passagier ist zu diesem Zeitpunkt kein Thema mehr im Raum. Der Frachtraum steht knöcheltief unter Wasser, sofort sichtbar beim Betreten (kein Wurf).\n\nZwei nötige Schritte, um das Problem zu lösen:\n1. Pumpen — Spieler mit Seefahrt-Wissen wissen sofort, wo die schiffseigene Pumpe sitzt und wie man sie bedient (kein Wurf, reines Fachwissen). Das Pumpen selbst ist eine Körper-Probe. Hält den Wasserstand nur im Zaum, dichtet aber nichts ab.\n2. Abdichten — jemand muss aktiv in der Werkstatt nach Planken fragen (keine Probe, reine Handlung), dann Mechanik-Probe (alternativ Geschick), um das Leck zu stopfen.\n\nRuf hängt am WIE, nicht am WOHER der Lösung:\n— Selbstorganisiert (Spieler erkennen das Problem, bringen Pumpen + Planken von sich aus in Gang) → Ruf-Gewinn bei der Crew allgemein\n— Auf Anweisung von Cormac oder Dirk (falls Spieler nicht selbst aktiv werden) → neutral\n— Misserfolg bei Pumpen/Abdichten → kein Malus, geht im allgemeinen Chaos des Sturms unter\n\nDirks eigentlicher Sturm-Payoff (siehe Batteriedeck-Interaktion „dirk_vertrauen“) ist ein separates, späteres Ereignis NACH dem Sturm — nicht dieses hier.",
         trigger: [
-          { id: "erkannt", label: "Wassereinbruch erkannt" },
-          { id: "selbstorganisiert", label: "Spieler organisieren sich selbst → Ruf-Gewinn Crew" },
-          { id: "auf_anweisung", label: "Auf Anweisung (Cormac/Dirk) → neutral" },
-          { id: "geloest", label: "Pumpen + Abdichten erfolgreich → Problem gelöst" }
+          { id: "erkannt", label: "Wassereinbruch erkannt", info: "Der Frachtraum steht knöcheltief unter Wasser, sofort sichtbar beim Betreten (kein Wurf). Zwei nötige Schritte: Pumpen (Körper-Probe, hält den Wasserstand nur im Zaum) und Abdichten (Planken aus der Werkstatt holen, dann Mechanik- oder Geschick-Probe zum Leck stopfen)." },
+          { id: "selbstorganisiert", label: "Spieler organisieren sich selbst → Ruf-Gewinn Crew", info: "Selbstorganisiert (Spieler erkennen das Problem, bringen Pumpen + Planken von sich aus in Gang) → Ruf-Gewinn bei der Crew allgemein." },
+          { id: "auf_anweisung", label: "Auf Anweisung (Cormac/Dirk) → neutral", info: "Auf Anweisung von Cormac oder Dirk (falls Spieler nicht selbst aktiv werden) → neutral." },
+          { id: "geloest", label: "Pumpen + Abdichten erfolgreich → Problem gelöst", info: "Misserfolg bei Pumpen/Abdichten → kein Malus, geht im allgemeinen Chaos des Sturms unter." }
         ]
       }
     }
@@ -559,12 +559,12 @@ const ORTE = {
         kurz: "Die Golden Lion läuft mit gebrochenem Mast auf den Strand auf. Reiner Erzählmoment, kein Wurf — Spieler können jederzeit eingreifen, SL entscheidet.",
         details: "Mit Knarren und Zittern schleppt sich die Golden Lion auf den Strand. Niemand traut sich mehr, am angeknacksten Mast die Segel zu bergen — der gibt beim abrupten Stopp ohnehin nach und knickt einfach ein, Holz, so dick wie ein Mensch, bricht wie ein Streichholz. Das Schiff schlingert zur Seite und frisst sich trotzdem tief in den Sand. Eins ist klar: Hier kommen sie so schnell nicht wieder weg.\n\nEin großer Teil der Crew blickt sich verunsichert um. Tom, ganz vorn am Bug — das Ruder war schon eine Weile nutzlos —, schaut auf seinen Kompass, blickt auf und sucht Augenkontakt mit Harwick, der inzwischen sein Quartier verlassen hat. Ein kurzes Nicken von Harwick, und Tom bricht in lautes Lachen aus. (GM-Hinweis: Das ist der Moment, der den Sturm-Reveal bestätigt, dass Tom das Schiff absichtlich hierher gesteuert hat — siehe 10.11/Bibel 16 \"Reveal\". Bleibt für die Spieler unerklärt, nur der Blick zählt.)\n\nWer hier nicht versteht, was gerade passiert ist, ist nicht allein. Cormac nickt den Leuten anerkennend zu, die sich im Sturm nützlich gemacht haben, und auch Tom. Weil das Ausmaß noch niemand richtig begriffen hat, steht die Crew wie eingefroren — bis Harwick die Stille mit seiner charismatischen, freundlichen Stimme durchbricht. Er reibt sich die Hände: „Dann wollen wir mal!“ Schneidet ein Seil an einer Winde durch und lässt sich damit vom Deck ab.\n\nUnten am Strand, weit unterhalb aller, die noch an Deck stehen, kratzt er sich am Hinterkopf und blickt zurück nach oben. „Das haben wir aber auch schon ruhiger hierhergeschafft, Tom!“ Kopfschüttelnd geht er ums Schiff, um es zu inspizieren.\n\nDie Crew erwacht langsam aus der Starre und beginnt, das Schiff zu verlassen — mit Hilfe der Zimmerer werden Leitern gebaut, manche klettern direkt aus dem Frachtraum ins Freie. Schnell wird klar: Hier liegt eine Menge Arbeit vor allen. Trotzdem stellt Harwick auf einmal eine kleine Gruppe zusammen und ordert bestimmte Leute zu sich.",
         trigger: [
-          { id: "aufgelaufen", label: "Schiff läuft mit gebrochenem Mast auf den Strand auf" },
-          { id: "blickkontakt", label: "Tom & Harwick tauschen einen Blick, Tom lacht auf" },
-          { id: "abgeseilt", label: "Harwick durchtrennt ein Seil, seilt sich vom Deck ab" },
-          { id: "seitenhieb", label: "Harwicks Seitenhieb an Tom (\"...auch schon ruhiger hierhergeschafft\")" },
-          { id: "crew_verlaesst_schiff", label: "Crew verlässt langsam das Schiff (Leitern/Frachtraum)" },
-          { id: "gruppe_zusammengestellt", label: "Harwick stellt eine kleine Gruppe zusammen, ordert Leute zu sich" }
+          { id: "aufgelaufen", label: "Schiff läuft mit gebrochenem Mast auf den Strand auf", info: "Mit Knarren und Zittern schleppt sich die Golden Lion auf den Strand. Der angeknackste Mast gibt beim abrupten Stopp nach und knickt ein. Das Schiff frisst sich tief in den Sand — hier kommt niemand so schnell wieder weg." },
+          { id: "blickkontakt", label: "Tom & Harwick tauschen einen Blick, Tom lacht auf", info: "Tom, ganz vorn am Bug, sucht Augenkontakt mit Harwick. Ein kurzes Nicken, und Tom bricht in lautes Lachen aus. (GM-Hinweis: bestätigt später den Sturm-Reveal, dass Tom das Schiff absichtlich hierher gesteuert hat — bleibt für die Spieler unerklärt.)" },
+          { id: "abgeseilt", label: "Harwick durchtrennt ein Seil, seilt sich vom Deck ab", info: "Harwick durchbricht die Stille: „Dann wollen wir mal!“ Schneidet ein Seil an einer Winde durch und lässt sich damit vom Deck ab." },
+          { id: "seitenhieb", label: "Harwicks Seitenhieb an Tom (\"...auch schon ruhiger hierhergeschafft\")", info: "Unten am Strand kratzt er sich am Hinterkopf, blickt zurück nach oben: „Das haben wir aber auch schon ruhiger hierhergeschafft, Tom!“ Kopfschüttelnd geht er ums Schiff, um es zu inspizieren." },
+          { id: "crew_verlaesst_schiff", label: "Crew verlässt langsam das Schiff (Leitern/Frachtraum)", info: "Cormac nickt den Leuten anerkennend zu, die sich im Sturm nützlich gemacht haben. Die Crew erwacht langsam aus der Starre — mit Hilfe der Zimmerer werden Leitern gebaut, manche klettern direkt aus dem Frachtraum ins Freie." },
+          { id: "gruppe_zusammengestellt", label: "Harwick stellt eine kleine Gruppe zusammen, ordert Leute zu sich", info: "Trotzdem stellt Harwick auf einmal eine kleine Gruppe zusammen und ordert bestimmte Leute zu sich." }
         ]
       },
       "dirk_payoff": {
@@ -572,10 +572,10 @@ const ORTE = {
         kurz: "Nur für den EINEN Spieler, der Dirk beim Batteriedeck (Bibel 10.4) überzeugt hat — SL weiß, wer das war. Kniffliges Handwerksproblem, großer Ruf-Gewinn bei Erfolg.",
         details: "Etwas abseits vom Trubel, dort wo das Werkzeug liegt, winkt Dirk den Spieler heran — knapp, ohne Umschweife. Aus einem ölig glänzenden Lederbeutel holt er ein kleines Messinginstrument hervor, ein Schusswinkelmesser, wie es auf keinem Handelsschiff zu finden ist. Der Zeiger ist verbogen, das Gehäuse eingedrückt — vom Sturm, oder vom Sturz danach. Seine Finger sind zu grob für die Feinarbeit, seine Werkzeuge hier am Strand zu roh. Er schiebt es dem Spieler wortlos hin. Erst auf Nachfrage, einsilbig: „Von meinem ersten Schiff. Kriegsmarine. Vor eurer Zeit.“ Mehr sagt er nicht — es ist bereits mehr, als er sonst über sich verliert.\n\nErfolg (Handwerk/Geschick-Probe): Das Instrument lässt sich wieder ausrichten. Dirk prüft es lange, bevor er nickt — dann, kaum hörbar: „Hätte nicht gedacht, dass hier einer weiß, wie man sowas anfasst.“ Für einen Moment ist die harte Schale weg. Großer Ruf-Gewinn bei Dirk.\n\nMisserfolg: Das Instrument bleibt kaputt. Dirk nimmt es zurück, zuckt mit den Schultern, sagt nichts weiter dazu. Kein Malus — er hat nichts anderes erwartet.",
         trigger: [
-          { id: "dirk_sucht_auf", label: "Dirk sucht den Spieler abseits vom Trubel auf" },
-          { id: "problem_gezeigt", label: "Zeigt das beschädigte Zielinstrument, bittet indirekt um Hilfe" },
-          { id: "erfolg_aufgetaut", label: "Reparatur gelingt — Dirk taut kurz auf, großer Ruf-Gewinn" },
-          { id: "misserfolg_kein_malus", label: "Reparatur gelingt nicht — Dirk nimmt es hin, kein Malus" }
+          { id: "dirk_sucht_auf", label: "Dirk sucht den Spieler abseits vom Trubel auf", info: "Etwas abseits vom Trubel, dort wo das Werkzeug liegt, winkt Dirk den Spieler heran — knapp, ohne Umschweife." },
+          { id: "problem_gezeigt", label: "Zeigt das beschädigte Zielinstrument, bittet indirekt um Hilfe", info: "Aus einem ölig glänzenden Lederbeutel holt er ein kleines Messinginstrument hervor, Zeiger verbogen, Gehäuse eingedrückt. Er schiebt es wortlos hin. Auf Nachfrage: „Von meinem ersten Schiff. Kriegsmarine. Vor eurer Zeit.“" },
+          { id: "erfolg_aufgetaut", label: "Reparatur gelingt — Dirk taut kurz auf, großer Ruf-Gewinn", info: "Dirk prüft es lange, bevor er nickt — dann, kaum hörbar: „Hätte nicht gedacht, dass hier einer weiß, wie man sowas anfasst.“ Für einen Moment ist die harte Schale weg. Großer Ruf-Gewinn bei Dirk." },
+          { id: "misserfolg_kein_malus", label: "Reparatur gelingt nicht — Dirk nimmt es hin, kein Malus", info: "Das Instrument bleibt kaputt. Dirk nimmt es zurück, zuckt mit den Schultern, sagt nichts weiter dazu. Kein Malus — er hat nichts anderes erwartet." }
         ]
       },
       "loser_balken": {
@@ -583,12 +583,12 @@ const ORTE = {
         kurz: "Ein Baumstamm gerät an der Seilwinde außer Kontrolle und schwingt auf einen Spieler zu. Weicht er aus, trifft es Sam Oakley stattdessen — daraus folgt eine Erste-Hilfe-Probe.",
         details: "Ein frisch gefällter Stamm hängt in der Seilwinde, halb hochgezogen zum Trockengestell. Das Tau ist nass, die Knoten improvisiert. Ein Ruck — die Winde rutscht durch, der Stamm schwingt lose durch die Luft, direkt auf einen der Spieler zu. Nur wenige Schritte hinter ihm arbeitet Sam Oakley, in seine Aufgabe vertieft, den Rücken zur Gefahr.\n\nWeicht der Spieler aus (Körper/Reflex-Probe): Er selbst kommt unversehrt davon — der Stamm schwingt weiter und trifft Sam an Schulter oder Rücken. Er geht zu Boden, blutet aus einer Platzwunde, humpelt fortan. Jetzt zählt schnelles Handeln: Ohne Erste Hilfe (Probe) blutet die Wunde unschön weiter, wird aber nicht lebensbedrohlich; bei Erfolg ist Sam rasch versorgt und dankbar — kleiner Ruf-Gewinn.\n\nWirft sich der Spieler stattdessen dazwischen, um Sam aus der Bahn zu ziehen oder den Stamm selbst abzufangen (schwerere Probe): Bei Erfolg werden beide verschont — spürbarer Ruf-Gewinn bei der Crew, die das mitbekommt. Bei Misserfolg trifft es stattdessen den Spieler selbst.",
         trigger: [
-          { id: "ausser_kontrolle", label: "Balken gerät an der Winde außer Kontrolle, schwingt auf einen Spieler zu" },
-          { id: "ausgewichen", label: "Spieler weicht aus — Sam Oakley wird getroffen" },
-          { id: "erste_hilfe", label: "Erste-Hilfe-Probe an Sam — Erfolg/Misserfolg" },
-          { id: "eingegriffen", label: "Spieler wirft sich dazwischen, versucht Sam zu schützen oder den Stamm abzufangen" },
-          { id: "beide_verschont", label: "Erfolg beim Eingreifen — beide verschont, Ruf-Gewinn bei der Crew" },
-          { id: "spieler_getroffen", label: "Misserfolg beim Eingreifen — Spieler selbst wird getroffen" }
+          { id: "ausser_kontrolle", label: "Balken gerät an der Winde außer Kontrolle, schwingt auf einen Spieler zu", info: "Ein frisch gefällter Stamm hängt in der Seilwinde. Das Tau ist nass, die Knoten improvisiert. Ein Ruck — die Winde rutscht durch, der Stamm schwingt lose auf einen Spieler zu. Nur wenige Schritte hinter ihm arbeitet Sam Oakley, den Rücken zur Gefahr." },
+          { id: "ausgewichen", label: "Spieler weicht aus — Sam Oakley wird getroffen", info: "Weicht der Spieler aus (Körper/Reflex-Probe): Er selbst kommt unversehrt davon — der Stamm schwingt weiter und trifft Sam an Schulter oder Rücken. Er geht zu Boden, blutet aus einer Platzwunde, humpelt fortan." },
+          { id: "erste_hilfe", label: "Erste-Hilfe-Probe an Sam — Erfolg/Misserfolg", info: "Jetzt zählt schnelles Handeln: Ohne Erste Hilfe blutet die Wunde unschön weiter, wird aber nicht lebensbedrohlich; bei Erfolg ist Sam rasch versorgt und dankbar — kleiner Ruf-Gewinn." },
+          { id: "eingegriffen", label: "Spieler wirft sich dazwischen, versucht Sam zu schützen oder den Stamm abzufangen", info: "Wirft sich der Spieler stattdessen dazwischen, um Sam aus der Bahn zu ziehen oder den Stamm selbst abzufangen (schwerere Probe)." },
+          { id: "beide_verschont", label: "Erfolg beim Eingreifen — beide verschont, Ruf-Gewinn bei der Crew", info: "Bei Erfolg werden beide verschont — spürbarer Ruf-Gewinn bei der Crew, die das mitbekommt." },
+          { id: "spieler_getroffen", label: "Misserfolg beim Eingreifen — Spieler selbst wird getroffen", info: "Bei Misserfolg trifft es stattdessen den Spieler selbst." }
         ]
       },
       "wat_holzfaellen": {
@@ -596,8 +596,8 @@ const ORTE = {
         kurz: "Reiner Rollenspiel-Moment, kein Wurf — Wat zeigt beim Holzfällen eine ruhige, kompetente Seite, ein Kontrast zu seinem Auftritt in der Taverne.",
         details: "Am Waldrand, wo das Holz gefällt wird, führt Wat den Trupp — ruhig, methodisch, ganz anders als der Mann aus der Kneipe. Er zeigt, wo die Axt ansetzen muss, korrigiert mit knappen Handbewegungen statt Worten. Kämpft jemand sichtlich mit dem Gewicht oder trifft daneben, übernimmt er kurz selbst, ohne ein Wort des Spotts — und gibt das Werkzeug danach kommentarlos zurück.",
         trigger: [
-          { id: "beobachtet", label: "Spieler arbeitet mit der Holzfäll-Gruppe / beobachtet Wat" },
-          { id: "hilft_leise", label: "Wat hilft still jemandem, der mit der Arbeit kämpft, ohne Spott" }
+          { id: "beobachtet", label: "Spieler arbeitet mit der Holzfäll-Gruppe / beobachtet Wat", info: "Am Waldrand führt Wat den Trupp — ruhig, methodisch, ganz anders als der Mann aus der Kneipe. Er zeigt, wo die Axt ansetzen muss, korrigiert mit knappen Handbewegungen statt Worten." },
+          { id: "hilft_leise", label: "Wat hilft still jemandem, der mit der Arbeit kämpft, ohne Spott", info: "Kämpft jemand sichtlich mit dem Gewicht oder trifft daneben, übernimmt er kurz selbst, ohne ein Wort des Spotts — und gibt das Werkzeug danach kommentarlos zurück." }
         ]
       },
       "josiahs_feuerstelle": {
@@ -605,8 +605,8 @@ const ORTE = {
         kurz: "Niedrigschwelliger Rollenspiel-Moment, kein Wurf — Josiah bittet um Hilfe beim Bau einer improvisierten Feuerstelle.",
         details: "Josiah klatscht in die Hände und schaut sich nach Freiwilligen um: „Kein Feuer, kein Essen — und ohne Essen macht mir hier keiner mehr die Arbeit!“ Wer hilft, bekommt sein loses, aufmunterndes Geplauder ab — und die feste Zusage, als Erster an die Pfanne zu kommen, sobald es wieder etwas zu kochen gibt.",
         trigger: [
-          { id: "angesprochen", label: "Josiah bittet aktiv um Hilfe beim Feuerstellenbau" },
-          { id: "geholfen", label: "Spieler hilft mit — kleiner warmer Moment mit Josiah" }
+          { id: "angesprochen", label: "Josiah bittet aktiv um Hilfe beim Feuerstellenbau", info: "Josiah klatscht in die Hände und schaut sich nach Freiwilligen um: „Kein Feuer, kein Essen — und ohne Essen macht mir hier keiner mehr die Arbeit!“" },
+          { id: "geholfen", label: "Spieler hilft mit — kleiner warmer Moment mit Josiah", info: "Wer hilft, bekommt sein loses, aufmunterndes Geplauder ab — und die feste Zusage, als Erster an die Pfanne zu kommen, sobald es wieder etwas zu kochen gibt." }
         ]
       },
       "josiahs_geschichte_haendler": {
@@ -614,11 +614,11 @@ const ORTE = {
         kurz: "Für die Zurückgebliebenen (nicht ins Dorf mitgegangen): Josiah erzählt eine stark verkürzte, zweite-Hand-Version von Vanthei/Jessica. Kein Sorathi, kein Wat-Geheimnis, kein emotionaler Moment. Ein Thahal-Händler bringt etwas oberflächlichen Insel-Kontakt.",
         details: "Josiah erzählt am Feuer, warmherzig wie immer: Harwick ist den Thahal seit Jahren als „Vanthei“ bekannt, ein Freund, der mit ihnen handelt — er lagert dort angeblich glänzendes Gut, das eines Tages der Inselgöttin übergeben werden soll, sobald genug davon zusammengekommen ist. Es gab eine Tochter, Jessica, die vor einigen Jahren gestorben ist. Mehr weiß — oder sagt — Josiah dazu nicht.\n\nNichts von alldem erreicht die Tiefe der Geschichte, die sich gerade im Dorf abspielt: Sorathi, Wats Verbindung zu ihm, der Moment, in dem Harwicks Fassung bricht — das bleibt allein denen vorbehalten, die mitgegangen sind.\n\nTrotzdem bleibt der Strand nicht ganz ohne Thahal-Kontakt: Ein Händler aus dem Dorf sucht das Wrack auf, tauscht dort hergestellte Gegenstände gegen Tuch und Werkzeug. Er ist freundlich, geschäftsmäßig, und plaudert nebenbei ein wenig über die Insel — nichts, was er nicht auch einem x-beliebigen Fremden erzählen würde.",
         trigger: [
-          { id: "josiah_erzaehlt", label: "Josiah erzählt die verkürzte Vanthei/Jessica-Geschichte am Feuer" },
-          { id: "grobe_eckpunkte_nur", label: "Nur grobe Eckpunkte — kein Sorathi, kein Wat-Geheimnis, keine Emotion" },
-          { id: "haendler_kommt", label: "Ein Thahal-Händler sucht das Wrack auf" },
-          { id: "handel_tuch_werkzeug", label: "Handel: Dorf-Gegenstände gegen Tuch und Werkzeug" },
-          { id: "oberflaechliche_infos", label: "Händler plaudert nur oberflächlich über die Insel" }
+          { id: "josiah_erzaehlt", label: "Josiah erzählt die verkürzte Vanthei/Jessica-Geschichte am Feuer", info: "Josiah erzählt am Feuer, warmherzig wie immer: Harwick ist den Thahal seit Jahren als „Vanthei“ bekannt, ein Freund, der mit ihnen handelt — er lagert dort angeblich glänzendes Gut, das eines Tages der Inselgöttin übergeben werden soll." },
+          { id: "grobe_eckpunkte_nur", label: "Nur grobe Eckpunkte — kein Sorathi, kein Wat-Geheimnis, keine Emotion", info: "Es gab eine Tochter, Jessica, die vor einigen Jahren gestorben ist. Mehr weiß — oder sagt — Josiah dazu nicht. Nichts von alldem erreicht die Tiefe der Geschichte, die sich gerade im Dorf abspielt." },
+          { id: "haendler_kommt", label: "Ein Thahal-Händler sucht das Wrack auf", info: "Der Strand bleibt trotzdem nicht ganz ohne Thahal-Kontakt: Ein Händler aus dem Dorf sucht das Wrack auf." },
+          { id: "handel_tuch_werkzeug", label: "Handel: Dorf-Gegenstände gegen Tuch und Werkzeug", info: "Er tauscht dort hergestellte Gegenstände gegen Tuch und Werkzeug." },
+          { id: "oberflaechliche_infos", label: "Händler plaudert nur oberflächlich über die Insel", info: "Er ist freundlich, geschäftsmäßig, und plaudert nebenbei ein wenig über die Insel — nichts, was er nicht auch einem x-beliebigen Fremden erzählen würde." }
         ]
       },
       "eber_und_wundbrand": {
@@ -626,15 +626,15 @@ const ORTE = {
         kurz: "Auf dem Rückweg vom Dorf erwischt ein Wildschwein Ezra Coombe (2 Treffer erlegen es). Zurück am Schiff verweigert Schiffsarzt Silas Pott aus Angst um seinen Posten die nötige Amputation — Wundbrand und Sepsis zwingen zum dringenden Kurs auf einen Hafen.",
         details: "Auf dem Rückweg raschelt es plötzlich im Gebüsch — ein großer Eber stürmt aus dem Unterholz auf die Gruppe zu. Er erwischt Ezra Coombe, der in hohem Bogen zu Boden fliegt.\n\nDas Tier bleibt kampfbereit stehen. Die Spieler haben jetzt die Chance, es anzugreifen — zwei Treffer reichen, um es zu erlegen. Erlegt, kann die Crew das Fleisch mitnehmen, was die angeschlagene Stimmung im Lager spürbar hebt.\n\nEzra selbst ist schwer verletzt und muss getragen werden — den Rest des Weges zurück zum Schiff.\n\nDort übernimmt Silas Pott die Versorgung der Verletzten — er hat schon einige nach dem Sturm behandelt und gilt als Schiffsarzt, so unqualifiziert er auch sein mag. Hat ein Spieler selbst medizinische Erfahrung, entsteht schnell ein Gegenpol: Silas spürt, dass dieser Spieler vermutlich der bessere Arzt wäre — und das ängstigt ihn. Er lässt sich kaum von der körperlichen Arbeit abnehmen, außer dem gelegentlichen Amputieren.\n\nSchlägt der Spieler eine Amputation vor oder greift generell ein, spielt sich Silas auf: Er könne diese kleine Verletzung auch ohne Amputation heilen, erklärt er Harwick und Cormac gegenüber — und macht unmissverständlich klar, dass er sich von „diesen dilettantischen Spielern“ nicht dreinreden lassen will.\n\nDas ist der Auftakt zur Katastrophe: Wundbrand setzt ein, die Sepsis wandert bereits den Oberschenkel hoch. Ein erfahrener Spieler erkennt eindeutig: Das Bein muss ab. Doch es geht nicht am Oberschenkel — die Hauptschlagader lässt sich hier nicht sauber abklemmen. An Bord der Golden Lion fehlen sowohl das nötige Werkzeug als auch die Arznei dafür.\n\nEs bleibt keine Wahl: Ein Hafen muss dringend angesteuert werden.",
         trigger: [
-          { id: "eber_greift_an", label: "Ein Wildschwein stürmt aus dem Gebüsch, erwischt Ezra Coombe" },
-          { id: "kampf_gegen_eber", label: "Kampf gegen den Eber — 2 Treffer erlegen ihn" },
-          { id: "eber_erbeutet", label: "Erlegtes Schwein hebt die Stimmung im Lager" },
-          { id: "silas_uebernimmt", label: "Silas Pott übernimmt die Versorgung der Verletzten" },
-          { id: "gegenpol_spieler", label: "Gegenpol zum medizinisch erfahrenen Spieler — Silas fürchtet um seinen Posten" },
-          { id: "silas_verweigert", label: "Silas verweigert die Amputation, spielt sich vor Harwick/Cormac auf" },
-          { id: "wundbrand_sepsis", label: "Wundbrand setzt ein, Sepsis wandert den Oberschenkel hoch" },
-          { id: "amputation_unmoeglich", label: "Amputation am Oberschenkel technisch unmöglich (Hauptschlagader)" },
-          { id: "kurs_auf_hafen", label: "Ein Hafen muss dringend angesteuert werden" }
+          { id: "eber_greift_an", label: "Ein Wildschwein stürmt aus dem Gebüsch, erwischt Ezra Coombe", info: "Auf dem Rückweg raschelt es plötzlich im Gebüsch — ein großer Eber stürmt aus dem Unterholz auf die Gruppe zu. Er erwischt Ezra Coombe, der in hohem Bogen zu Boden fliegt." },
+          { id: "kampf_gegen_eber", label: "Kampf gegen den Eber — 2 Treffer erlegen ihn", info: "Das Tier bleibt kampfbereit stehen. Die Spieler haben jetzt die Chance, es anzugreifen — zwei Treffer reichen, um es zu erlegen." },
+          { id: "eber_erbeutet", label: "Erlegtes Schwein hebt die Stimmung im Lager", info: "Erlegt, kann die Crew das Fleisch mitnehmen, was die angeschlagene Stimmung im Lager spürbar hebt. Ezra selbst ist schwer verletzt und muss getragen werden — den Rest des Weges zurück zum Schiff." },
+          { id: "silas_uebernimmt", label: "Silas Pott übernimmt die Versorgung der Verletzten", info: "Silas Pott übernimmt die Versorgung — er hat schon einige nach dem Sturm behandelt und gilt als Schiffsarzt, so unqualifiziert er auch sein mag." },
+          { id: "gegenpol_spieler", label: "Gegenpol zum medizinisch erfahrenen Spieler — Silas fürchtet um seinen Posten", info: "Hat ein Spieler selbst medizinische Erfahrung, entsteht schnell ein Gegenpol: Silas spürt, dass dieser Spieler vermutlich der bessere Arzt wäre — und das ängstigt ihn. Er lässt sich kaum von der körperlichen Arbeit abnehmen." },
+          { id: "silas_verweigert", label: "Silas verweigert die Amputation, spielt sich vor Harwick/Cormac auf", info: "Schlägt der Spieler eine Amputation vor oder greift ein, spielt sich Silas auf: Er könne diese kleine Verletzung auch ohne Amputation heilen, erklärt er Harwick und Cormac — und macht klar, dass er sich von „diesen dilettantischen Spielern“ nicht dreinreden lassen will." },
+          { id: "wundbrand_sepsis", label: "Wundbrand setzt ein, Sepsis wandert den Oberschenkel hoch", info: "Das ist der Auftakt zur Katastrophe: Wundbrand setzt ein, die Sepsis wandert bereits den Oberschenkel hoch. Ein erfahrener Spieler erkennt eindeutig: Das Bein muss ab." },
+          { id: "amputation_unmoeglich", label: "Amputation am Oberschenkel technisch unmöglich (Hauptschlagader)", info: "Doch es geht nicht am Oberschenkel — die Hauptschlagader lässt sich hier nicht sauber abklemmen. An Bord der Golden Lion fehlen sowohl das nötige Werkzeug als auch die Arznei dafür." },
+          { id: "kurs_auf_hafen", label: "Ein Hafen muss dringend angesteuert werden", info: "Es bleibt keine Wahl: Ein Hafen muss dringend angesteuert werden." }
         ]
       }
     }
@@ -648,14 +648,14 @@ const ORTE = {
         kurz: "Reiner Erzählmoment, kein Wurf (außer optional Wahrnehmung) — Harwick lässt Metallschmuck ablegen, löst Ezra Coombes festsitzenden Ehering mit einem Schreckmoment, Cormac deutet beinahe einen früheren Verlust Harwicks an, Wildschwein-Fehlalarm am Ende.",
         details: "Die Gruppe ist schon eine Weile unterwegs, als Harwick auf dem Weg bittet, sämtlichen Metallschmuck auszuziehen und zu verstauen. Er scheint es ernst zu meinen und kontrolliert jeden persönlich. (GM-Hinweis: Das ist keine allgemeine Vorsicht, sondern eine gezielte Gegenmaßnahme — Harwick weiß bereits von den Gerüchten, dass der neue Häuptling der Crew einen Fluch zuschreibt, weil sie selbst Metallschmuck trägt, was der Thahal-Theologie widerspricht. Er versucht, genau diesen Verdacht zu entschärfen, bevor er am Dorf ankommt.)\n\nEzra Coombe hat seinen Ehering noch an der Hand und versucht, ihn vor Harwick zu verstecken. Dieser starrt ihn ernst an, bis Ezra versucht, den Ring vom Finger zu lösen. Doch der sitzt fest. Ezra zuckt mit den Schultern: „Den habe ich seit ihrem Tod nicht mehr abgenommen“ — und lächelt verlegen.\n\nHarwick schaut ernst zu Cormac und zieht dann mit einem Ruck seinen Degen. Selbst Cormac zuckt einen Moment zusammen — bis er Harwicks Gesicht sieht und sich wieder entspannt.\n\nHarwick zerrt Ezras Hand zu sich und schneidet ein Stück von dessen Hemd ab — alles in einer Bewegung. Ezra kneift die Augen zusammen und schreit kurz auf, bis er merkt, dass Harwick ihn nicht verletzt hat.\n\nHarwick steckt den Degen zurück, fädelt den Stoff durch den Ring und bindet ihn eng um Ezras Finger. Mit dem anderen Ende umkreist er den Finger in die Gegenrichtung und wickelt den Stoff dabei ab — der Ring bewegt sich Stück für Stück über den Finger. Ezra gerät kurz ins Taumeln, ist aber froh, noch in einem Stück zu sein. Als der Ring ab ist, küsst er ihn und schaut mit einer Mischung aus Furcht und Erleichterung zu Harwick.\n\nAls sich dieser mit einem leichten Lächeln und einem Klopfen auf die Schulter abwendet, sagt Ezra zur Seite: „Für eine Sekunde dachte ich…“ Cormac legt den Kopf schräg: „Für eine Sekunde dachtest du was? Kapitän Harwick hat noch nie jemanden aus seiner Crew verloren!“ Nach kurzem Stocken schaut er zu Boden und fasst sich an die Seite: „Na ja, fast…“, mehr zu sich selbst.\n\nEin Spieler mit guter Wahrnehmung sieht, wie die Miene des Kapitäns für einen Moment entgleist — bevor er sich fängt und ernst, gerade nach vorne geht. Im ernsten Ton: „Weiter geht's…“ (GM-Hinweis: unausgesprochene Anspielung auf seine tote Tochter — die Kernprämisse der Kampagne. Bleibt für die Spieler unerklärt.)\n\nCormacs sonst so kraftvolle Gestalt wirkt jetzt behutsam. Er folgt dem Kapitän, man hört ihn vorsichtig fragen: „War das mit dem Degen wirklich nötig?“\n\nAuf einmal ein Rascheln! Viele machen sich kampfbereit, Spannung liegt in der Luft. Auch Cormac fängt sich kurz, dann lacht er: „Entspannt euch! Hier gibt's nur Wildschweine. Die sind keine Gefahr.“ (GM-Hinweis: bewusstes Setup — Cormacs Einschätzung wird auf dem Rückweg widerlegt, wenn der echte Wildschwein-Angriff passiert, siehe ARBEITSSTAND.md 5. Wer verletzt wird, ist dort weiterhin offen.)",
         trigger: [
-          { id: "metallschmuck_angesagt", label: "Harwick lässt die Gruppe Metallschmuck ablegen, kontrolliert jeden" },
-          { id: "ring_festgeklemmt", label: "Ezra Coombes Ehering sitzt fest, er versucht ihn zu verstecken" },
-          { id: "degen_schreckmoment", label: "Harwick zieht abrupt den Degen — auch Cormac zuckt zusammen" },
-          { id: "ring_geloest", label: "Harwick löst den Ring mit dem Tuchtrick, ohne Ezra zu verletzen" },
-          { id: "cormacs_beinahe_verrat", label: "Cormacs \"Naja, fast...\" — Andeutung auf einen früheren Verlust" },
-          { id: "wahrnehmung_maske", label: "Nur bei guter Wahrnehmung: Harwicks Fassung rutscht kurz" },
-          { id: "cormacs_nachfrage", label: "Cormac fragt leise, ob der Degen wirklich nötig war" },
-          { id: "wildschwein_fehlalarm", label: "Rascheln im Gebüsch — Fehlalarm, nur Wildschweine" }
+          { id: "metallschmuck_angesagt", label: "Harwick lässt die Gruppe Metallschmuck ablegen, kontrolliert jeden", info: "Harwick bittet auf dem Weg, sämtlichen Metallschmuck auszuziehen und zu verstauen. Er scheint es ernst zu meinen und kontrolliert jeden persönlich. (GM-Hinweis: gezielte Gegenmaßnahme gegen den Metallschmuck-Fluch-Verdacht der Thahal.)" },
+          { id: "ring_festgeklemmt", label: "Ezra Coombes Ehering sitzt fest, er versucht ihn zu verstecken", info: "Ezra Coombe hat seinen Ehering noch an der Hand und versucht, ihn vor Harwick zu verstecken. Dieser starrt ihn ernst an, bis Ezra versucht, den Ring vom Finger zu lösen. Doch der sitzt fest. Ezra zuckt mit den Schultern: „Den habe ich seit ihrem Tod nicht mehr abgenommen“ — und lächelt verlegen." },
+          { id: "degen_schreckmoment", label: "Harwick zieht abrupt den Degen — auch Cormac zuckt zusammen", info: "Harwick schaut ernst zu Cormac und zieht dann mit einem Ruck seinen Degen. Selbst Cormac zuckt einen Moment zusammen — bis er Harwicks Gesicht sieht und sich wieder entspannt." },
+          { id: "ring_geloest", label: "Harwick löst den Ring mit dem Tuchtrick, ohne Ezra zu verletzen", info: "Harwick schneidet ein Stück Hemd ab, fädelt es durch den Ring und wickelt ihn Stück für Stück über den Finger. Als der Ring ab ist, küsst Ezra ihn und schaut mit einer Mischung aus Furcht und Erleichterung zu Harwick." },
+          { id: "cormacs_beinahe_verrat", label: "Cormacs \"Naja, fast...\" — Andeutung auf einen früheren Verlust", info: "Ezra: „Für eine Sekunde dachte ich…“ Cormac: „Für eine Sekunde dachtest du was? Kapitän Harwick hat noch nie jemanden aus seiner Crew verloren!“ Nach kurzem Stocken, mehr zu sich selbst: „Na ja, fast…“" },
+          { id: "wahrnehmung_maske", label: "Nur bei guter Wahrnehmung: Harwicks Fassung rutscht kurz", info: "Ein Spieler mit guter Wahrnehmung sieht, wie die Miene des Kapitäns für einen Moment entgleist — bevor er sich fängt und ernst sagt: „Weiter geht's…“ (GM-Hinweis: unausgesprochene Anspielung auf seine tote Tochter.)" },
+          { id: "cormacs_nachfrage", label: "Cormac fragt leise, ob der Degen wirklich nötig war", info: "Cormacs sonst so kraftvolle Gestalt wirkt jetzt behutsam. Man hört ihn vorsichtig fragen: „War das mit dem Degen wirklich nötig?“" },
+          { id: "wildschwein_fehlalarm", label: "Rascheln im Gebüsch — Fehlalarm, nur Wildschweine", info: "Auf einmal ein Rascheln! Viele machen sich kampfbereit. Cormac lacht: „Entspannt euch! Hier gibt's nur Wildschweine. Die sind keine Gefahr.“ (GM-Hinweis: bewusstes Setup — wird auf dem Rückweg widerlegt.)" }
         ]
       }
     }
@@ -669,14 +669,14 @@ const ORTE = {
         kurz: "Reiner Erzählmoment, kein Wurf (außer optional Wahrnehmung/Menschenkenntnis) — der Häuptling weist Harwick öffentlich zurück, das Dorf ist erkennbar gespalten.",
         details: "Kaum betritt die Gruppe die Lichtung, geht ein Raunen durch die Menge. Ein Wort läuft von Mund zu Mund, kaum lauter als ein Atemzug: „Vanthei.“ Manche senken den Kopf, andere weichen einen Schritt zurück.\n\nJe näher die Gruppe kommt, desto ernster wird der Blick des Häuptlings auf sie gerichtet. Harwick bleibt vorsichtig, breitet aber trotzdem — fast einstudiert — die Arme aus, wie zur Begrüßung eines alten Bekannten.\n\nHäuptling Ta'ahal (GM-Hinweis: kein Eigenname, sondern der Titel jedes Thahal-Anführers — von \"Thahal\"/\"Bewahrer\" abgeleitet, bedeutet \"der, der erhält\") lässt ihn ausreden. Dann sagt er, scharf, absichtlich laut und für jeden im Dorf deutlich hörbar, mit unverhohlenem Abscheu: „Vanthei! Du bist hier nicht länger willkommen!“\n\nNiemand im Dorf trägt eine Waffe — nur der Häuptling einen Speer. Er stößt ihn in den Boden, dreht sich um und geht.\n\nEinige Dorfbewohner starren mit großen Augen zu Harwick. Der steht da wie bestellt und nicht abgeholt, blickt sich ernst um.\n\nEin junger Mann ruft: „Vanthei!“ — und macht einen Schritt auf ihn zu, wird aber sofort von anderen festgehalten und in eine Hütte gezogen.\n\nWer gute Wahrnehmung oder Menschenkenntnis hat, erkennt den Zwiespalt, in dem die Dorfbewohner stecken. Niemand kommt der Gruppe zu nahe. Jeder Versuch, Kontakt aufzunehmen, verschreckt die Leute nur.\n\nHarwick spricht einen alten Mann direkt an — in Worten, die die Spieler nicht verstehen. Der alte Mann schüttelt traurig den Kopf und verlässt den Platz.\n\nHarwick dreht sich um, geht mit ernster Miene durch die Gruppe hindurch und verlässt das Dorf. Der junge Mann von vorhin ruft ihm in gebrochenem Englisch nach: „Er hätte gewollt, dass du es zu ihr bringst!“ (GM-Hinweis: \"Er\" = der verstorbene alte Häuptling, \"sie\" = die Göttin/das Heiligtum. Dieser junge Mann ist der spätere Thahal-Helfer im Nachtlager — Station 4, kontaktiert die Gruppe dort heimlich nachts, einziger Zugang zu Diebstahl/Aufhetzen. Für die Spieler bleibt das hier nur Sympathie, kein Versprechen.)\n\nLangsam wird es dunkel. In gebührendem Abstand zum Dorf macht Harwick klar, dass hier das Lager aufgeschlagen wird.",
         trigger: [
-          { id: "geraunt", label: "Menge raunt \"Vanthei\", manche weichen zurück" },
-          { id: "haeuptling_ablehnung", label: "Häuptling Ta'ahal weist Harwick laut und mit Abscheu zurück" },
-          { id: "speer_geste", label: "Häuptling stößt den Speer in den Boden und geht" },
-          { id: "junger_mann_zurueckgehalten", label: "Ein junger Mann ruft \"Vanthei\", wird zurückgehalten und weggezogen" },
-          { id: "zwiespalt_wahrnehmung", label: "Nur bei Wahrnehmung/Menschenkenntnis: Zwiespalt im Dorf erkennbar" },
-          { id: "alter_mann_thahal", label: "Harwick spricht mit einem alten Mann auf Thahal, dieser lehnt traurig ab" },
-          { id: "abschiedsruf", label: "Junger Mann ruft Harwick in gebrochenem Englisch nach: \"Er hätte gewollt, dass du es zu ihr bringst!\"" },
-          { id: "lager_aufgeschlagen", label: "Bei Einbruch der Dunkelheit schlägt die Gruppe in gebührendem Abstand das Nachtlager auf" }
+          { id: "geraunt", label: "Menge raunt \"Vanthei\", manche weichen zurück", info: "Kaum betritt die Gruppe die Lichtung, geht ein Raunen durch die Menge. Ein Wort läuft von Mund zu Mund, kaum lauter als ein Atemzug: „Vanthei.“ Manche senken den Kopf, andere weichen einen Schritt zurück." },
+          { id: "haeuptling_ablehnung", label: "Häuptling Ta'ahal weist Harwick laut und mit Abscheu zurück", info: "Harwick breitet fast einstudiert die Arme aus, wie zur Begrüßung eines alten Bekannten. Häuptling Ta'ahal sagt scharf, absichtlich laut, mit unverhohlenem Abscheu: „Vanthei! Du bist hier nicht länger willkommen!“" },
+          { id: "speer_geste", label: "Häuptling stößt den Speer in den Boden und geht", info: "Niemand im Dorf trägt eine Waffe — nur der Häuptling einen Speer. Er stößt ihn in den Boden, dreht sich um und geht." },
+          { id: "junger_mann_zurueckgehalten", label: "Ein junger Mann ruft \"Vanthei\", wird zurückgehalten und weggezogen", info: "Ein junger Mann ruft: „Vanthei!“ — und macht einen Schritt auf ihn zu, wird aber sofort von anderen festgehalten und in eine Hütte gezogen." },
+          { id: "zwiespalt_wahrnehmung", label: "Nur bei Wahrnehmung/Menschenkenntnis: Zwiespalt im Dorf erkennbar", info: "Wer gute Wahrnehmung oder Menschenkenntnis hat, erkennt den Zwiespalt, in dem die Dorfbewohner stecken. Niemand kommt der Gruppe zu nahe; jeder Kontaktversuch verschreckt nur." },
+          { id: "alter_mann_thahal", label: "Harwick spricht mit einem alten Mann auf Thahal, dieser lehnt traurig ab", info: "Harwick spricht einen alten Mann direkt an — in Worten, die die Spieler nicht verstehen. Der alte Mann schüttelt traurig den Kopf und verlässt den Platz." },
+          { id: "abschiedsruf", label: "Junger Mann ruft Harwick in gebrochenem Englisch nach: \"Er hätte gewollt, dass du es zu ihr bringst!\"", info: "Harwick verlässt mit ernster Miene das Dorf. Der junge Mann ruft ihm in gebrochenem Englisch nach: „Er hätte gewollt, dass du es zu ihr bringst!“ (GM-Hinweis: \"er\" = der verstorbene alte Häuptling, \"sie\" = die Göttin. Für die Spieler bleibt das nur Sympathie, kein Versprechen.)" },
+          { id: "lager_aufgeschlagen", label: "Bei Einbruch der Dunkelheit schlägt die Gruppe in gebührendem Abstand das Nachtlager auf", info: "Langsam wird es dunkel. In gebührendem Abstand zum Dorf macht Harwick klar, dass hier das Lager aufgeschlagen wird." }
         ]
       }
     }
@@ -690,13 +690,13 @@ const ORTE = {
         kurz: "Cormac hält die Stimmung hoch, während Harwick sich zurückzieht, und schickt die Spieler auf Wildschwein-Jagd — Geschicklichkeit zum Schießen, Mechanik zum Nachladen, mehrere Versuche bis zur völligen Dunkelheit. Danach: nächtliches Erwachen, der Thahal-Kontakt kündigt sich an (siehe eigene, noch offene Interaktion).",
         details: "Die Männer erreichen einen geeigneten Platz und schlagen ihr Lager auf. Einer aus der Crew fragt etwas ängstlich, ob es hier giftige Schlangen oder Ähnliches gibt.\n\nHarwick hat sich etwas zurückgezogen. Cormac erkennt das und hält die Meute in Schach. Er ermuntert sie: Hier gebe es nur dicke Käfer und ein paar Spinnen. Unzählig viel Obst — und, dabei grinst er sie an (das Grinsen erreicht seine Augen allerdings nie) — vor allem Wildschwein.\n\n„Bereitet ein Feuer vor. Die Thahal werden uns heute nicht versorgen.“ Er deutet auf die Spieler. „Schnappt euch zwei Musketen und stabile Säbel und erlegt uns ein Schwein.“\n\nWegen der beginnenden Dämmerung braucht es Proben, die beim Jagen helfen — keine leichte Aufgabe. Wer glaubhaft macht, Übung im Schießen zu haben, kann mit einer Geschicklichkeits-Probe feuern. Ein Fehlschuss verlangt eine Mechanik-Probe zum Nachladen — sonst ist das Schwein weg. Mehrere Versuche sind möglich, bis die Dunkelheit so dicht ist, dass man die eigene Hand vor Augen nicht mehr sieht.\n\nKommen die Spieler ohne erlegtes Tier zurück — und kommen sie auch nicht auf die Idee, wenigstens Früchte zu sammeln —, sinkt die Stimmung im Camp weiter.\n\nTief in der Nacht raschelt es im Gebüsch. Niemand hat Wachen eingeteilt. Nur wer auf Wahrnehmung würfelt, wird davon wach. (SL-Hinweis: wie die Spieler reagieren, bleibt bewusst offen.)\n\nEs ist der junge Mann aus dem Dorf, der aus dem Dschungel kommt. Wer jetzt wach ist, sieht: Harwick sitzt noch immer am erloschenen Feuer.",
         trigger: [
-          { id: "lager_bezogen", label: "Crew erreicht den Lagerplatz, jemand fragt ängstlich nach giftigen Tieren" },
-          { id: "cormac_haelt_stimmung", label: "Cormac hält die Stimmung hoch, während Harwick sich zurückzieht" },
-          { id: "jagdauftrag", label: "Cormac schickt die Spieler mit Musketen/Säbeln auf Wildschwein-Jagd" },
-          { id: "jagd_proben", label: "Geschicklichkeit zum Schießen, Mechanik zum Nachladen, mehrere Versuche bis zur Dunkelheit" },
-          { id: "jagd_erfolglos", label: "Ohne Beute und ohne gesammeltes Obst sinkt die Stimmung weiter" },
-          { id: "raunen_nachts", label: "Rascheln im Gebüsch tief in der Nacht — nur bei Wahrnehmung wach" },
-          { id: "junge_mann_erscheint", label: "Der junge Mann aus dem Dorf kommt aus dem Dschungel, Harwick sitzt noch am erloschenen Feuer" }
+          { id: "lager_bezogen", label: "Crew erreicht den Lagerplatz, jemand fragt ängstlich nach giftigen Tieren", info: "Die Männer erreichen einen geeigneten Platz und schlagen ihr Lager auf. Einer aus der Crew fragt etwas ängstlich, ob es hier giftige Schlangen oder Ähnliches gibt." },
+          { id: "cormac_haelt_stimmung", label: "Cormac hält die Stimmung hoch, während Harwick sich zurückzieht", info: "Harwick hat sich etwas zurückgezogen. Cormac erkennt das und hält die Meute in Schach: Hier gebe es nur dicke Käfer und ein paar Spinnen, unzählig viel Obst — und vor allem Wildschwein (das Grinsen erreicht seine Augen allerdings nie)." },
+          { id: "jagdauftrag", label: "Cormac schickt die Spieler mit Musketen/Säbeln auf Wildschwein-Jagd", info: "„Bereitet ein Feuer vor. Die Thahal werden uns heute nicht versorgen.“ Er deutet auf die Spieler. „Schnappt euch zwei Musketen und stabile Säbel und erlegt uns ein Schwein.“" },
+          { id: "jagd_proben", label: "Geschicklichkeit zum Schießen, Mechanik zum Nachladen, mehrere Versuche bis zur Dunkelheit", info: "Wegen der beginnenden Dämmerung braucht es Proben: Geschicklichkeits-Probe zum Feuern, bei Fehlschuss eine Mechanik-Probe zum Nachladen — sonst ist das Schwein weg. Mehrere Versuche möglich, bis die Dunkelheit zu dicht wird." },
+          { id: "jagd_erfolglos", label: "Ohne Beute und ohne gesammeltes Obst sinkt die Stimmung weiter", info: "Kommen die Spieler ohne erlegtes Tier zurück — und kommen sie auch nicht auf die Idee, wenigstens Früchte zu sammeln —, sinkt die Stimmung im Camp weiter." },
+          { id: "raunen_nachts", label: "Rascheln im Gebüsch tief in der Nacht — nur bei Wahrnehmung wach", info: "Tief in der Nacht raschelt es im Gebüsch. Niemand hat Wachen eingeteilt. Nur wer auf Wahrnehmung würfelt, wird davon wach." },
+          { id: "junge_mann_erscheint", label: "Der junge Mann aus dem Dorf kommt aus dem Dschungel, Harwick sitzt noch am erloschenen Feuer", info: "Es ist der junge Mann aus dem Dorf, der aus dem Dschungel kommt. Wer jetzt wach ist, sieht: Harwick sitzt noch immer am erloschenen Feuer." }
         ]
       },
       "sorathis_besuch": {
@@ -704,19 +704,19 @@ const ORTE = {
         kurz: "Sorathi sucht die Gruppe nachts heimlich auf — Wiedersehen mit Harwick, Geschichten über die Crew (v.a. Wat), die Frage nach Jessica bricht Harwicks Fassade auf. Endet mit einer offenen, spielergetriebenen Diskussion über den Weg zum Siegel.",
         details: "<strong>Die Annäherung</strong><br>\nNachts bemerken Spieler mit einem erfolgreichen Wahrnehmungswurf, dass sich jemand ans Lager anschleicht. Wie sie darauf reagieren, bleibt ihnen frei überlassen. Harwick sitzt noch immer wach am längst erloschenen Feuer, unnatürlich ruhig — er zeigt keine Angst, dreht sich nicht einmal zu den Geräuschen um. Rufen die Spieler oder richten Waffen in die Richtung, ruft eine leise Stimme, dass sie keine Angst haben sollen — Sorathi, wechselnd zwischen der Sprache der Thahal und gebrochenem Englisch.\n\n<strong>Wiedersehen</strong><br>\nSorathi wendet sich direkt an Vanthei und macht ihn auf sich aufmerksam. Aus seinen Gedanken gerissen, zeigt Harwicks Gesicht im Mondschein ein Lächeln, seine Stimme eine Wärme, die die Spieler bisher nicht an ihm kannten. Die beiden sprechen davon, dass Sorathi vor zwei Mondläufen den Kupferritus abgeschlossen hat — Harwick war offenbar lange nicht mehr auf der Insel. Fragen die Spieler nach, erklärt er den Ritus bereitwillig und erzählt dabei auch vom Heiligtum. Sorathi begegnet Vanthei ohne jede Angst oder Zurückhaltung — für ihn ist er schlicht ein Freund der Thahal, der ihnen hilft. In gebrochenem Englisch spricht er über Harwicks Aufgabe und davon, wie dieser schon unter dem alten Ta'ahal in Ehren gehalten wurde. Das Feuer wird neu entfacht, und sie sitzen eine Weile friedlich beisammen.\n\n<strong>Sorathi und die Crew</strong><br>\nHarwick hatte einst Sorathis Mutter geholfen, nachdem ein Wildschwein sie aufgeschlitzt hatte — er nahm beide mit an Bord. Sorathi kennt daher große Teile der Crew:\n<ul>\n  <li>Er fragt aktiv nach Josiah und Tom.</li>\n  <li>Als auch Cormac zum Gespräch dazustößt, freut er sich kindlich und umarmt den alten Seebären — der zunächst sichtlich überfordert ist, bis sich tiefe innere Zufriedenheit auf seinem Gesicht breitmacht.</li>\n</ul>\n\n<strong>Die Geschichte mit Wat</strong><br>\n<ul>\n  <li>Wat war es, der die verletzte Mutter und den damals kleinen Jungen beim Jagen im Dschungel fand.</li>\n  <li>Sorathi hatte Angst — bis seine Mutter, trotz ihrer Schmerzen, keine Spur davon zeigte, nur Wärme für ihr Kind. Etwas daran erreichte Wat, ähnlich wie Josiahs vorbehaltlose Art ihn erreicht.</li>\n  <li>Er kniete vor dem verängstigten Jungen und versprach rau: „Sie wird wieder gesund.“</li>\n  <li>Sorathi verstand die Worte damals nicht — kein Englisch, nur ein bewaffneter Fremder in einer fremden Sprache — und genau deshalb wollte er seither Englisch lernen; über die Jahre bekam er immer wieder ein Buch geschenkt.</li>\n  <li>Selbst Harwick und Cormac haben keine wirkliche Erklärung für Wats Verhalten — auf Nachfrage damals schaute er nur mürrisch und wies sie ab, weshalb niemand weiter bohrte.</li>\n  <li>Wat selbst ließ sich nie im Dorf blicken und blieb auch bei späteren Besuchen distanziert — nickte Sorathi aber jedes Mal anerkennend zu.</li>\n</ul>\n<em>GM-Hinweis: Vorgriff für eine spätere Szene — konfrontiert man Wat später damit, bleibt er schroff, aber bei der Nachricht von Sorathis Kupferritus oder seiner Hilfe kann selbst er sich ein kleines Lächeln nicht verkneifen.</em>\n\n<strong>Die Frage nach Jessica</strong><br>\nIrgendwann fragt Sorathi, wo Jessica sei. Das Gespräch gerät ins Stocken. Cormac versucht abzulenken und bringt noch einmal den Kupferritus ins Spiel — vergeblich. Harwick wird ernst: „Sie ist heute nicht bei uns.“ Er wird nicht sagen, dass sie tot ist. Sorathi kann die Andeutung nicht lesen und fragt weiter nach, bis Harwick keinen Ausweg mehr hat. Die Spieler bemerken Tränen in seinen Augen. Er bedankt sich für Sorathis Besuch, verabschiedet sich, geht zu den Zelten und starrt in den Wald.\n\n<strong>Cormacs Tribut</strong><br>\nCormac erzählt von ihr — mit Bewunderung und Trauer in der Stimme. Dabei hält er den Knoten an seinem Gürtel fest, den er immer bei sich trägt, und streicht mit dem Daumen über das Seil. Sorathi versteht und wird sichtlich traurig: Sie wäre jetzt auch 14, und der alte Ta'ahal hatte davon gesprochen, dass auch sie den Kupferritus hätte ablegen können. Sie war immer so stark und aufgeweckt.\n\n<strong>Sorathis Erkenntnis</strong><br>\nSorathi begreift in diesem Moment etwas: Jessicas Tod und Harwicks nie überwundene Trauer markieren für ihn den Zeitpunkt, an dem Vanthei das Geschenk der Göttin überbringen sollte. Die Thahal fürchten, seit der Baum starb, die Verbindung zur Göttin verloren zu haben — Harwick trägt dieselbe Wunde durch Jessica. Sorathi weiß, dass die Göttin niemals ein Leben zurückbringen kann — dieser Gedanke wäre den Thahal unvorstellbar —, aber sie heilt die Wunden der Seele. In den Thahal, und auch in Harwick.\n\n<strong>Offene Diskussion: Der Weg zum Siegel</strong><br>\nVon hier aus entwickelt sich ein offenes Gespräch, in das die Spieler stark eingebunden werden: was der beste Weg ist, an das Siegel zu kommen. Bewusst nicht vorgeskriptet — das entscheidet sich am Tisch.",
         trigger: [
-          { id: "anschleichen_bemerkt", label: "Wahrnehmungswurf: Spieler bemerken, dass sich jemand anschleicht" },
-          { id: "harwick_ungeruehrt", label: "Harwick zeigt keine Angst, dreht sich nicht um" },
-          { id: "sorathi_ruft", label: "Bei Rufen/Waffen: Sorathi beruhigt leise, wechselt Sprache" },
-          { id: "vanthei_erkannt_warm", label: "Sorathi spricht Vanthei an — Harwicks Lächeln/Wärme wird sichtbar" },
-          { id: "kupferritus_erwaehnt", label: "Sorathis kürzlich abgeschlossener Kupferritus wird erwähnt, Harwick erklärt auf Nachfrage" },
-          { id: "feuer_neu_entfacht", label: "Feuer wird neu entfacht, alle sitzen friedlich zusammen" },
-          { id: "sorathi_fragt_crew", label: "Sorathi fragt nach Josiah/Tom, freut sich kindlich über Cormac, umarmt ihn" },
-          { id: "wat_rettungsgeschichte", label: "Sorathi erzählt, wie Wat seine Mutter fand und ihr Genesung versprach" },
-          { id: "jessica_frage", label: "Sorathi fragt, wo Jessica sei — Gespräch gerät ins Stocken" },
-          { id: "harwicks_rueckzug", label: "Harwick weicht aus, wird in die Enge getrieben, zieht sich mit Tränen in den Augen zurück" },
-          { id: "cormacs_tribut", label: "Cormac erzählt von Jessica, hält seinen Knoten fest — Sorathi wird traurig" },
-          { id: "sorathis_erkenntnis", label: "Sorathi erkennt: jetzt ist der Zeitpunkt, das Geschenk der Göttin zu überbringen" },
-          { id: "offene_diskussion_siegel", label: "Offene, spielergetriebene Diskussion: der beste Weg zum Siegel" }
+          { id: "anschleichen_bemerkt", label: "Wahrnehmungswurf: Spieler bemerken, dass sich jemand anschleicht", info: "Nachts bemerken Spieler mit einem erfolgreichen Wahrnehmungswurf, dass sich jemand ans Lager anschleicht. Wie sie reagieren, bleibt ihnen frei überlassen." },
+          { id: "harwick_ungeruehrt", label: "Harwick zeigt keine Angst, dreht sich nicht um", info: "Harwick sitzt noch immer wach am längst erloschenen Feuer, unnatürlich ruhig — er zeigt keine Angst, dreht sich nicht einmal zu den Geräuschen um." },
+          { id: "sorathi_ruft", label: "Bei Rufen/Waffen: Sorathi beruhigt leise, wechselt Sprache", info: "Rufen die Spieler oder richten Waffen in die Richtung, ruft eine leise Stimme, dass sie keine Angst haben sollen — Sorathi, wechselnd zwischen der Sprache der Thahal und gebrochenem Englisch." },
+          { id: "vanthei_erkannt_warm", label: "Sorathi spricht Vanthei an — Harwicks Lächeln/Wärme wird sichtbar", info: "Sorathi wendet sich direkt an Vanthei. Aus seinen Gedanken gerissen, zeigt Harwicks Gesicht im Mondschein ein Lächeln, seine Stimme eine Wärme, die die Spieler bisher nicht an ihm kannten." },
+          { id: "kupferritus_erwaehnt", label: "Sorathis kürzlich abgeschlossener Kupferritus wird erwähnt, Harwick erklärt auf Nachfrage", info: "Die beiden sprechen davon, dass Sorathi vor zwei Mondläufen den Kupferritus abgeschlossen hat. Fragen die Spieler nach, erklärt Harwick ihn bereitwillig und erzählt dabei vom Heiligtum." },
+          { id: "feuer_neu_entfacht", label: "Feuer wird neu entfacht, alle sitzen friedlich zusammen", info: "Das Feuer wird neu entfacht, und sie sitzen eine Weile friedlich beisammen." },
+          { id: "sorathi_fragt_crew", label: "Sorathi fragt nach Josiah/Tom, freut sich kindlich über Cormac, umarmt ihn", info: "Er fragt aktiv nach Josiah und Tom. Als auch Cormac dazustößt, freut er sich kindlich und umarmt den alten Seebären — der zunächst überfordert ist, bis tiefe innere Zufriedenheit sich auf seinem Gesicht breitmacht." },
+          { id: "wat_rettungsgeschichte", label: "Sorathi erzählt, wie Wat seine Mutter fand und ihr Genesung versprach", info: "Wat war es, der die verletzte Mutter und den damals kleinen Jungen im Dschungel fand. Er kniete vor dem verängstigten Jungen und versprach rau: „Sie wird wieder gesund.“ Deshalb wollte Sorathi seither Englisch lernen." },
+          { id: "jessica_frage", label: "Sorathi fragt, wo Jessica sei — Gespräch gerät ins Stocken", info: "Irgendwann fragt Sorathi, wo Jessica sei. Das Gespräch gerät ins Stocken. Cormac versucht abzulenken und bringt den Kupferritus noch einmal ins Spiel — vergeblich." },
+          { id: "harwicks_rueckzug", label: "Harwick weicht aus, wird in die Enge getrieben, zieht sich mit Tränen in den Augen zurück", info: "Harwick wird ernst: „Sie ist heute nicht bei uns.“ Er wird nicht sagen, dass sie tot ist. Sorathi fragt weiter, bis Harwick keinen Ausweg mehr hat. Die Spieler bemerken Tränen in seinen Augen; er bedankt sich, verabschiedet sich, geht zu den Zelten und starrt in den Wald." },
+          { id: "cormacs_tribut", label: "Cormac erzählt von Jessica, hält seinen Knoten fest — Sorathi wird traurig", info: "Cormac erzählt von ihr — mit Bewunderung und Trauer in der Stimme, hält dabei den Knoten an seinem Gürtel fest. Sorathi wird sichtlich traurig: Sie wäre jetzt auch 14, der alte Ta'ahal hatte davon gesprochen, dass auch sie den Kupferritus hätte ablegen können." },
+          { id: "sorathis_erkenntnis", label: "Sorathi erkennt: jetzt ist der Zeitpunkt, das Geschenk der Göttin zu überbringen", info: "Sorathi begreift: Jessicas Tod und Harwicks nie überwundene Trauer markieren den Zeitpunkt, an dem Vanthei das Geschenk der Göttin überbringen sollte. Die Göttin kann kein Leben zurückbringen — aber sie heilt die Wunden der Seele." },
+          { id: "offene_diskussion_siegel", label: "Offene, spielergetriebene Diskussion: der beste Weg zum Siegel", info: "Von hier aus entwickelt sich ein offenes Gespräch, in das die Spieler stark eingebunden werden: was der beste Weg ist, an das Siegel zu kommen. Bewusst nicht vorgeskriptet — das entscheidet sich am Tisch." }
         ]
       }
     }
@@ -734,16 +734,16 @@ const ORTE = {
         kurz: "Übergabe des Siegels an einen Wächter, stille Gänge mit Raum für Gespräche, dann die eigentliche Schatzkammer: der silberne Stein, Licht durch ein Deckenloch, ringsum Schätze — darunter, bei genauem Hinsehen, auch Harwicks eigenes, nie ans Meer gegebenes Gut. Ein paar Proben (Geschick/Körper, Wahrnehmung/Wissen).",
         details: "Nur bei ablaufendem Wasser und mit dem Boot lässt sich die Höhle überhaupt erreichen — ein enges Zeitfenster, das die Gruppe knapp einhält. Am Eingang wartet bereits ein Wächter, Langbogen und Standschild wie gewohnt, das Gesicht hinter zeremonieller Bemalung kaum zu lesen. Worte werden kaum gewechselt — hier zählt nicht, was gesagt wird, sondern was übergeben wird.\n\nHarwick reicht das Siegel wortlos weiter — ein runder Vulkanstein, verziert und glänzend glatt poliert, kühl und schwer in der Hand. Der Wächter nimmt es entgegen, prüft es mit einem kurzen, geübten Blick und führt die Gruppe tiefer in den Fels — dorthin, wo ein eigens dafür ausgehauener Sockel wartet. Mit beiden Händen setzt er das Siegel ein; ein trockenes, hallendes Klacken, dann Stille. Er tritt zur Seite und lässt die Gruppe passieren, ohne ein weiteres Wort — von hier an sind sie auf sich gestellt.\n\nDahinter ziehen sich mehrere schmale Gänge durch den nassen Fels, das Licht der mitgebrachten Fackeln wirft lange Schatten. Der Boden ist vom stetigen Wasser glattgeschliffen — wer nicht aufpasst, rutscht (Probe: Geschick oder Körper, keine Erschwernis; bei Misserfolg nichts Schlimmes, nur ein nasser, unwürdiger Sturz). Genug Zeit bleibt für ein Gespräch, wenn die Spieler eines suchen wollen.\n\nHarwick geht auffallend zügig voran, den Blick starr nach vorn gerichtet — Jahre der Vorbereitung, jetzt nur noch wenige Schritte entfernt. Wer genau hinsieht, erkennt in seinem Gesicht nicht nur Erleichterung, sondern auch etwas Angespannteres, das er nicht benennt.\n\nCormac bleibt dicht bei ihm, wortkarg wie immer — bis er, kaum hörbar, sagt: „Egal, was da drin liegt. Nichts davon bringt sie zurück.“ Harwick antwortet nicht.\n\nDie Gänge münden unvermittelt in eine hohe, weite Kammer. Durch ein schmales Loch in der Decke bricht Tageslicht herein, gebündelt wie durch ein Brennglas, und trifft mitten im Raum auf einen mannshohen, silbernen Stein — der das Licht auffängt und in alle Richtungen zurückwirft, bis die ganze Kammer in einem kühlen, flirrenden Schimmer steht.\n\nRingsum: Truhen, Kisten, aufgeschichtete Haufen. Schätze, so weit das Licht reicht.\n\nWer genauer hinsieht (Probe: Wahrnehmung oder Wissen, keine Erschwernis), erkennt: Nicht alles hier ist von den Thahal gearbeitet. Zwischen geschnitztem Holz, Muscheln und rohem Gold liegen europäische Münzen, ein Kompass, Ringe fremder Machart — Fracht, keine Opfergabe. Was Harwick über die Jahre angeblich für die Göttin verwahrt hat, liegt hier unübersehbar zwischen dem, was tatsächlich ihr gehört. Harwick selbst bewegt sich auffällig zielsicher durch den Haufen, als wüsste er genau, wo er zuletzt hingegriffen hat.\n\nWie die Spieler mit dem Fund umgehen — ehrfürchtig oder gierig, wählerisch oder wahllos —, bleibt ganz ihnen überlassen. Es gibt hier keine Wache mehr, die zusieht, kein Urteil von außen. Nur der Stein, der weiter leise glänzt.\n\nDie Truhen sind schwer, der Rückweg eng und rutschig — wer beim Tragen nicht aufpasst (Probe: Körper), verliert im schlimmsten Fall eine kleinere Kiste im Wasser. Kein großer Verlust, nur ein kleiner Dämpfer auf dem Weg zurück ans Licht.\n\nAls die Gruppe wieder ins Tageslicht hinaustritt, wartet das Boot bei ablaufendem Wasser genau da, wo sie es zurückgelassen haben. Die Schatzinsel liegt hinter ihnen — was als Schiffbruch begann, endet mit vollen Truhen und einem Kapitän, der genau bekommen hat, wonach er kam. Was das für ihn bedeutet, wird sich erst noch zeigen.",
         trigger: [
-          { id: "ankunft_hoehle", label: "Ankunft bei ablaufendem Wasser, ein Wächter erwartet die Gruppe" },
-          { id: "siegel_uebergabe", label: "Harwick übergibt das Siegel wortlos, der Wächter setzt es in den Sockel" },
-          { id: "waechter_laesst_passieren", label: "Wächter tritt zur Seite, lässt die Gruppe unbegleitet passieren" },
-          { id: "gaenge_gespraeche", label: "Schmale, glatte Gänge geben Raum für Gespräche mit Harwick/Cormac" },
-          { id: "boden_probe", label: "Optionale Geschick/Körper-Probe auf dem glattgeschliffenen Boden" },
-          { id: "kammer_enthuellt", label: "Die Gänge münden in die vom silbernen Stein erhellte Schatzkammer" },
-          { id: "fremdes_gut_entdeckt", label: "Wahrnehmung/Wissen: europäisches Gut zwischen den Thahal-Schätzen erkennbar" },
-          { id: "harwick_zielsicher", label: "Harwick bewegt sich auffällig zielsicher durch den Schatzhaufen" },
-          { id: "truhen_tragen", label: "Körper-Probe beim Tragen der schweren Truhen zurück" },
-          { id: "abfahrt", label: "Rückkehr ans Licht, Boot wartet — die Insel liegt hinter der Gruppe" }
+          { id: "ankunft_hoehle", label: "Ankunft bei ablaufendem Wasser, ein Wächter erwartet die Gruppe", info: "Nur bei ablaufendem Wasser und mit dem Boot lässt sich die Höhle überhaupt erreichen — ein enges Zeitfenster. Am Eingang wartet bereits ein Wächter, Langbogen und Standschild, das Gesicht hinter zeremonieller Bemalung kaum zu lesen." },
+          { id: "siegel_uebergabe", label: "Harwick übergibt das Siegel wortlos, der Wächter setzt es in den Sockel", info: "Harwick reicht das Siegel wortlos weiter — ein runder Vulkanstein, kühl und schwer in der Hand. Der Wächter führt die Gruppe zu einem eigens ausgehauenen Sockel und setzt es mit beiden Händen ein; ein trockenes, hallendes Klacken, dann Stille." },
+          { id: "waechter_laesst_passieren", label: "Wächter tritt zur Seite, lässt die Gruppe unbegleitet passieren", info: "Er tritt zur Seite und lässt die Gruppe passieren, ohne ein weiteres Wort — von hier an sind sie auf sich gestellt." },
+          { id: "gaenge_gespraeche", label: "Schmale, glatte Gänge geben Raum für Gespräche mit Harwick/Cormac", info: "Harwick geht auffallend zügig voran, den Blick starr nach vorn. Cormac bleibt dicht bei ihm — bis er, kaum hörbar, sagt: „Egal, was da drin liegt. Nichts davon bringt sie zurück.“ Harwick antwortet nicht." },
+          { id: "boden_probe", label: "Optionale Geschick/Körper-Probe auf dem glattgeschliffenen Boden", info: "Der Boden ist vom stetigen Wasser glattgeschliffen — wer nicht aufpasst, rutscht (Probe: Geschick oder Körper, keine Erschwernis; bei Misserfolg nur ein nasser, unwürdiger Sturz)." },
+          { id: "kammer_enthuellt", label: "Die Gänge münden in die vom silbernen Stein erhellte Schatzkammer", info: "Die Gänge münden in eine hohe, weite Kammer. Durch ein schmales Loch in der Decke bricht Tageslicht herein und trifft auf einen mannshohen, silbernen Stein, der es in alle Richtungen zurückwirft. Ringsum: Truhen, Kisten, Schätze, so weit das Licht reicht." },
+          { id: "fremdes_gut_entdeckt", label: "Wahrnehmung/Wissen: europäisches Gut zwischen den Thahal-Schätzen erkennbar", info: "Wer genauer hinsieht (Probe: Wahrnehmung oder Wissen, keine Erschwernis), erkennt: Zwischen geschnitztem Holz, Muscheln und rohem Gold liegen europäische Münzen, ein Kompass, Ringe fremder Machart — Fracht, keine Opfergabe." },
+          { id: "harwick_zielsicher", label: "Harwick bewegt sich auffällig zielsicher durch den Schatzhaufen", info: "Harwick selbst bewegt sich auffällig zielsicher durch den Haufen, als wüsste er genau, wo er zuletzt hingegriffen hat." },
+          { id: "truhen_tragen", label: "Körper-Probe beim Tragen der schweren Truhen zurück", info: "Die Truhen sind schwer, der Rückweg eng und rutschig — wer beim Tragen nicht aufpasst (Probe: Körper), verliert im schlimmsten Fall eine kleinere Kiste im Wasser." },
+          { id: "abfahrt", label: "Rückkehr ans Licht, Boot wartet — die Insel liegt hinter der Gruppe", info: "Als die Gruppe wieder ins Tageslicht hinaustritt, wartet das Boot bei ablaufendem Wasser genau da, wo sie es zurückgelassen haben. Was als Schiffbruch begann, endet mit vollen Truhen." }
         ]
       }
     }
