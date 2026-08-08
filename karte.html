@@ -793,7 +793,7 @@
         bgAudio.removeAttribute('src');
         return;
       }
-      bgAudio.src = audioFile;
+      bgAudio.src = 'audio/' + audioFile;
       applyAudioState();
       bgAudio.play().catch(function () {
         // Blockiertes Autoplay ist normal, solange isMuted=true nichts
