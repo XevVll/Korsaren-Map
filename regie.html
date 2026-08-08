@@ -129,7 +129,8 @@
   .v-rail-item.inB { border-left-color: var(--vlive); color: var(--vlive); }
   .v-rail-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  .v-node { display: flex; align-items: center; gap: 0.4rem; padding: 0.24rem 0.8rem; cursor: pointer; color: var(--vink-dim); font-size: 0.88rem; }
+  .v-node { display: flex; align-items: center; gap: 0.4rem; padding: 0.24rem 0.8rem; cursor: pointer; color: var(--vink-dim); font-size: 0.88rem; border-left: 2px solid transparent; }
+  .v-node.active { border-left-color: var(--vgold); color: var(--vgold); background: var(--vgold-soft); }
   .v-node:hover { background: var(--vpanel3); color: var(--vink); }
   .v-node.lvl1 { padding-left: 1.76rem; }
   .v-node.lvl2 { padding-left: 2.72rem; }

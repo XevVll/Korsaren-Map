@@ -319,6 +319,15 @@ function rufTrackHtml(pcId, npcKey, tier) {
 
 // ---------- Baum: Szene → Orte → Ort → Interaktionen ----------
 function vToggleNode(key) { vOpenNodes.has(key) ? vOpenNodes.delete(key) : vOpenNodes.add(key); renderAll(); }
+// Ort-Zeile im Baum hat zwei Funktionen in einem Klick: auf-/zuklappen UND
+// die Übersicht (Ort-Notiz) in Pane A zeigen - ersetzt die vorherige
+// separate "📄 Übersicht"-Datei darunter, ein Klick auf den Ordner selbst
+// reicht jetzt.
+function vOpenOrtFolder(key, sceneId, ortId) {
+  vOpenNodes.has(key) ? vOpenNodes.delete(key) : vOpenNodes.add(key);
+  paneA = { type: 'ort', sceneId: sceneId, ortId: ortId };
+  renderAll();
+}
 function paneMatches(paneRef, ref) {
   if (!paneRef || paneRef.type !== ref.type) return false;
   return Object.keys(ref).every(function (k) { return paneRef[k] === ref[k]; });
@@ -355,10 +364,10 @@ function renderTree() {
       const lKey = oKey + ':' + marker.id, lOpen = vOpenNodes.has(lKey);
       const openCount = openMarkerCounts[marker.id] || 0;
       const hidden = !!hiddenMarkerIds[marker.id];
-      html += '<div class="v-node lvl2' + (hidden ? '' : '') + '" onclick="vToggleNode(\'' + lKey + '\')" style="opacity:' + (hidden ? '.55' : '1') + '"><span class="v-caret">' + (lOpen ? '▾' : '▸') + '</span><span class="v-file-icon">📁</span><span class="v-file-label">' + marker.title + '</span>' +
+      const ortActive = paneMatches(paneA, { type: 'ort', sceneId: sceneId, ortId: marker.id });
+      html += '<div class="v-node lvl2' + (ortActive ? ' active' : '') + '" onclick="vOpenOrtFolder(\'' + lKey + '\',\'' + sceneId + '\',\'' + marker.id + '\')" style="opacity:' + (hidden ? '.55' : '1') + '"><span class="v-caret">' + (lOpen ? '▾' : '▸') + '</span><span class="v-file-icon">📁</span><span class="v-file-label">' + marker.title + '</span>' +
         (openCount > 0 ? '<span class="v-tag" style="margin-left:auto">' + openCount + '</span>' : '') + '</div>';
       if (!lOpen) return;
-      html += vFileRow({ type: 'ort', sceneId: sceneId, ortId: marker.id }, '📄 Übersicht', '📄', 3);
       iaKeys.forEach(function (iaId) {
         html += vFileRow({ type: 'ia', sceneId: sceneId, ortId: marker.id, iaId: iaId }, ort.interaktionen[iaId].title, '📄', 3);
       });
