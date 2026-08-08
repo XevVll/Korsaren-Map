@@ -53,9 +53,9 @@ Spielleiter-Ansicht (`regie.html`) live mit der Spieler-Kartenansicht (`karte.ht
 - **Bilder:** Neues PNG in `images/` ablegen, dann `python3 tools/optimize_images.py` (WebP,
   Kantenlänge je nach Namensmuster gekappt). Löscht das PNG NICHT automatisch, trägt den neuen
   Dateinamen NICHT automatisch in `.js`-Dateien ein — beides bleibt manuell.
-- **Audio:** `python3 tools/optimize_audio.py <datei.mp3>` (Opus/OGG, 64 kbps VBR, volle Länge
-  bleibt erhalten). Hendrik hört jede konvertierte Datei komplett an — nicht ohne explizites
-  „passt" mergen.
+- **Audio:** Datei in `audio/` ablegen, dann `python3 tools/optimize_audio.py <datei.mp3>`
+  (Opus/OGG, 64 kbps VBR, volle Länge bleibt erhalten). Hendrik hört jede konvertierte Datei
+  komplett an — nicht ohne explizites „passt" mergen.
 - **Git-Push-Eigenheit:** Der Remote-Feature-Branch behält oft eine veraltete Spitze von vor
   einem früheren Squash-Merge, wodurch `git push` als „non-fast-forward" abgelehnt wird, obwohl
   der Inhalt längst in `main` gemergt ist. Fix: `git fetch origin <branch>`, dann
@@ -75,6 +75,15 @@ Hendrik entwickelt Story-Inhalte selbst — keine proaktiven Inhaltsvorschläge 
 Bei Story-Lücken lieber `[OFFEN]` in der Bibel vermerken als selbst etwas erfinden.
 
 ## Changelog
+
+### 2026-08-08
+- **Audiodateien in eigenen `audio/`-Ordner verschoben** (analog zu `images/`): `Grimgate1.ogg`,
+  `island1.ogg`, `ship1.ogg`, `storm1.ogg` liegen jetzt in `audio/` statt im Hauptordner.
+  `tools/optimize_audio.py` liest/schreibt jetzt dort. In `karte.html`/`grimsgate_demo.html` wird
+  das `audio/`-Präfix zentral beim Setzen von `bgAudio.src` ergänzt — die gespeicherten
+  Dateinamen selbst (in den Szenen-Dateien UND live in Firebase unter
+  `sceneAudioFile/{sceneId}`) bleiben unverändert als bloße Dateinamen (z. B. `"storm1.ogg"`),
+  daher war keine Migration bestehender Firebase-Werte nötig.
 
 ### 2026-08-01
 - **Golden-Lion-Ankunft ausformuliert:** neue Interaktion in `ORTE.golden_lion`
