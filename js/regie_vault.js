@@ -201,7 +201,7 @@ function attachHiddenMarkersListener(sceneId) {
   hiddenMarkersScene = sceneId; hiddenMarkerIds = {};
   if (!db || !sceneId) return;
   hiddenMarkersRef = db.ref('hiddenMarkersLive/' + fbKey(sceneId));
-  hiddenMarkersListener = hiddenMarkersRef.on('value', function (snap) { hiddenMarkerIds = snap.val() || {}; renderTree(); });
+  hiddenMarkersListener = hiddenMarkersRef.on('value', function (snap) { hiddenMarkerIds = snap.val() || {}; renderAll(); });
 }
 function toggleMarkerVisibility(sceneId, markerId) {
   if (!db) return;
