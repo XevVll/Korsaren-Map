@@ -54,7 +54,7 @@ Eintrag in `js/characters.js`:
 ```js
 { id: "harwick", name: "James Harwick", img: "images/James_Harwick.webp" }
 ```
-Bild muss vorher durch die Asset-Pipeline gelaufen sein (siehe Skill `korsaren-assets`).
+Bild muss vorher durch die Asset-Pipeline gelaufen sein (siehe Skill `pnp-assets`).
 
 ## Schritt 3: Wo der neue NPC danach sichtbar wird
 

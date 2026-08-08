@@ -76,7 +76,7 @@ für denselben Marker, unabhängig von Szene/Trigger — Firebase-Pfad `markerVa
 **Design-Regel 2.8 (verbindlich):** `desc` ist reine Ort-/Stimmungsangabe für Spieler — kein
 Plot-Wissen, kein Handlungsauftrag, keine Vorwegnahme dessen, was der GM eigentlich selbst
 enthüllen soll. GM-Hintergrundwissen gehört ausschließlich nach `js/regie.js`. Siehe auch Skill
-`korsaren-content-style` zum Gegenlesen.
+`pnp-content-style` zum Gegenlesen.
 
 Fehlt ein `img`, zeigt `karte.html` „Kein Bild hinterlegt." — lieber ein Platzhalterbild (z. B.
 das Kartenbild selbst) setzen als das Feld leer zu lassen.
@@ -131,6 +131,6 @@ gewünscht:
       `info`
 - [ ] Bei Mehrfachvorkommen desselben Orts in mehreren Szenen: `nurSzenen`/`nichtInSzenen`/
       `szenenUeberschreibungen` korrekt gesetzt
-- [ ] Neue Bilder durch `tools/optimize_images.py` gelaufen (siehe Skill `korsaren-assets`)
-- [ ] Mit `korsaren-safe-test`-Methode offline geprüft, dass die neue Szene im Admin-Panel und in
+- [ ] Neue Bilder durch `tools/optimize_images.py` gelaufen (siehe Skill `pnp-assets`)
+- [ ] Mit `pnp-safe-test`-Methode offline geprüft, dass die neue Szene im Admin-Panel und in
       `karte.html` ohne Fehler erscheint

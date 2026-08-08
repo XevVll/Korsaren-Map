@@ -29,16 +29,16 @@ Diese Pipeline ist Teil des generischen Werkzeugkastens (`tools/`) und gilt unve
    Verwendungszweck manuell ergänzen:
    - Ort-/Kartenbild → `js/scenes.js`, `js/golden_lion_scenes.js` oder
      `js/schatzinsel_scenes.js` (`img`/`background`/`imgOverrides`-Feld, siehe Skill
-     `korsaren-scene`)
+     `pnp-scene`)
    - Charakter-Porträt → `js/characters.js`
 
 ## Audio (`tools/optimize_audio.py`)
 
-1. Neue Audiodatei (mp3/wav/...) im **Hauptordner** (nicht `images/`) ablegen.
+1. Neue Audiodatei (mp3/wav/...) in **`audio/`** (nicht `images/`, nicht Hauptordner) ablegen.
 2. `python3 tools/optimize_audio.py <dateiname> [weitere...]` — Dateiname ist Pflichtargument,
    kein automatischer Verzeichnis-Scan wie bei Bildern.
-3. Ergebnis: gleichnamige `.ogg`-Datei (Opus, 64 kbps VBR, Metadaten/Cover-Art entfernt) im
-   Hauptordner.
+3. Ergebnis: gleichnamige `.ogg`-Datei (Opus, 64 kbps VBR, Metadaten/Cover-Art entfernt) in
+   `audio/`.
 4. **Quelldatei wird NICHT automatisch gelöscht.**
 5. **Pflicht vor dem Mergen: Hendrik hört jede konvertierte Datei komplett durch.** Nicht ohne
    sein explizites „passt" als abgeschlossen behandeln.
