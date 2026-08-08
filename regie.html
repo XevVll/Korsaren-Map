@@ -111,8 +111,10 @@
   .v-tree-head { padding: 0.56rem 0.8rem 0.32rem; font-size: 0.76rem; letter-spacing: 1.2px; color: var(--vink-faint); }
   .v-pane { grid-row: 1/2; overflow: hidden; display: flex; flex-direction: column; border-right: 1px solid var(--vline); }
   .v-pane-tab { flex: none; padding: 0.4rem 0.96rem; font-size: 0.84rem; color: var(--vink-dim); background: var(--vpanel2); border-bottom: 1px solid var(--vline); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .v-pane-body { flex: 1; overflow-y: auto; padding: 0.8rem 1.12rem; }
-  .v-status { grid-column: 1/5; grid-row: 2/3; display: flex; align-items: center; gap: 0.8rem; padding: 0.32rem 0.8rem; font-size: 0.8rem; color: var(--vink-faint); background: var(--vpanel2); border-top: 1px solid var(--vline); }
+  .v-pane-body { flex: 1; min-height: 0; overflow-y: auto; padding: 0.8rem 1.12rem; }
+  /* rechtsbündig, damit der Text nicht unter dem fest positionierten
+     Würfel-Widget (unten links, siehe #diceControls) verschwindet */
+  .v-status { grid-column: 1/5; grid-row: 2/3; display: flex; align-items: center; justify-content: flex-end; gap: 0.8rem; padding: 0.32rem 0.8rem; font-size: 0.8rem; color: var(--vink-faint); background: var(--vpanel2); border-top: 1px solid var(--vline); }
   .v-rail { grid-row: 1/2; background: var(--vpanel); border-left: 1px solid var(--vline); overflow-y: auto; padding-bottom: 0.8rem; }
   .v-rail-head { padding: 0.56rem 0.8rem 0.32rem; font-size: 0.76rem; letter-spacing: 1.2px; color: var(--vink-faint); text-transform: uppercase; }
   .v-rail-sub { padding: 0.4rem 0.8rem 0.16rem; font-size: 0.68rem; letter-spacing: .6px; text-transform: uppercase; color: var(--vink-faint); opacity: .85; }
@@ -147,14 +149,18 @@
   .v-callout.hinweis { border-left-color: var(--vaccent); background: var(--vaccent-soft); white-space: pre-line; }
   .v-callout.hinweis .v-callout-title { color: var(--vaccent); }
 
-  .v-chk { display: flex; align-items: flex-start; gap: 6px; padding: 1.5px 0; }
-  .v-chk .box { flex: none; width: 0.96rem; height: 0.96rem; margin-top: 2px; border: 1.3px solid var(--vink-faint); border-radius: 2px; cursor: pointer; background: none; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.64rem; color: transparent; }
+  .v-chk { display: flex; align-items: flex-start; gap: 6px; padding: 4px 0; }
+  .v-chk .box { flex: none; width: 0.96rem; height: 0.96rem; margin-top: 3px; border: 1.3px solid var(--vink-faint); border-radius: 2px; cursor: pointer; background: none; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.64rem; color: transparent; }
   .v-chk .box:hover { border-color: var(--vgold); }
   .v-chk .box.on { background: var(--vlive); border-color: var(--vlive); color: #f4ecda; }
-  .v-chk .lbl { flex: 1; min-width: 0; }
+  .v-chk-main { flex: 1; min-width: 0; }
+  .v-chk .lbl { display: block; }
   .v-chk.on .lbl { color: var(--vink-dim); text-decoration: line-through; text-decoration-color: var(--vink-faint); }
   .v-chk .pencil { flex: none; background: none; border: none; color: var(--vink-faint); cursor: pointer; font-size: 0.8rem; padding: 0 2px; }
   .v-chk .pencil:hover, .v-chk .pencil.has { color: var(--vgold); }
+  /* Story-Info direkt am Ablauf-Punkt, wie ein kleiner Lesetext-Ausschnitt */
+  .v-chk-info { margin-top: 3px; padding: 0.32rem 0.56rem; background: var(--vpaper); border-left: 2px solid var(--vgold-soft); border-radius: 0 3px 3px 0; font-size: 0.84rem; line-height: 1.5; color: var(--vink-dim); white-space: pre-line; }
+  .v-chk.on .v-chk-info { opacity: .6; }
   .v-chk-note { margin: 1px 0 5px 1.44rem; }
   .v-note-field { width: 100%; resize: vertical; min-height: 24px; background: var(--vbg); border: 1px solid var(--vline-soft); border-radius: 3px; color: var(--vink); font-family: 'Georgia', serif; font-size: 0.88rem; padding: 4px 6px; line-height: 1.35; }
   .v-note-field:focus { border-color: var(--vgold); outline: none; }

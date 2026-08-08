@@ -377,10 +377,18 @@ function paneLabel(ref) {
 // (regie/{szene}/{ort}/interaktionen/{iaId}/trigger/{triggerId} = bool).
 // Notizen liegen weiterhin EINE gemeinsame Ebene höher, pro Interaktion
 // (nicht pro Trigger) - siehe renderIaNote() - genau wie im alten Schema.
-function chk(path, label, fired) {
+//
+// "info" (optional, viertes Argument) ist der Lesetext-Ausschnitt, der zu
+// GENAU diesem Punkt gehört - steht direkt darunter, statt gesammelt als
+// ein großer Block oben in der Notiz. Fehlt "info" (noch nicht für jede
+// der ~40 echten Interaktionen aufgeteilt), zeigt renderIaNote() als
+// Rückfall weiterhin den kompletten "details"-Text oben an.
+function chk(path, label, fired, info) {
   return '<div class="v-chk' + (fired ? ' on' : '') + '">' +
     '<button class="box' + (fired ? ' on' : '') + '" onclick="vToggleTrigger(\'' + path + '\',' + (fired ? 'false' : 'true') + ')">' + (fired ? '✓' : '') + '</button>' +
-    '<span class="lbl">' + label + '</span></div>';
+    '<div class="v-chk-main"><span class="lbl">' + label + '</span>' +
+    (info ? '<div class="v-chk-info">' + info + '</div>' : '') +
+    '</div></div>';
 }
 function vToggleTrigger(path, val) {
   if (!db) return;
@@ -433,14 +441,21 @@ function renderIaNote(ref, target) {
   const basePath = 'regie/' + fbKey(sceneId) + '/' + fbKey(ortId) + '/interaktionen/' + iaId;
   const backlinks = backlinksForIa(ort, sceneId, iaId);
 
+  // Sobald mindestens ein Trigger ein "info"-Feld hat, gilt die Interaktion
+  // als "aufgeteilt" - der große Lesetext oben entfällt zugunsten von "kurz"
+  // als knappem Einstieg, der Rest hängt direkt an den jeweiligen Punkten.
+  // Ohne "info" (noch nicht aufgeteilte Interaktionen) bleibt "details" oben
+  // als vollständiger Rückfall erhalten, damit nichts verloren geht.
+  const hasInfo = (ia.trigger || []).some(function (t) { return !!t.info; });
+
   function triggerListHtml(dynTrigger) {
-    return (ia.trigger || []).map(function (t) { return chk(basePath + '/trigger/' + t.id, t.label, !!dynTrigger[t.id]); }).join('');
+    return (ia.trigger || []).map(function (t) { return chk(basePath + '/trigger/' + t.id, t.label, !!dynTrigger[t.id], t.info); }).join('');
   }
 
   function draw(dyn) {
     let html = '<h1 class="v-h1">' + ia.title + '</h1>';
     html += '<dl class="v-prop"><dt>ort</dt><dd>' + (marker ? marker.title : ortId) + '</dd><dt>tags</dt><dd><span class="v-tag">#' + fbKey(sceneId) + '</span></dd></dl>';
-    html += '<div class="v-callout readaloud"><div class="v-callout-title">📖 Lesetext</div>' + ia.details + '</div>';
+    html += '<div class="v-callout readaloud"><div class="v-callout-title">📖 ' + (hasInfo ? 'Kurz' : 'Lesetext') + '</div>' + (hasInfo ? ia.kurz : ia.details) + '</div>';
     html += '<div class="v-callout"><div class="v-callout-title">☑ Ablauf</div>' + triggerListHtml(dyn.trigger || {}) + '</div>';
     html += '<div class="v-callout"><div class="v-callout-title">✎ Notiz zur Interaktion</div><textarea class="v-note-field" placeholder="z.B. besondere Reaktionen, Würfe, Abweichungen vom Skript…" data-path="' + basePath + '/notizen">' + (dyn.notizen || '') + '</textarea><div class="v-save-hint"></div></div>';
     html += '<div class="v-backlinks"><h5>Erwähnt' + (backlinks.length ? ' (' + backlinks.length + ')' : '') + '</h5>' +
@@ -593,15 +608,23 @@ function renderRail() {
 }
 
 // ---------- Alles zusammen ----------
+// Baut je Pane ein festes Tab-Label ("was ist hier offen") + einen separat
+// scrollbaren Body-Container - vorher landete der Inhalt direkt im äußeren
+// .v-pane (overflow:hidden), wodurch lange Interaktionen (z.B. "Sorathis
+// Besuch", 13 Trigger) abgeschnitten statt scrollbar waren.
+function mountPane(ref, containerEl) {
+  containerEl.innerHTML = '<div class="v-pane-tab"></div><div class="v-pane-body"></div>';
+  containerEl.querySelector('.v-pane-tab').textContent = paneLabel(ref);
+  renderPane(ref, containerEl.querySelector('.v-pane-body'));
+}
 function renderAll() {
   if (!viewState.szene) return;
   renderTree();
-  renderPane(paneA, document.getElementById('v-paneA'));
-  renderPane(paneB, document.getElementById('v-paneB'));
+  mountPane(paneA, document.getElementById('v-paneA'));
+  mountPane(paneB, document.getElementById('v-paneB'));
   renderRail();
   document.getElementById('v-status').innerHTML =
-    Object.keys(ORTE).length + ' Orte im Datenmodell · Pane A: ' + paneLabel(paneA) + ' · Pane B: ' + paneLabel(paneB) +
-    '<span style="margin-left:auto"></span>';
+    Object.keys(ORTE).length + ' Orte im Datenmodell';
   renderSoundBar();
   renderCharBar();
 }
