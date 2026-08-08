@@ -32,12 +32,14 @@ let charBarScene = null;
 
 let openMarkersRef = null, openMarkersListener = null, openMarkersScene = null, openMarkerCounts = {};
 let hiddenMarkersRef = null, hiddenMarkersListener = null, hiddenMarkersScene = null, hiddenMarkerIds = {};
+let sceneRegieRef = null, sceneRegieListener = null, sceneRegieScene = null, sceneRegieSnapshot = {};
 
 let extraGhosts = {};   // { [fbKey(sceneId)]: { [ghostId]: {name,rolle,verfassung,beduerfnis} } }
 let extraNpcIds = {};   // { [npcId]: true }
 let players = {};       // { [pcId]: {name} }
 let pcRuf = {};         // { [pcId]: { [npcKey]: tier(0-4) } }
 let charStatus = {};    // { [charKey]: Freitext } - siehe charKeyFor(), global statt pro Szene
+let questDone = {};     // { [fbKey(sceneId)]: { [triggerId]: true } } - SL-Ermessen, Bibel 2.9
 let vOpenNodes = new Set();
 let vShowAdd = null;    // 'npc' | 'pc' | null
 
@@ -85,6 +87,7 @@ try {
   db.ref('players').on('value', function (s) { players = s.val() || {}; renderAll(); });
   db.ref('pcRuf').on('value', function (s) { pcRuf = s.val() || {}; renderAll(); });
   db.ref('charStatus').on('value', function (s) { charStatus = s.val() || {}; renderAll(); });
+  db.ref('questDone').on('value', function (s) { questDone = s.val() || {}; renderAll(); });
 } catch (e) {
   statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft. Bitte js/firebase-config.js prüfen.';
   statusEl.className = 'status error';
@@ -202,6 +205,20 @@ function attachHiddenMarkersListener(sceneId) {
   if (!db || !sceneId) return;
   hiddenMarkersRef = db.ref('hiddenMarkersLive/' + fbKey(sceneId));
   hiddenMarkersListener = hiddenMarkersRef.on('value', function (snap) { hiddenMarkerIds = snap.val() || {}; renderAll(); });
+}
+function attachSceneRegieListener(sceneId) {
+  if (sceneId === sceneRegieScene) return;
+  if (sceneRegieRef && sceneRegieListener) sceneRegieRef.off('value', sceneRegieListener);
+  sceneRegieScene = sceneId; sceneRegieSnapshot = {};
+  if (!db || !sceneId) return;
+  sceneRegieRef = db.ref('regie/' + fbKey(sceneId));
+  sceneRegieListener = sceneRegieRef.on('value', function (snap) { sceneRegieSnapshot = snap.val() || {}; renderAll(); });
+}
+function toggleQuestDone(sceneId, triggerId) {
+  if (!db) return;
+  const ref = db.ref('questDone/' + fbKey(sceneId) + '/' + triggerId);
+  const isDone = !!(questDone[fbKey(sceneId)] && questDone[fbKey(sceneId)][triggerId]);
+  if (isDone) ref.remove(); else ref.set(true);
 }
 function toggleMarkerVisibility(sceneId, markerId) {
   if (!db) return;
@@ -344,6 +361,7 @@ function vFileRow(ref, label, icon, level) {
 function renderTree() {
   attachOpenMarkersListener(viewState.szene);
   attachHiddenMarkersListener(viewState.szene);
+  attachSceneRegieListener(viewState.szene);
   const el = document.getElementById('v-tree');
   let html = '<div class="v-tree-head">VAULT</div>';
   getAllSceneEntries().forEach(function (entry) {
@@ -667,9 +685,64 @@ function mountPane(ref, containerEl) {
   containerEl.querySelector('.v-pane-tab').textContent = paneLabel(ref);
   renderPane(ref, containerEl.querySelector('.v-pane-body'));
 }
+// Bibel 2.9: übergeordnetes Ziel + explizite, vom SL ausgesprochene Aufträge.
+// Reine Funktion (nimmt den Szenen-Regie-Teilbaum als Parameter statt selbst
+// zu lesen) - dadurch von renderSceneHead() (live, sceneRegieSnapshot) UND
+// buildSessionExportMarkdown() (Snapshot aus db.ref('regie').once()) gleichermaßen
+// nutzbar, und offline testbar wie buildSessionExportMarkdown().
+function activeQuestsForScene(sceneId, sceneRegie) {
+  const snap = sceneRegie || {};
+  const quests = [];
+  getMarkersForScene(sceneId).forEach(function (marker) {
+    const ortRaw = ORTE[marker.id] || { interaktionen: {} };
+    const ort = resolveOrtForScene(ortRaw, sceneId);
+    const iaKeys = getSceneInteraktionen(ort, sceneId);
+    const ortRegie = snap[marker.id] || {};
+    iaKeys.forEach(function (iaId) {
+      const ia = ort.interaktionen[iaId];
+      const iaRegie = (ortRegie.interaktionen && ortRegie.interaktionen[iaId]) || {};
+      (ia.trigger || []).forEach(function (t) {
+        if (!t.grantsQuest) return;
+        if (!(iaRegie.trigger && iaRegie.trigger[t.id])) return;
+        if (questDone[fbKey(sceneId)] && questDone[fbKey(sceneId)][t.id]) return;
+        quests.push({
+          sceneId: sceneId, triggerId: t.id, ortTitle: marker.title, iaTitle: ia.title,
+          warum: t.grantsQuest.warum, was: t.grantsQuest.was
+        });
+      });
+    });
+  });
+  return quests;
+}
+function renderSceneHead() {
+  const el = document.getElementById('sceneHead');
+  if (!el || !viewState.szene) return;
+  const sr = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[viewState.szene] : null;
+  const quests = activeQuestsForScene(viewState.szene, sceneRegieSnapshot);
+  let html = '';
+  if (sr && sr.uebergeordnetesZiel) {
+    html += '<div class="sh-goal"><span class="sh-goal-label">🎯 Übergeordnetes Ziel</span><span class="sh-goal-text">' + sr.uebergeordnetesZiel + '</span></div>';
+  }
+  if (sr && sr.stimmung) {
+    html += '<div class="sh-mood"><span class="sh-mood-label">Stimmung</span><span class="sh-mood-text">' + sr.stimmung + '</span></div>';
+  }
+  if (quests.length) {
+    html += '<div class="sh-quests"><span class="sh-quests-label">📜 Aktive Aufträge (' + quests.length + ')</span>' +
+      quests.map(function (q) {
+        return '<div class="sh-quest"><div class="sh-quest-body">' +
+          '<div class="sh-quest-was"><b>Was:</b> ' + q.was + '</div>' +
+          '<div class="sh-quest-warum"><b>Warum:</b> ' + q.warum + '</div>' +
+          '<div class="sh-quest-src">' + q.ortTitle + ' — ' + q.iaTitle + '</div></div>' +
+          '<button class="sh-quest-done" onclick="toggleQuestDone(\'' + q.sceneId + '\',\'' + q.triggerId + '\')">✓ erledigt</button></div>';
+      }).join('') + '</div>';
+  }
+  el.classList.toggle('has-content', !!html);
+  el.innerHTML = html;
+}
 function renderAll() {
   if (!viewState.szene) return;
   renderTree();
+  renderSceneHead();
   mountPane(paneA, document.getElementById('v-paneA'));
   mountPane(paneB, document.getElementById('v-paneB'));
   renderRail();
@@ -722,6 +795,22 @@ function buildSessionExportMarkdown(scopeAllScenes, regieSnapshot) {
   const sceneLabels = sceneIds.map(getSceneLabel).join(', ');
   const dateStr = new Date().toLocaleDateString('de-DE');
   let md = '# Session-Export — ' + sceneLabels + ' (' + dateStr + ')\n\n';
+
+  let goalsQuestsMd = '';
+  sceneIds.forEach(function (sceneId) {
+    const sr = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[sceneId] : null;
+    const quests = activeQuestsForScene(sceneId, snap[fbKey(sceneId)] || {});
+    if ((sr && sr.uebergeordnetesZiel) || quests.length) {
+      goalsQuestsMd += '### ' + getSceneLabel(sceneId) + '\n\n';
+      if (sr && sr.uebergeordnetesZiel) goalsQuestsMd += '**Übergeordnetes Ziel:** ' + sr.uebergeordnetesZiel + '\n\n';
+      quests.forEach(function (q) {
+        goalsQuestsMd += '- **Was:** ' + q.was + ' — **Warum:** ' + q.warum + ' _(' + q.ortTitle + ' — ' + q.iaTitle + ')_\n';
+      });
+      goalsQuestsMd += '\n';
+    }
+  });
+  md += '## Übergeordnetes Ziel & Aktive Aufträge\n\n';
+  md += goalsQuestsMd || '_Kein übergeordnetes Ziel gesetzt, keine aktiven Aufträge im gewählten Bereich._\n\n';
 
   let eventsMd = '';
   let notesMd = '';

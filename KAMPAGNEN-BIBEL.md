@@ -96,6 +96,29 @@ Spieler zu diesem Zeitpunkt noch nicht haben können, oder NPC-Ziele vorwegnehme
 Hintergrundwissen für den Spielleiter gehört in GM-Notizen (`regie.js`), sobald diese
 ausgearbeitet werden — nicht in den spielersichtbaren Marker-Text.
 
+### 2.9 Übergeordnetes Ziel + explizite Quests pro Szene
+Jede Szene braucht ein **übergeordnetes Ziel**, dem alles untergeordnet ist (z. B. Grimsgate: an
+Bord der Golden Lion gelangen; Schatzinsel: Harwicks Schatz der Thahal holen und die Insel wieder
+verlassen). Innerhalb dieses Rahmens bekommen die Spieler **mindestens einen klar ausgesprochenen
+Auftrag** — kein System-Hinweis, sondern eine Figur, die im Gespräch explizit sagt, worum es geht.
+Jeder Auftrag hat zwei Teile: **Warum** (narrativ, wieso soll ich das tun) und **Was** (praktisch,
+was ist konkret zu tun). Ob und wie die Spieler den Auftrag erfüllen, bleibt ihre Entscheidung —
+kein Zwang, kein automatischer Fehlschlag. Aufträge können sich verketten (Person A verweist an
+Person B), müssen es aber nicht.
+
+**Verhältnis zu 2.5:** ersetzt NPC-Wünsche (2.5) nicht — NPCs behalten ihre eigenen, organischen
+Bedürfnisse, an denen Spieler frei andocken können. 2.9 stellt nur sicher, dass **mindestens
+einer** dieser Momente pro Szene als klarer, aktiv verfolgbarer Auftrag ausgesprochen wird, statt
+sich rein implizit aus der Atmosphäre zu ergeben. Auslöser für diese Regel: die
+Lagerfeuer-Session auf der Schatzinsel (August 2026), in der die Spieler über eine lange Phase
+hinweg keine aktive Aufgabe hatten außer „der Gruppe folgen" — bei Figuren wie dem Kapitän oder in
+einem fremden Dorf blieb kaum aktives Eingreifen möglich.
+
+Technisch: `SZENEN_REGIE[sceneId].uebergeordnetesZiel` (Freitext) und `grantsQuest: {warum, was}`
+auf einzelnen Trigger-Objekten in `regie.js` (siehe 13.2), sichtbar in der „Szenen-Kopf"-Leiste im
+Admin-Panel. Gilt ab August 2026 für neue Inhalte — kein rückwirkendes Nacharbeiten bereits
+geschriebener Szenen-Prosa.
+
 ---
 
 ## 3. Die Golden Lion
@@ -1083,6 +1106,12 @@ schicken (Details und die Firebase-Falle siehe Docstring im Skript).
   Reload erscheinen. `z-index: 150`, damit sie über Ortsoverlays sichtbar bleibt.
   `object-position: top`, damit bei knappem Platz nur unten beschnitten wird und Gesichter
   vollständig bleiben
+- **`uebergeordnetesZiel`/`grantsQuest`** (neu, August 2026, siehe 2.9): `uebergeordnetesZiel`
+  (Freitext) auf `SZENEN_REGIE[sceneId]`, `grantsQuest: {warum, was}` optional auf einzelnen
+  Trigger-Objekten in `regie.js`. Beides rein statisch (keine Spielerdaten), zusammen mit dem
+  Live-Zustand (ausgelöst? erledigt?) in der neuen „Szenen-Kopf"-Leiste im Admin-Panel
+  angezeigt. Abschluss eines Auftrags ist bewusst SL-Handarbeit (`questDone`, siehe 13.3), nicht
+  automatisch aus Spielverhalten abgeleitet
 
 ### 13.3 Firebase-Pfade
 
@@ -1097,6 +1126,7 @@ schicken (Details und die Firebase-Falle siehe Docstring im Skript).
 | `diceRolls/{pushId}` | Live-Würfel-Feed, selbst-verfallend nach ~90s (siehe 13.6) |
 | `openMarkers/{sceneId}/{markerId}/{sessionId}` | Live-Präsenz: wer hat welchen Ort gerade offen (siehe 13.9) |
 | `hiddenMarkersLive/{sceneId}/{markerId}` | Vom SL live ausgeblendete Marker (siehe 13.10) |
+| `questDone/{sceneId}/{triggerId}` | Vom SL manuell als erledigt markierte Aufträge (siehe 2.9) |
 
 ### 13.4 Bildvarianten-System
 
