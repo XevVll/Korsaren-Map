@@ -936,8 +936,8 @@ er bei allem Übernatürlichen den Tod nicht bezwingen kann.
 
 ### 13.1 Hosting & Dateien
 
-**GitHub Pages:** `https://xevvll.github.io/Korsaren-Map/`
-(Benutzername „xevvll" — zwei kleine L)
+**GitHub Pages:** `https://xevvll.github.io/PnP-Desk/`
+(Benutzername „xevvll" — zwei kleine L; Repo hieß bis August 2026 „Korsaren-Map")
 
 > **Restrukturierung (Juli 2026):** Das Projekt lag bisher komplett flach im
 > Hauptordner mit uneinheitlichen Namen (u. a. `grimsgate_admin.html`, obwohl
