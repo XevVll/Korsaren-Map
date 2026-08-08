@@ -115,6 +115,82 @@ const MANIFEST_EXTRA = [
       "Spieler decken ihn, statt ihn bloßzustellen → dankbare Loyalität",
       "Spieler stellen seine Unfähigkeit öffentlich bloß → er wird aus Scham zum Feind"
     ]
+  },
+  {
+    id: "eli_trewin", name: "Eli Trewin", role: "Matrose (Zwilling)",
+    triggers: [
+      "Spieler lernen die beiden auseinanderzuhalten → beide sind gerührt und treu",
+      "Spieler bringen einen der beiden zu Schaden → der andere vergisst und vergibt nie"
+    ]
+  },
+  {
+    id: "job_trewin", name: "Job Trewin", role: "Matrose (Zwilling)",
+    triggers: [
+      "Wer Eli gut behandelt, hat auch Job → die beiden sind ein Paket",
+      "Ein Angriff auf Eli macht Job zum stillen Feind"
+    ]
+  },
+  {
+    id: "mara_vega", name: "Marisol „Mara“ Vega", role: "Vollmatrosin",
+    triggers: [
+      "Spieler begegnen ihr als Gleiche und beweisen Können → harter, verlässlicher Respekt",
+      "Spieler behandeln sie herablassend oder machen Avancen → eiskalt, notfalls handgreiflich"
+    ]
+  },
+  {
+    id: "cookie_crup", name: "Bartholomew „Cookie“ Crup", role: "Smutje",
+    triggers: [
+      "Spieler loben sein Essen oder teilen einen Schluck mit ihm → mürrische Zuneigung",
+      "Spieler schimpfen übers Essen → kleinere, kältere Portionen, dauerhaft"
+    ]
+  },
+  {
+    id: "rufus_katt", name: "Rufus Katt", role: "Böttcher",
+    triggers: [
+      "Spieler helfen, gerecht zu rationieren → er merkt es sich",
+      "Spieler stehlen aus den Vorräten → er meldet es sofort nach oben"
+    ]
+  },
+  {
+    id: "osei", name: "Osei", role: "Segelmacher",
+    triggers: [
+      "Spieler nehmen seine Warnungen ernst → er hält sie auf dem Laufenden",
+      "Spieler verspotten seinen Aberglauben → er warnt sie nicht mehr"
+    ]
+  },
+  {
+    id: "diego_vaz", name: "Diego Vaz", role: "Zimmermannsmaat",
+    triggers: [
+      "Spieler packen bei Reparaturen mit an → schneller, williger fertig"
+    ]
+  },
+  {
+    id: "bram_tuck", name: "Bram Tuck", role: "Waffenmeistergehilfe",
+    triggers: [
+      "Spieler gewinnen Wats Respekt → Bram folgt ohne Frage",
+      "Spieler stellen die Rangordnung infrage → er sucht Streit"
+    ]
+  },
+  {
+    id: "pip", name: "Pip", role: "Schiffsjunge / Pulveraffe",
+    triggers: [
+      "Spieler sind freundlich zu ihm oder beschützen ihn → die ganze Crew taut auf",
+      "Spieler bringen ihn in Gefahr oder sind grausam → schwerer Rufsturz bei der gesamten Mannschaft"
+    ]
+  },
+  {
+    id: "jory_pell", name: "Jory Pell", role: "Matrose",
+    triggers: [
+      "Spieler achten seinen Glauben → stiller Beistand, wenn es hart wird",
+      "Spieler lästern über Gott → kalte Ablehnung"
+    ]
+  },
+  {
+    id: "anselm_frei", name: "Anselm Frei", role: "Matrose",
+    triggers: [
+      "Spieler decken ihn und bohren nicht nach → vorsichtiges Vertrauen",
+      "Spieler drohen, seine Vergangenheit auszuplaudern → panische Feindseligkeit"
+    ]
   }
 ];
 

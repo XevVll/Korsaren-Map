@@ -37,6 +37,7 @@ let extraGhosts = {};   // { [fbKey(sceneId)]: { [ghostId]: {name,rolle,verfassu
 let extraNpcIds = {};   // { [npcId]: true }
 let players = {};       // { [pcId]: {name} }
 let pcRuf = {};         // { [pcId]: { [npcKey]: tier(0-4) } }
+let charStatus = {};    // { [charKey]: Freitext } - siehe charKeyFor(), global statt pro Szene
 let vOpenNodes = new Set();
 let vShowAdd = null;    // 'npc' | 'pc' | null
 
@@ -83,6 +84,7 @@ try {
   db.ref('extraNpcs').on('value', function (s) { extraNpcIds = s.val() || {}; renderAll(); });
   db.ref('players').on('value', function (s) { players = s.val() || {}; renderAll(); });
   db.ref('pcRuf').on('value', function (s) { pcRuf = s.val() || {}; renderAll(); });
+  db.ref('charStatus').on('value', function (s) { charStatus = s.val() || {}; renderAll(); });
 } catch (e) {
   statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft. Bitte js/firebase-config.js prüfen.';
   statusEl.className = 'status error';
@@ -322,10 +324,12 @@ function paneMatches(paneRef, ref) {
   return Object.keys(ref).every(function (k) { return paneRef[k] === ref[k]; });
 }
 function vFileRow(ref, label, icon, level) {
+  // Bewusst kein "in Pane B öffnen"-Knopf hier - der Baum öffnet immer in
+  // Pane A, Pane B ist für Charaktere reserviert (über die rechte Leiste),
+  // plus die Backlink-Buttons in den Notizen selbst.
   const inA = paneMatches(paneA, ref), inB = paneMatches(paneB, ref);
   return '<div class="v-file lvl' + level + (inA ? ' inA' : '') + (inB ? ' inB' : '') + '" onclick="paneA=' + JSON.stringify(ref).replace(/"/g, '&quot;') + '; renderAll();">' +
     '<span class="v-file-icon">' + icon + '</span><span class="v-file-label">' + label + '</span>' +
-    '<button class="v-add-btn" style="margin-left:auto" title="rechtes Pane" onclick="event.stopPropagation(); paneB=' + JSON.stringify(ref).replace(/"/g, '&quot;') + '; renderAll();">▸B</button>' +
     '</div>';
 }
 function renderTree() {
@@ -383,13 +387,28 @@ function paneLabel(ref) {
 // ein großer Block oben in der Notiz. Fehlt "info" (noch nicht für jede
 // der ~40 echten Interaktionen aufgeteilt), zeigt renderIaNote() als
 // Rückfall weiterhin den kompletten "details"-Text oben an.
-function chk(path, label, fired, info) {
+// basePath ist der Interaktions-Pfad (.../interaktionen/{iaId}), t das
+// Trigger-Objekt ({id,label,info?}). Zwei Firebase-Werte je Punkt:
+//   .../trigger/{id}          - bool, ob ausgelöst (wie bisher)
+//   .../trigger_notizen/{id}  - freier Kommentar GENAU zu diesem Punkt
+// (zusätzlich zur bestehenden, interaktionsweiten "notizen" darunter).
+function chk(basePath, t, fired, noteVal) {
+  const triggerPath = basePath + '/trigger/' + t.id;
+  const notePath = basePath + '/trigger_notizen/' + t.id;
+  const key = 'tn_' + notePath.replace(/[^a-z0-9]/gi, '_');
+  const noteOpen = !!(noteVal && noteVal.trim());
   return '<div class="v-chk' + (fired ? ' on' : '') + '">' +
-    '<button class="box' + (fired ? ' on' : '') + '" onclick="vToggleTrigger(\'' + path + '\',' + (fired ? 'false' : 'true') + ')">' + (fired ? '✓' : '') + '</button>' +
-    '<div class="v-chk-main"><span class="lbl">' + label + '</span>' +
-    (info ? '<div class="v-chk-info">' + info + '</div>' : '') +
+    '<button class="box' + (fired ? ' on' : '') + '" onclick="vToggleTrigger(\'' + triggerPath + '\',' + (fired ? 'false' : 'true') + ')">' + (fired ? '✓' : '') + '</button>' +
+    '<div class="v-chk-main">' +
+      '<div class="v-chk-lbl-row"><span class="lbl">' + t.label + '</span>' +
+      '<button class="pencil' + (noteOpen ? ' has' : '') + '" onclick="vToggleEl(\'' + key + '\')" title="Kommentar zu diesem Punkt">✎</button></div>' +
+      (t.info ? '<div class="v-chk-info">' + t.info + '</div>' : '') +
+      '<div class="v-chk-note" id="' + key + '" style="display:' + (noteOpen ? 'block' : 'none') + '">' +
+        '<textarea class="v-note-field" placeholder="Kommentar zu diesem Punkt…" data-path="' + notePath + '">' + (noteVal || '') + '</textarea><div class="v-save-hint"></div>' +
+      '</div>' +
     '</div></div>';
 }
+function vToggleEl(id) { const el = document.getElementById(id); if (el) el.style.display = (el.style.display === 'none' ? 'block' : 'none'); }
 function vToggleTrigger(path, val) {
   if (!db) return;
   db.ref(path).set(val).then(renderAll).catch(function (err) { alert('NICHT gespeichert — ' + err.message); });
@@ -448,15 +467,15 @@ function renderIaNote(ref, target) {
   // als vollständiger Rückfall erhalten, damit nichts verloren geht.
   const hasInfo = (ia.trigger || []).some(function (t) { return !!t.info; });
 
-  function triggerListHtml(dynTrigger) {
-    return (ia.trigger || []).map(function (t) { return chk(basePath + '/trigger/' + t.id, t.label, !!dynTrigger[t.id], t.info); }).join('');
+  function triggerListHtml(dynTrigger, dynTriggerNotizen) {
+    return (ia.trigger || []).map(function (t) { return chk(basePath, t, !!dynTrigger[t.id], (dynTriggerNotizen || {})[t.id]); }).join('');
   }
 
   function draw(dyn) {
     let html = '<h1 class="v-h1">' + ia.title + '</h1>';
     html += '<dl class="v-prop"><dt>ort</dt><dd>' + (marker ? marker.title : ortId) + '</dd><dt>tags</dt><dd><span class="v-tag">#' + fbKey(sceneId) + '</span></dd></dl>';
     html += '<div class="v-callout readaloud"><div class="v-callout-title">📖 ' + (hasInfo ? 'Kurz' : 'Lesetext') + '</div>' + (hasInfo ? ia.kurz : ia.details) + '</div>';
-    html += '<div class="v-callout"><div class="v-callout-title">☑ Ablauf</div>' + triggerListHtml(dyn.trigger || {}) + '</div>';
+    html += '<div class="v-callout"><div class="v-callout-title">☑ Ablauf</div>' + triggerListHtml(dyn.trigger || {}, dyn.trigger_notizen || {}) + '</div>';
     html += '<div class="v-callout"><div class="v-callout-title">✎ Notiz zur Interaktion</div><textarea class="v-note-field" placeholder="z.B. besondere Reaktionen, Würfe, Abweichungen vom Skript…" data-path="' + basePath + '/notizen">' + (dyn.notizen || '') + '</textarea><div class="v-save-hint"></div></div>';
     html += '<div class="v-backlinks"><h5>Erwähnt' + (backlinks.length ? ' (' + backlinks.length + ')' : '') + '</h5>' +
       (backlinks.length ? backlinks.map(function (b) { return '<button class="v-backlink-item" onclick="paneB=' + JSON.stringify(b.ref).replace(/"/g, '&quot;') + '; renderAll();"><b>' + b.label + '</b> <span>' + b.sub + '</span></button>'; }).join('') : '<div class="v-empty">Keine Verknüpfungen gefunden.</div>') +
@@ -471,11 +490,28 @@ function renderIaNote(ref, target) {
     .catch(function (err) { console.error('Fehler beim Laden von', basePath, err); });
 }
 
+// Freitext-Status je Charakter (NPC/Ghost/PC) - liegt unter charStatus/{key}
+// in Firebase, GLOBAL (nicht pro Szene), damit der Zustand einer Person
+// tatsächlich von Szene zu Szene mitgenommen wird, statt bei jedem
+// Szenenwechsel verloren zu gehen. Ergänzt "Erwähnt in" (was die Person
+// betrifft), nicht ersetzt es.
+function charKeyFor(ref) {
+  if (ref.type === 'npc') return 'npc_' + ref.npcId;
+  if (ref.type === 'ghost') return 'ghost_' + fbKey(ref.sceneId) + '_' + ref.ghostId;
+  if (ref.type === 'pc') return 'pc_' + ref.pcId;
+  return null;
+}
+function statusBlockHtml(charKey) {
+  return '<div class="v-callout"><div class="v-callout-title">📌 Aktueller Status</div>' +
+    '<textarea class="v-note-field" placeholder="z.B. verletzt am Bein, weiß von X, misstraut Y…" data-path="charStatus/' + charKey + '">' + (charStatus[charKey] || '') + '</textarea><div class="v-save-hint"></div></div>';
+}
+
 function renderNpcNote(ref, target) {
   const n = npcRecord(ref.npcId);
   if (!n) { target.innerHTML = '<div class="v-empty">Nicht gefunden.</div>'; return; }
   let html = '<h1 class="v-h1">' + n.name + '</h1>';
   html += '<dl class="v-prop"><dt>rolle</dt><dd>' + n.role + '</dd></dl>';
+  html += statusBlockHtml(charKeyFor(ref));
   html += '<div class="v-callout"><div class="v-callout-title">± Trigger &amp; Ruf-Verbindungen</div>' +
     (n.triggers || []).map(function (t) { return '<div class="v-sb-line">◆ ' + t + '</div>'; }).join('') + '</div>';
   const pcs = Object.keys(players).map(function (id) { return Object.assign({ id: id }, players[id]); });
@@ -495,6 +531,7 @@ function renderNpcNote(ref, target) {
     }).join('') : '<div class="v-empty">Keine Verknüpfungen gefunden.</div>') +
     '</div>';
   target.innerHTML = html;
+  bindNoteFields(target);
 }
 
 function renderGhostNote(ref, target) {
@@ -502,24 +539,28 @@ function renderGhostNote(ref, target) {
   if (!g) { target.innerHTML = '<div class="v-empty">Nicht gefunden.</div>'; return; }
   let html = '<h1 class="v-h1">' + g.name + ' <span class="v-tag">👻 Ghost</span></h1>';
   html += '<dl class="v-prop"><dt>rolle</dt><dd>' + g.rolle + '</dd><dt>szene</dt><dd>' + getSceneLabel(ref.sceneId) + '</dd></dl>';
+  html += statusBlockHtml(charKeyFor(ref));
   html += '<div class="v-callout"><div class="v-callout-title">Verfassung &amp; Bedürfnis</div>' + g.verfassung + '<div class="v-sb-line" style="margin-top:4px"><b>Bedürfnis</b> ' + g.beduerfnis + '</div></div>';
   const mentions = iaMentioningGhost(ref.sceneId, ref.ghostId);
   html += '<div class="v-backlinks"><h5>Erwähnt in' + (mentions.length ? ' (' + mentions.length + ')' : '') + '</h5>' +
     (mentions.length ? mentions.map(function (m) { return '<button class="v-backlink-item" onclick="paneB={type:\'ia\',sceneId:\'' + m.sceneId + '\',ortId:\'' + m.ortId + '\',iaId:\'' + m.iaId + '\'}; renderAll();"><b>' + m.title + '</b> <span>· ' + m.ortTitle + '</span></button>'; }).join('') : '<div class="v-empty">Keine Verknüpfungen gefunden.</div>') +
     '</div>';
   target.innerHTML = html;
+  bindNoteFields(target);
 }
 
 function renderPcNote(ref, target) {
   const pc = players[ref.pcId];
   if (!pc) { target.innerHTML = '<div class="v-empty">Nicht gefunden.</div>'; return; }
   let html = '<h1 class="v-h1">' + pc.name + ' <span class="v-tag">🎭 Spielercharakter</span></h1>';
+  html += statusBlockHtml(charKeyFor(ref));
   html += '<div class="v-callout"><div class="v-callout-title">☆ Ruf bei den NPCs</div>' +
     trackableNpcs().map(function (n) {
       const t = getPcRuf(ref.pcId, n.id);
       return '<div class="v-ruf-row"><span class="v-ruf-name">' + n.name + '</span>' + rufTrackHtml(ref.pcId, n.id, t) + '<span class="v-ruf-tier">' + RUF_TIERS[t] + '</span></div>';
     }).join('') + '</div>';
   target.innerHTML = html;
+  bindNoteFields(target);
 }
 
 function renderPane(ref, target) {
@@ -576,7 +617,7 @@ function renderRail() {
   const pcs = Object.keys(players).map(function (id) { return Object.assign({ id: id }, players[id]); });
 
   let html = '<div class="v-rail-head">Charaktere</div>';
-  html += '<div class="v-rail-sub v-folder-row">NPCs <button class="v-add-btn" onclick="vToggleAdd(\'npc\')" title="NPC hinzufügen">+</button></div>';
+  html += '<div class="v-rail-sub v-folder-row"><span class="v-rail-sub-label">NPCs</span><button class="v-add-btn" onclick="vToggleAdd(\'npc\')" title="NPC hinzufügen">+</button></div>';
   if (vShowAdd === 'npc') {
     const avail = MANIFEST_EXTRA.filter(function (m) { return !extraNpcIds[m.id]; });
     html += '<div class="v-add-panel"><div class="v-add-sub">Aus dem Crew-Manifest</div>' +
@@ -586,7 +627,7 @@ function renderRail() {
   html += npcs.map(function (n) { return vRailItem({ type: 'npc', npcId: n.id }, n.name, '👤'); }).join('');
 
   if (focusScene) {
-    html += '<div class="v-rail-sub">Ghosts · ' + getSceneLabel(focusScene) + ' <button class="v-add-btn" onclick="vToggleAdd(\'ghost\')" title="Ghost anlegen" style="margin-left:6px">+</button></div>';
+    html += '<div class="v-rail-sub v-folder-row"><span class="v-rail-sub-label">Ghosts · ' + getSceneLabel(focusScene) + '</span><button class="v-add-btn" onclick="vToggleAdd(\'ghost\')" title="Ghost anlegen">+</button></div>';
     if (vShowAdd === 'ghost') {
       html += '<div class="v-add-panel"><form class="v-form" onsubmit="event.preventDefault(); vSubmitGhost(this,\'' + focusScene + '\');">' +
         '<input name="name" placeholder="Name" required>' +
@@ -598,7 +639,7 @@ function renderRail() {
     html += ghosts.length ? ghosts.map(function (g) { return vRailItem({ type: 'ghost', sceneId: focusScene, ghostId: g.id }, g.name, '👻'); }).join('') : '<div class="v-empty">keine in dieser Szene</div>';
   }
 
-  html += '<div class="v-rail-sub v-folder-row">Spielercharaktere <button class="v-add-btn" onclick="vToggleAdd(\'pc\')" title="Spielercharakter anlegen">+</button></div>';
+  html += '<div class="v-rail-sub v-folder-row"><span class="v-rail-sub-label">Spielercharaktere</span><button class="v-add-btn" onclick="vToggleAdd(\'pc\')" title="Spielercharakter anlegen">+</button></div>';
   if (vShowAdd === 'pc') {
     html += '<div class="v-add-panel"><form class="v-form" onsubmit="event.preventDefault(); vSubmitPc(this);"><input name="name" placeholder="Name" required><button type="submit">Anlegen</button></form></div>';
   }
