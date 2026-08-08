@@ -5,1480 +5,285 @@
 <title>Grimsgate – Admin</title>
 <style>
   :root {
-    --bg: #14100b;
-    --panel: #1a130b;
-    --panel-2: #221808;
-    --line: #3a2a18;
-    --ink: #cbb98f;
-    --ink-dim: #8a7a5c;
-    --ink-faint: #6b5d45;
-    --gold: #c9a24b;
-    --accent: #a8391e;
-    --live: #7fa87f;
-    --live-dim: #3a4a3a;
+    --bg: #14100b; --panel: #1a130b; --panel-2: #221808; --line: #3a2a18;
+    --ink: #cbb98f; --ink-dim: #8a7a5c; --ink-faint: #6b5d45;
+    --gold: #c9a24b; --accent: #a8391e; --live: #7fa87f; --live-dim: #3a4a3a;
   }
-
   * { box-sizing: border-box; }
-
   html, body { height: 100%; }
-
-  body {
-    margin: 0;
-    background: var(--bg);
-    font-family: 'Georgia', 'Times New Roman', serif;
-    color: var(--ink);
-    display: flex;
-    flex-direction: column;
-  }
-
-  header {
-    padding: 20px 24px 14px;
-    text-align: center;
-    border-bottom: 1px solid var(--line);
-  }
-
-  h1 {
-    color: var(--gold);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    font-size: 24px;
-    margin: 0 0 4px 0;
-  }
-
-  .subtitle {
-    color: var(--ink-dim);
-    font-style: italic;
-    font-size: 13px;
-    margin-bottom: 10px;
-  }
-
-  .status {
-    font-size: 12.5px;
-    color: var(--ink-dim);
-  }
-
+  body { margin: 0; background: var(--bg); font-family: 'Georgia', 'Times New Roman', serif; color: var(--ink); display: flex; flex-direction: column; overflow: hidden; }
+  header { padding: 14px 24px 10px; text-align: center; border-bottom: 1px solid var(--line); flex: none; }
+  h1 { color: var(--gold); letter-spacing: 4px; text-transform: uppercase; font-size: 20px; margin: 0 0 4px 0; }
+  .subtitle { color: var(--ink-dim); font-style: italic; font-size: 12px; margin-bottom: 8px; }
+  .status { font-size: 12px; color: var(--ink-dim); }
   .status.connected { color: var(--live); }
   .status.error { color: #c76a5a; }
 
-  /* ---------- Sound-Leiste ---------- */
-  #soundBar {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 24px;
-    border-bottom: 1px solid var(--line);
-    background: var(--panel);
-    font-size: 13px;
-  }
+  #soundBar { display: flex; align-items: center; gap: 10px; padding: 10px 24px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 13px; }
   #soundBarLabel { color: var(--gold); font-family: inherit; white-space: nowrap; }
   .soundBarIcon { color: var(--ink-faint); }
-  #soundLinkInput {
-    flex: 1; max-width: 480px;
-    background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
-    color: var(--ink); font-family: inherit; font-size: 13px;
-    padding: 6px 10px;
-  }
+  #soundLinkInput { flex: 1; max-width: 480px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px; color: var(--ink); font-family: inherit; font-size: 13px; padding: 6px 10px; }
   #soundLinkInput:focus { outline: none; border-color: var(--gold); }
-  #soundLinkHint { font-size: 11px; color: var(--ink-faint); min-width: 140px; }
-  #soundLinkHint.saved { color: var(--live); }
-  #soundLinkHint.error { color: #c76a5a; }
+  .save-hint { font-size: 11px; color: var(--ink-faint); min-width: 100px; }
+  .save-hint.saved { color: var(--live); }
+  .save-hint.error { color: #c76a5a; }
 
-  /* ---------- Charakter-Leiste ---------- */
-  #charBar {
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    padding: 10px 24px;
-    border-bottom: 1px solid var(--line);
-    background: var(--panel);
-    font-size: 13px;
-  }
+  #charBar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 10px 24px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 13px; }
   #charBarLabel { color: var(--gold); white-space: nowrap; }
   #charCheckboxes { display: flex; flex-wrap: wrap; gap: 6px 14px; }
-  .char-toggle {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 12.5px; color: var(--ink-dim);
-    cursor: pointer; user-select: none;
-  }
+  .char-toggle { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--ink-dim); cursor: pointer; user-select: none; }
   .char-toggle input { accent-color: var(--gold); cursor: pointer; }
   .char-toggle.active { color: var(--ink); }
-  .char-more-btn {
-    font-family: inherit; font-size: 12px;
-    background: transparent; border: 1px dashed var(--line);
-    color: var(--ink-faint); border-radius: 3px;
-    padding: 3px 10px; cursor: pointer; white-space: nowrap;
-    transition: border-color .12s, color .12s;
-  }
+  .char-more-btn { font-family: inherit; font-size: 12px; background: transparent; border: 1px dashed var(--line); color: var(--ink-faint); border-radius: 3px; padding: 3px 10px; cursor: pointer; white-space: nowrap; }
   .char-more-btn:hover { border-color: var(--gold); color: var(--ink); }
 
-  /* ---------- Werkzeug-Balken + einklappbares Fach ---------- */
-  #toolbarStrip {
-    display: flex; align-items: center; gap: 16px;
-    padding: 6px 24px;
-    border-bottom: 1px solid var(--line);
-    background: var(--panel);
-  }
-  #toolDrawerToggle {
-    font-family: inherit; font-size: 12px;
-    background: transparent; border: 1px solid var(--line);
-    color: var(--ink-dim); border-radius: 3px;
-    padding: 4px 12px; cursor: pointer;
-    display: flex; align-items: center; gap: 6px;
-    transition: border-color .12s, color .12s;
-  }
+  #toolbarStrip { display: flex; align-items: center; gap: 16px; padding: 6px 24px; border-bottom: 1px solid var(--line); background: var(--panel); flex: none; }
+  #toolDrawerToggle { font-family: inherit; font-size: 12px; background: transparent; border: 1px solid var(--line); color: var(--ink-dim); border-radius: 3px; padding: 4px 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
   #toolDrawerToggle:hover { border-color: var(--gold); color: var(--ink); }
   #toolDrawerToggle .chev { font-size: 10px; transition: transform .15s; }
   #toolDrawerToggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
   #timerTicker { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-  #timerTickerTime {
-    font-family: 'Georgia', serif; font-size: 17px; letter-spacing: 1px; color: var(--gold);
-    min-width: 78px;
-  }
-  #timerTickerAlert {
-    display: none; font-size: 11.5px; color: #e0a08e;
-    border: 1px solid var(--accent); border-radius: 12px; padding: 2px 9px;
-    animation: markPulse 1.6s ease-in-out infinite;
-  }
+  #timerTickerTime { font-family: 'Georgia', serif; font-size: 16px; letter-spacing: 1px; color: var(--gold); min-width: 74px; }
+  #timerTickerAlert { display: none; font-size: 11px; color: #e0a08e; border: 1px solid var(--accent); border-radius: 12px; padding: 2px 9px; animation: markPulse 1.6s ease-in-out infinite; }
   #timerTickerAlert.on { display: inline-block; }
-  #toolDrawer { display: none; border-bottom: 1px solid var(--line); }
+  #toolDrawer { display: none; border-bottom: 1px solid var(--line); flex: none; }
   #toolDrawer.open { display: block; }
   #toolDrawer #charBar { border-bottom: none; }
 
-  /* ---------- Live-Vorschau (Spieleransicht) ---------- */
-  /* Schwebendes Widget unten rechts statt volle Breite, damit die
-     Szenen-Inhalte (Spalten links/mitte) gleichzeitig lesbar bleiben. */
-  #previewWidget {
-    position: fixed; bottom: 16px; right: 16px; z-index: 250;
-    display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
-  }
-  #previewToggle {
-    background: rgba(15,12,8,0.85); border: 1px solid var(--line);
-    color: var(--ink-dim); border-radius: 20px;
-    padding: 6px 14px; font-size: 11.5px;
-    backdrop-filter: blur(2px);
-  }
+  #previewWidget { position: fixed; bottom: 16px; right: 16px; z-index: 250; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  #previewToggle { background: rgba(15,12,8,0.85); border: 1px solid var(--line); color: var(--ink-dim); border-radius: 20px; padding: 6px 14px; font-size: 11.5px; backdrop-filter: blur(2px); }
   #previewToggle:hover { border-color: var(--gold); color: var(--ink); }
-  #previewPanel {
-    display: none;
-    width: 380px; height: 300px;
-    border: 1px solid var(--line); border-radius: 6px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.55);
-    background: #000;
-  }
-  #previewPanel.open {
-    display: block;
-  }
-  #previewFrame {
-    width: 100%; height: 100%; border: none;
-  }
-  @media (max-width: 500px) {
-    #previewPanel { width: 88vw; height: 66vw; }
-  }
+  #previewPanel { display: none; width: 380px; height: 300px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.55); background: #000; }
+  #previewPanel.open { display: block; }
+  #previewFrame { width: 100%; height: 100%; border: none; }
+  @media (max-width: 500px) { #previewPanel { width: 88vw; height: 66vw; } }
 
-  /* ---------- Stoppuhr ---------- */
-  #timerBar {
-    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-    padding: 10px 24px;
-    border-bottom: 1px solid var(--line);
-    background: var(--panel);
-    font-size: 13px;
-  }
-  #timerDisplay {
-    font-family: 'Georgia', serif; font-size: 20px; letter-spacing: 1px;
-    color: var(--gold); min-width: 84px;
-  }
-  .timer-btn {
-    font-family: inherit; font-size: 11.5px;
-    background: transparent; border: 1px solid var(--line);
-    color: var(--ink-faint); border-radius: 3px;
-    padding: 5px 10px; cursor: pointer;
-    transition: border-color .12s, color .12s;
-  }
+  #timerBar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 10px 24px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 13px; }
+  #timerDisplay { font-family: 'Georgia', serif; font-size: 18px; letter-spacing: 1px; color: var(--gold); min-width: 78px; }
+  .timer-btn { font-family: inherit; font-size: 11.5px; background: transparent; border: 1px solid var(--line); color: var(--ink-faint); border-radius: 3px; padding: 5px 10px; cursor: pointer; }
   .timer-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
   .timer-btn.running { border-color: var(--live); color: var(--live); }
   #timerMarkForm { display: flex; align-items: center; gap: 6px; }
-  #timerMarkLabel {
-    width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
-    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 8px;
-  }
-  #timerMarkMinutes {
-    width: 60px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
-    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 8px;
-  }
+  #timerMarkLabel { width: 150px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px; color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 8px; }
+  #timerMarkMinutes { width: 60px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px; color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 8px; }
   #timerMarkLabel:focus, #timerMarkMinutes:focus { outline: none; border-color: var(--gold); }
   #timerMarks { display: flex; flex-wrap: wrap; gap: 6px; }
-  .timer-mark {
-    font-size: 11.5px; color: var(--ink-dim);
-    border: 1px solid var(--line); border-radius: 12px;
-    padding: 4px 10px; cursor: pointer; white-space: nowrap;
-  }
+  .timer-mark { font-size: 11.5px; color: var(--ink-dim); border: 1px solid var(--line); border-radius: 12px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
   .timer-mark:hover { border-color: var(--accent); color: #e0a08e; }
-  .timer-mark.due {
-    border-color: var(--accent); color: #e0a08e; background: rgba(168,57,30,0.15);
-    animation: markPulse 1.6s ease-in-out infinite;
-  }
-  @keyframes markPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(168,57,30,0.4); }
-    50% { box-shadow: 0 0 0 5px rgba(168,57,30,0); }
-  }
+  .timer-mark.due { border-color: var(--accent); color: #e0a08e; background: rgba(168,57,30,0.15); animation: markPulse 1.6s ease-in-out infinite; }
+  @keyframes markPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(168,57,30,0.4); } 50% { box-shadow: 0 0 0 5px rgba(168,57,30,0); } }
 
-  /* ---------- Würfel-Feed (szenenübergreifend, identisch zu karte.html) ---------- */
-  #diceControls {
-    position: fixed; bottom: 16px; left: 16px; z-index: 200;
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    background: rgba(15,12,8,0.75);
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    padding: 8px 14px;
-    backdrop-filter: blur(2px);
-    font-size: 12.5px;
-  }
-  #diceNameLabel {
-    color: var(--ink-dim); cursor: pointer; white-space: nowrap;
-  }
+  #diceControls { position: fixed; bottom: 16px; left: 16px; z-index: 200; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: rgba(15,12,8,0.75); border: 1px solid var(--line); border-radius: 24px; padding: 8px 14px; backdrop-filter: blur(2px); font-size: 12.5px; }
+  #diceNameLabel { color: var(--ink-dim); cursor: pointer; white-space: nowrap; }
   #diceNameLabel:hover { color: var(--gold); }
-  #diceD100Btn, #diceForm button {
-    font-family: inherit; font-size: 12.5px;
-    background: transparent; border: 1px solid var(--line);
-    color: var(--ink); border-radius: 3px;
-    padding: 5px 10px; cursor: pointer;
-  }
+  #diceD100Btn, #diceForm button { font-family: inherit; font-size: 12.5px; background: transparent; border: 1px solid var(--line); color: var(--ink); border-radius: 3px; padding: 5px 10px; cursor: pointer; }
   #diceD100Btn:hover, #diceForm button:hover { border-color: var(--gold); color: var(--gold); }
   #diceForm { display: flex; align-items: center; gap: 6px; }
-  #diceForm input {
-    width: 42px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
-    color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 6px;
-    -moz-appearance: textfield;
-  }
-  #diceForm input::-webkit-outer-spin-button,
-  #diceForm input::-webkit-inner-spin-button {
-    -webkit-appearance: none; margin: 0;
-  }
-  #diceFeed {
-    position: fixed; top: 16px; left: 16px; z-index: 200;
-    display: flex; flex-direction: column; gap: 6px;
-    max-width: 320px;
-  }
-  .dice-toast {
-    background: rgba(15,12,8,0.85);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 6px 12px;
-    font-size: 12.5px; color: var(--ink);
-    transition: opacity .4s ease;
-  }
+  #diceForm input { width: 42px; background: var(--bg); border: 1px solid var(--line); border-radius: 3px; color: var(--ink); font-family: inherit; font-size: 12.5px; padding: 5px 6px; }
+  #diceFeed { position: fixed; top: 16px; left: 16px; z-index: 200; display: flex; flex-direction: column; gap: 6px; max-width: 320px; }
+  .dice-toast { background: rgba(15,12,8,0.85); border: 1px solid var(--line); border-radius: 12px; padding: 6px 12px; font-size: 12.5px; color: var(--ink); transition: opacity .4s ease; }
   .dice-toast.fade { opacity: 0; }
   .dice-toast.private { border-style: dashed; font-style: italic; }
-  #dicePrivateLabel {
-    display: flex; align-items: center; gap: 5px;
-    color: var(--ink-dim); font-size: 12px; cursor: pointer; white-space: nowrap;
-  }
+  #dicePrivateLabel { display: flex; align-items: center; gap: 5px; color: var(--ink-dim); font-size: 12px; cursor: pointer; white-space: nowrap; }
   #dicePrivateLabel input { accent-color: var(--gold); cursor: pointer; }
 
-  /* ---------- Board ---------- */
-  .board {
-    display: grid;
-    grid-template-columns: 260px 300px 1fr;
-    flex: 1;
-    min-height: 0;
+  /* ============================================================
+     VAULT-BOARD — ersetzt die alte 3-Spalten-Ansicht (Szenen/Orte/
+     Detail). Helles Pergament-Schema (bewusst anders als das dunkle
+     App-Chrome oben), Schrift skaliert mit der Fensterbreite.
+     ============================================================ */
+  html { font-size: clamp(14px, 0.5vw + 7px, 19px); }
+  .vault {
+    --vbg: #e9ddc0; --vpanel: #f4ecda; --vpanel2: #f1e8cf; --vpanel3: #e6d9b0;
+    --vline: #cdbb8e; --vline-soft: #dccfa8;
+    --vink: #241a0e; --vink-dim: #5a4a2e; --vink-faint: #8a7550;
+    --vgold: #8a5e12; --vgold-soft: rgba(138,94,18,.13);
+    --vaccent: #9a3018; --vaccent-soft: rgba(154,48,24,.13);
+    --vlive: #3d6b3d; --vlive-soft: rgba(61,107,61,.15);
+    --vwarn: #a8661e; --vwarn-soft: rgba(168,102,30,.14);
+    --vpaper: #fffaf0;
+    display: grid; grid-template-columns: minmax(200px,15rem) 1.3fr 1fr minmax(150px,12rem);
+    grid-template-rows: minmax(0,1fr) auto;
+    flex: 1; min-height: 0;
+    background: var(--vbg); color: var(--vink); font-size: 1rem;
   }
-  .col { overflow-y: auto; border-right: 1px solid var(--line); padding-bottom: 76px; }
-  .col:last-child { border-right: none; }
-  .col-head {
-    position: sticky; top: 0; z-index: 2;
-    padding: 10px 16px;
-    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--ink-faint);
-    background: var(--bg);
-    border-bottom: 1px solid var(--line);
-  }
+  .v-tree { grid-row: 1/2; background: var(--vpanel); border-right: 1px solid var(--vline); overflow-y: auto; padding-bottom: 0.8rem; }
+  .v-tree-head { padding: 0.56rem 0.8rem 0.32rem; font-size: 0.76rem; letter-spacing: 1.2px; color: var(--vink-faint); }
+  .v-pane { grid-row: 1/2; overflow: hidden; display: flex; flex-direction: column; border-right: 1px solid var(--vline); }
+  .v-pane-tab { flex: none; padding: 0.4rem 0.96rem; font-size: 0.84rem; color: var(--vink-dim); background: var(--vpanel2); border-bottom: 1px solid var(--vline); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .v-pane-body { flex: 1; overflow-y: auto; padding: 0.8rem 1.12rem; }
+  .v-status { grid-column: 1/5; grid-row: 2/3; display: flex; align-items: center; gap: 0.8rem; padding: 0.32rem 0.8rem; font-size: 0.8rem; color: var(--vink-faint); background: var(--vpanel2); border-top: 1px solid var(--vline); }
+  .v-rail { grid-row: 1/2; background: var(--vpanel); border-left: 1px solid var(--vline); overflow-y: auto; padding-bottom: 0.8rem; }
+  .v-rail-head { padding: 0.56rem 0.8rem 0.32rem; font-size: 0.76rem; letter-spacing: 1.2px; color: var(--vink-faint); text-transform: uppercase; }
+  .v-rail-sub { padding: 0.4rem 0.8rem 0.16rem; font-size: 0.68rem; letter-spacing: .6px; text-transform: uppercase; color: var(--vink-faint); opacity: .85; }
+  .v-rail-item { display: flex; align-items: center; gap: 0.4rem; width: 100%; text-align: left; background: none; border: none; border-left: 2px solid transparent; padding: 0.24rem 0.8rem; cursor: pointer; color: var(--vink-dim); font-size: 0.86rem; font-family: inherit; }
+  .v-rail-item:hover { background: var(--vpanel3); color: var(--vink); }
+  .v-rail-item.inA { border-left-color: var(--vgold); color: var(--vgold); background: var(--vgold-soft); }
+  .v-rail-item.inB { border-left-color: var(--vlive); color: var(--vlive); }
+  .v-rail-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* ---------- Col 1: Szenen ---------- */
-  .scene-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 12px 10px 16px;
-    border-left: 3px solid transparent;
-    cursor: pointer;
-    transition: background .12s;
-  }
-  .scene-row:hover { background: var(--panel); }
-  .scene-row.selected {
-    background: var(--panel-2);
-    border-left-color: var(--gold);
-  }
-  .scene-row .label { font-size: 14px; display: flex; align-items: center; gap: 7px; }
-  .scene-row .live-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--live); flex: 0 0 auto;
-    box-shadow: 0 0 5px var(--live);
-  }
-  .live-btn {
-    font-family: inherit; font-size: 10.5px;
-    background: transparent; border: 1px solid var(--line);
-    color: var(--ink-faint); border-radius: 3px;
-    padding: 3px 7px; cursor: pointer; white-space: nowrap;
-    transition: border-color .12s, color .12s;
-  }
-  .live-btn:hover { border-color: var(--accent); color: #e0a08e; }
-  .live-btn.is-live { border-color: var(--live); color: var(--live); }
+  .v-node { display: flex; align-items: center; gap: 0.4rem; padding: 0.24rem 0.8rem; cursor: pointer; color: var(--vink-dim); font-size: 0.88rem; }
+  .v-node:hover { background: var(--vpanel3); color: var(--vink); }
+  .v-node.lvl1 { padding-left: 1.76rem; }
+  .v-node.lvl2 { padding-left: 2.72rem; }
+  .v-caret { flex: none; width: 0.8rem; font-size: 0.72rem; color: var(--vink-faint); }
+  .v-file { display: flex; align-items: center; gap: 0.4rem; padding: 0.24rem 0.8rem; cursor: pointer; font-size: 0.88rem; color: var(--vink-dim); border-left: 2px solid transparent; white-space: nowrap; overflow: hidden; }
+  .v-file:hover { background: var(--vpanel3); color: var(--vink); }
+  .v-file.inA { border-left-color: var(--vgold); color: var(--vgold); background: var(--vgold-soft); }
+  .v-file.inB { border-left-color: var(--vlive); color: var(--vlive); }
+  .v-file.lvl3 { padding-left: 3.68rem; }
+  .v-file-icon { flex: none; font-size: 0.8rem; opacity: .75; }
+  .v-file-label { overflow: hidden; text-overflow: ellipsis; }
+  .v-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--vlive); flex: none; box-shadow: 0 0 4px var(--vlive); }
 
-  /* ---------- Col 2: Orte ---------- */
-  .ort-card {
-    margin: 10px 12px; padding: 12px 13px;
-    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
-    cursor: pointer;
-    transition: border-color .12s, background .12s;
-  }
-  .ort-card:hover { border-color: var(--ink-faint); }
-  .ort-card.active { border-color: var(--gold); background: var(--panel-2); }
-  .ort-card.ausgeblendet { opacity: .55; }
-  .ort-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .ort-card .title { font-size: 15px; color: var(--ink); margin-bottom: 4px; }
-  .ort-card-head .title { margin-bottom: 0; }
-  .ort-card .personen { font-size: 11px; color: var(--gold); margin-bottom: 6px; }
-  .ort-card .kurz { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
-  .ort-card.leer .kurz { font-style: italic; }
-  .ort-open-count {
-    display: inline-block;
-    background: var(--live); color: #0a0a0a;
-    border-radius: 10px; padding: 1px 7px;
-    font-size: 11px; font-weight: 700;
-    vertical-align: middle;
-  }
-  .vis-btn {
-    font-family: inherit; font-size: 10px;
-    background: transparent; border: 1px solid var(--live);
-    color: var(--live); border-radius: 3px;
-    padding: 2px 7px; cursor: pointer; white-space: nowrap; flex: 0 0 auto;
-    transition: border-color .12s, color .12s;
-  }
-  .vis-btn:hover { border-color: var(--accent); color: #e0a08e; }
-  .vis-btn.is-hidden { color: var(--ink-faint); border-color: var(--line); }
+  .v-h1 { margin: 0 0 6px; color: var(--vgold); font-size: 1.2rem; line-height: 1.3; }
+  .v-prop { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 0.88rem; margin: 0 0 8px; padding: 0.48rem 0.72rem; background: var(--vpanel2); border: 1px solid var(--vline-soft); border-radius: 4px; }
+  .v-prop dt { color: var(--vink-faint); white-space: nowrap; }
+  .v-prop dd { margin: 0; color: var(--vink); }
+  .v-callout { border-left: 3px solid var(--vink-faint); background: var(--vpanel2); border-radius: 0 4px 4px 0; padding: 0.4rem 0.72rem 0.56rem; margin: 0 0 8px; font-size: 0.96rem; line-height: 1.5; }
+  .v-callout-title { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; letter-spacing: .5px; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; color: var(--vink-dim); }
+  .v-callout.readaloud { border-left-color: var(--vgold); background: var(--vpaper); color: var(--vink); white-space: pre-line; }
+  .v-callout.readaloud .v-callout-title { color: var(--vgold); }
+  .v-callout.hinweis { border-left-color: var(--vaccent); background: var(--vaccent-soft); white-space: pre-line; }
+  .v-callout.hinweis .v-callout-title { color: var(--vaccent); }
 
-  /* ---------- Col 3: Detail ---------- */
-  .ort-detail-head { padding: 18px 24px 10px; border-bottom: 1px solid var(--line); }
-  .ort-detail-head h2 { font-weight: 400; font-size: 21px; margin: 0 0 4px; color: var(--gold); }
-  .ort-detail-head .personen-line { font-size: 12px; color: var(--ink-dim); }
+  .v-chk { display: flex; align-items: flex-start; gap: 6px; padding: 1.5px 0; }
+  .v-chk .box { flex: none; width: 0.96rem; height: 0.96rem; margin-top: 2px; border: 1.3px solid var(--vink-faint); border-radius: 2px; cursor: pointer; background: none; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 0.64rem; color: transparent; }
+  .v-chk .box:hover { border-color: var(--vgold); }
+  .v-chk .box.on { background: var(--vlive); border-color: var(--vlive); color: #f4ecda; }
+  .v-chk .lbl { flex: 1; min-width: 0; }
+  .v-chk.on .lbl { color: var(--vink-dim); text-decoration: line-through; text-decoration-color: var(--vink-faint); }
+  .v-chk .pencil { flex: none; background: none; border: none; color: var(--vink-faint); cursor: pointer; font-size: 0.8rem; padding: 0 2px; }
+  .v-chk .pencil:hover, .v-chk .pencil.has { color: var(--vgold); }
+  .v-chk-note { margin: 1px 0 5px 1.44rem; }
+  .v-note-field { width: 100%; resize: vertical; min-height: 24px; background: var(--vbg); border: 1px solid var(--vline-soft); border-radius: 3px; color: var(--vink); font-family: 'Georgia', serif; font-size: 0.88rem; padding: 4px 6px; line-height: 1.35; }
+  .v-note-field:focus { border-color: var(--vgold); outline: none; }
+  .v-save-hint { font-size: 0.76rem; color: var(--vink-faint); min-height: 1em; }
+  .v-save-hint.saved { color: var(--vlive); }
+  .v-save-hint.error { color: var(--vaccent); }
 
-  .ort-variant-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
-  .variant-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
-  .variant-btn {
-    font-family: inherit; font-size: 12px;
-    background: var(--panel); border: 1px solid var(--line);
-    color: var(--ink-dim); border-radius: 3px;
-    padding: 6px 11px; cursor: pointer;
-    transition: border-color .12s, color .12s, background .12s;
-  }
-  .variant-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
-  .variant-btn.active { border-color: var(--gold); color: var(--gold); background: var(--panel-2); }
-  .variant-hint { font-size: 10.5px; color: var(--ink-faint); margin-top: 6px; min-height: 14px; }
-  .variant-hint.saved { color: var(--live); }
+  .v-tag { display: inline-block; font-family: ui-monospace, Consolas, monospace; font-size: 0.76rem; color: var(--vgold); background: var(--vgold-soft); padding: 1px 5px; border-radius: 3px; margin: 0 3px 3px 0; white-space: nowrap; }
+  .v-sb { border: 1px solid var(--vline-soft); border-radius: 4px; padding: 0.4rem 0.64rem; margin-bottom: 0.4rem; background: var(--vpanel2); }
+  .v-sb-head { display: flex; justify-content: space-between; gap: 8px; font-size: 0.9rem; }
+  .v-sb-name { color: var(--vgold); font-weight: 700; }
+  .v-sb-rolle { color: var(--vink-faint); font-size: 0.8rem; }
+  .v-sb-line { font-size: 0.82rem; color: var(--vink-dim); margin-top: 2px; }
+  .v-sb-line b { color: var(--vink-faint); font-weight: 600; }
 
-  /* ---------- Szenen-Dokument (Stimmung + Ghosts) & Steckbriefe ---------- */
-  .szene-doc-head {
-    margin: 10px 12px 2px; padding: 10px 13px;
-    background: var(--panel); border: 1px solid var(--gold); border-radius: 4px;
-    cursor: pointer; color: var(--gold); font-size: 13px;
-    display: flex; align-items: center; gap: 7px;
-    transition: background .12s, color .12s;
-  }
-  .szene-doc-head:hover { background: var(--panel-2); }
-  .szene-doc-head.active { background: var(--gold); color: #0a0a0a; }
-  .szene-doc-icon { font-size: 14px; }
+  .v-vis-btn { font-family: inherit; font-size: 0.76rem; background: transparent; border: 1px solid var(--vlive); color: var(--vlive); border-radius: 3px; padding: 2px 7px; cursor: pointer; white-space: nowrap; margin-left: auto; }
+  .v-vis-btn:hover { border-color: var(--vaccent); color: var(--vaccent); }
+  .v-vis-btn.is-hidden { color: var(--vink-faint); border-color: var(--vline); }
+  .v-variant-btn { font-family: inherit; font-size: 0.84rem; background: var(--vpanel); border: 1px solid var(--vline); color: var(--vink-dim); border-radius: 3px; padding: 5px 10px; cursor: pointer; margin: 0 6px 6px 0; }
+  .v-variant-btn:hover { border-color: var(--vink-faint); color: var(--vink); }
+  .v-variant-btn.active { border-color: var(--vgold); color: var(--vgold); background: var(--vgold-soft); }
+  .v-live-btn { font-family: inherit; font-size: 0.76rem; background: transparent; border: 1px solid var(--vline); color: var(--vink-faint); border-radius: 3px; padding: 3px 8px; cursor: pointer; margin-left: 6px; }
+  .v-live-btn:hover { border-color: var(--vaccent); color: var(--vaccent); }
+  .v-live-btn.is-live { border-color: var(--vlive); color: var(--vlive); }
 
-  .szene-stimmung {
-    margin: 16px 24px; padding: 16px 20px;
-    background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--gold);
-    border-radius: 4px; font-size: 15px; line-height: 1.7; color: var(--ink);
-  }
+  .v-backlinks { margin-top: 10px; border-top: 1px solid var(--vline-soft); padding-top: 7px; }
+  .v-backlinks h5 { margin: 0 0 5px; font-size: 0.76rem; letter-spacing: 1px; text-transform: uppercase; color: var(--vink-faint); }
+  .v-backlink-item { display: block; width: 100%; text-align: left; background: var(--vpanel2); border: 1px solid var(--vline-soft); border-radius: 3px; padding: 4px 7px; margin-bottom: 3px; cursor: pointer; font-size: 0.84rem; color: var(--vink-dim); }
+  .v-backlink-item b { color: var(--vgold); font-weight: 600; }
+  .v-backlink-item span { color: var(--vink-faint); }
+  .v-backlink-item:hover { border-color: var(--vgold); }
+  .v-empty { font-size: 0.8rem; color: var(--vink-faint); font-style: italic; padding: 0.24rem 0; }
 
-  .steckbrief-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
-  .steckbrief-block label {
-    display: block; font-size: 10.5px; letter-spacing: .08em;
-    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px;
-  }
-  .steckbrief {
-    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
-    padding: 10px 13px; margin-bottom: 10px;
-  }
-  .steckbrief:last-child { margin-bottom: 0; }
-  .steckbrief.koerperlich { border-left: 3px solid var(--accent); }
-  .sb-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 7px; }
-  .sb-name { font-size: 14px; color: var(--ink); font-weight: 600; }
-  .sb-rolle { font-size: 12px; color: var(--gold); }
-  .sb-koerper {
-    font-size: 10px; color: var(--accent); border: 1px solid var(--accent);
-    border-radius: 3px; padding: 1px 6px; margin-left: auto; white-space: nowrap;
-  }
-  .sb-zeile { font-size: 12.5px; line-height: 1.5; color: var(--ink-dim); margin-top: 4px; }
-  .sb-label {
-    display: inline-block; font-size: 9.5px; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--ink-faint); margin-right: 7px; min-width: 62px; vertical-align: baseline;
-  }
+  .v-ruf-track { display: inline-flex; gap: 2px; vertical-align: middle; }
+  .v-ruf-seg { width: 0.88rem; height: 0.56rem; border-radius: 1px; background: var(--vline); cursor: pointer; border: 1px solid var(--vline-soft); padding: 0; }
+  .v-ruf-seg.on { background: var(--vgold); border-color: var(--vgold); }
+  .v-ruf-seg:hover { border-color: var(--vgold); }
+  .v-ruf-row { display: flex; align-items: center; gap: 0.64rem; padding: 0.16rem 0; font-size: 0.88rem; }
+  .v-ruf-name { flex: 1; min-width: 0; }
+  .v-ruf-tier { color: var(--vink-faint); font-size: 0.8rem; white-space: nowrap; }
 
-  .ort-notiz-block { padding: 14px 24px; border-bottom: 1px dashed var(--line); }
-  .ort-hinweis {
-    margin: 14px 24px 0; padding: 12px 15px;
-    background: var(--bg); border: 1px solid var(--line); border-left: 3px solid var(--gold);
-    border-radius: 3px; font-size: 14px; line-height: 1.6; color: var(--ink-dim);
-  }
-  .ort-hinweis-label {
-    display: block; font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--ink-faint); margin-bottom: 5px;
-  }
-  .ort-notiz-block label,
-  .notiz-block label,
-  .trigger-label {
-    display: block; font-size: 10.5px; letter-spacing: .08em;
-    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px;
-  }
+  .v-add-btn { background: none; border: 1px solid var(--vline-soft); color: var(--vink-dim); border-radius: 3px; width: 1.28rem; height: 1.28rem; line-height: 1; cursor: pointer; font-size: 0.88rem; }
+  .v-add-btn:hover { border-color: var(--vgold); color: var(--vgold); }
+  .v-add-panel { margin: 0.32rem 0.8rem 0.8rem; padding: 0.64rem; background: var(--vpanel2); border: 1px solid var(--vline-soft); border-radius: 5px; }
+  .v-add-sub { font-size: 0.76rem; letter-spacing: .4px; text-transform: uppercase; color: var(--vink-faint); margin: 0.48rem 0 0.32rem; }
+  .v-add-sub:first-child { margin-top: 0; }
+  .v-add-item { display: block; width: 100%; text-align: left; background: var(--vpanel); border: 1px solid var(--vline-soft); border-radius: 3px; padding: 0.32rem 0.56rem; margin-bottom: 0.24rem; cursor: pointer; font-size: 0.84rem; color: var(--vink-dim); }
+  .v-add-item i { color: var(--vink-faint); font-style: italic; }
+  .v-add-item:hover { border-color: var(--vgold); color: var(--vgold); }
+  .v-form { display: flex; flex-direction: column; gap: 0.32rem; }
+  .v-form input, .v-form select { background: var(--vbg); border: 1px solid var(--vline-soft); border-radius: 3px; color: var(--vink); font-family: inherit; font-size: 0.84rem; padding: 0.32rem 0.48rem; }
+  .v-form button { margin-top: 0.16rem; background: var(--vgold-soft); border: 1px solid var(--vgold); color: var(--vgold); border-radius: 3px; padding: 0.32rem; font-size: 0.84rem; cursor: pointer; }
+  .v-folder-row { display: flex; align-items: center; justify-content: space-between; padding-right: 0.64rem; }
 
-  textarea {
-    width: 100%; resize: vertical; min-height: 54px;
-    background: var(--panel); border: 1px solid var(--line); border-radius: 3px;
-    color: var(--ink); font-family: inherit; font-size: 13px; padding: 8px 10px;
-    line-height: 1.5;
+  @media (max-width: 980px) {
+    .vault { grid-template-columns: minmax(150px,11rem) 1.3fr 1fr minmax(120px,9rem); }
   }
-  textarea:focus { outline: none; border-color: var(--gold); }
-
-  .save-hint { font-size: 10.5px; color: var(--ink-faint); margin-top: 4px; min-height: 14px; }
-  .save-hint.saved { color: var(--live); }
-
-  .interaktionen { padding: 14px 24px 40px; }
-  .interaktion {
-    border: 1px solid var(--line); border-radius: 4px; margin-bottom: 12px;
-    background: var(--panel); overflow: hidden;
-  }
-  .interaktion.open { border-color: var(--ink-faint); }
-  .interaktion-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px; cursor: pointer;
-  }
-  .interaktion-head .title { font-size: 15px; color: var(--ink); }
-  .interaktion-head .kurz { font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
-  .chevron { color: var(--ink-faint); font-size: 12px; transition: transform .15s; }
-  .interaktion.open .chevron { transform: rotate(90deg); color: var(--gold); }
-  .interaktion-body { display: none; padding: 0 16px 16px; }
-  .interaktion.open .interaktion-body { display: block; }
-
-  .details-text {
-    font-size: 13px; line-height: 1.6; color: var(--ink-dim);
-    background: var(--bg); border: 1px solid var(--line); border-radius: 3px;
-    padding: 12px 14px; margin-bottom: 14px; white-space: pre-line;
-  }
-
-  .trigger {
-    display: flex; align-items: center; gap: 10px;
-    padding: 7px 0; border-bottom: 1px solid var(--line);
-    cursor: pointer; user-select: none;
-  }
-  .trigger:last-of-type { border-bottom: none; }
-  .seal {
-    width: 16px; height: 16px; border-radius: 50%; flex: 0 0 auto;
-    border: 1.5px solid var(--ink-faint); position: relative;
-    transition: border-color .15s, background .15s;
-  }
-  .trigger.fired .seal { border-color: var(--live); background: var(--live-dim); }
-  .trigger.fired .seal::after {
-    content: "✓"; position: absolute; inset: 0; display: flex;
-    align-items: center; justify-content: center; font-size: 10px; color: var(--live);
-  }
-  .trigger-text { font-size: 13px; color: var(--ink-dim); }
-  .trigger.fired .trigger-text { color: var(--ink); }
-
-  .notiz-block { margin-top: 14px; }
-
-  .empty-hint {
-    padding: 60px 24px; text-align: center; color: var(--ink-faint); font-size: 13.5px;
-  }
-
-  /* Rechte Detail-Spalte im Pergament-Look: heller Hintergrund, dunkle
-     Schrift (augenfreundlicher beim vielen Lesen, gleiche Palette wie das
-     Crew-Manifest). Die CSS-Variablen werden NUR hier lokal überschrieben —
-     alle verschachtelten Elemente (Stimmung, Steckbriefe, Regie-Hinweis,
-     Interaktionen, Notizen) erben die hellen Werte automatisch. Die Szenen-
-     und Orte-Spalten links bleiben dunkel (Navigation, Kontrast). */
-  #col-detail {
-    --bg: #e9ddc0;
-    --panel: #f4ecda;
-    --panel-2: #ece0c6;
-    --line: #cebf98;
-    --ink: #241a0e;
-    --ink-dim: #5a4a2e;
-    --ink-faint: #8a7550;
-    --gold: #8a5e12;
-    --accent: #9a3018;
-    --live: #3d6e34;
-    --live-dim: #c8dcc0;
-    background: #dccdaa;
-    color: var(--ink);
-  }
-
-  ::-webkit-scrollbar { width: 9px; }
-  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
-  ::-webkit-scrollbar-track { background: transparent; }
 </style>
 </head>
 <body>
 
-  <header>
-    <h1>Grimsgate – Admin</h1>
-    <div class="subtitle">Links: Szene wählen &amp; live setzen · Mitte/Rechts: Regie-Notizen (nur hier sichtbar)</div>
-    <div class="status" id="status">Verbinde mit Firebase…</div>
-  </header>
+<header>
+  <h1>Grimsgate – Admin</h1>
+  <div class="subtitle">Baum links: Szene → Orte → Ort → Interaktion · Charaktere rechts · Panes in der Mitte (nur hier sichtbar)</div>
+  <div class="status" id="status">Verbinde mit Firebase…</div>
+</header>
 
-  <!-- Schlanker Balken direkt unter dem Header: Toggle für das Werkzeug-Fach
-       (Sound/Timer/Charaktere) + immer sichtbarer Timer-Ticker, damit fällige
-       Merker auch bei eingeklapptem Fach signalisiert werden. -->
-  <div id="toolbarStrip">
-    <button id="toolDrawerToggle" aria-expanded="false">⚙ Werkzeuge <span class="chev">▾</span></button>
-    <div id="timerTicker" title="Stoppuhr (Details im Werkzeug-Fach)">
-      <span id="timerTickerTime">00:00:00</span>
-      <span id="timerTickerAlert" title="Ein Zeit-Merker ist fällig">⏰ Merker fällig</span>
-    </div>
+<div id="toolbarStrip">
+  <button id="toolDrawerToggle" aria-expanded="false">⚙ Werkzeuge <span class="chev">▾</span></button>
+  <div id="timerTicker" title="Stoppuhr (Details im Werkzeug-Fach)">
+    <span id="timerTickerTime">00:00:00</span>
+    <span id="timerTickerAlert" title="Ein Zeit-Merker ist fällig">⏰ Merker fällig</span>
+  </div>
+</div>
+
+<div id="toolDrawer">
+  <div id="soundBar">
+    <span id="soundBarLabel">Szene: –</span>
+    <span class="soundBarIcon">🎵</span>
+    <input type="text" id="soundLinkInput" placeholder="Dateiname der Audiodatei einfügen (z.B. storm1.ogg)…">
+    <span class="save-hint" id="soundLinkHint"></span>
   </div>
 
-  <div id="toolDrawer">
-    <div id="soundBar">
-      <span id="soundBarLabel">Szene: –</span>
-      <span class="soundBarIcon">🎵</span>
-      <input type="text" id="soundLinkInput" placeholder="Dateiname der Audiodatei einfügen (z.B. storm1.ogg)…">
-      <span class="save-hint" id="soundLinkHint"></span>
-    </div>
-
-    <div id="timerBar">
-      <span id="timerDisplay">00:00:00</span>
-      <button class="timer-btn" id="timerStartPause">Start</button>
-      <button class="timer-btn" id="timerReset">Reset</button>
-      <form id="timerMarkForm">
-        <input type="text" id="timerMarkLabel" placeholder="Label, z.B. Junge/Wat">
-        <input type="number" id="timerMarkMinutes" placeholder="Min" min="0">
-        <button type="submit" class="timer-btn">+ Merker</button>
-      </form>
-      <div id="timerMarks"></div>
-    </div>
-
-    <div id="charBar">
-      <span id="charBarLabel">Charaktere in dieser Szene:</span>
-      <div id="charCheckboxes"></div>
-    </div>
+  <div id="timerBar">
+    <span id="timerDisplay">00:00:00</span>
+    <button class="timer-btn" id="timerStartPause">Start</button>
+    <button class="timer-btn" id="timerReset">Reset</button>
+    <form id="timerMarkForm">
+      <input type="text" id="timerMarkLabel" placeholder="Label, z.B. Junge/Wat">
+      <input type="number" id="timerMarkMinutes" placeholder="Min" min="0">
+      <button type="submit" class="timer-btn">+ Merker</button>
+    </form>
+    <div id="timerMarks"></div>
   </div>
 
-  <div id="previewWidget">
-    <div id="previewPanel">
-      <iframe id="previewFrame" title="Live-Vorschau Spieleransicht"></iframe>
-    </div>
-    <button id="previewToggle">▶ Live-Vorschau</button>
+  <div id="charBar">
+    <span id="charBarLabel">Portraits in dieser Szene:</span>
+    <div id="charCheckboxes"></div>
   </div>
+</div>
 
-  <div class="board">
-    <div class="col" id="col-szenen"><div class="col-head">Szenen</div></div>
-    <div class="col" id="col-orte"><div class="col-head">Orte</div></div>
-    <div class="col" id="col-detail"></div>
+<div id="previewWidget">
+  <div id="previewPanel">
+    <iframe id="previewFrame" title="Live-Vorschau Spieleransicht"></iframe>
   </div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-
-  <script src="js/firebase-config.js"></script>
-  <script src="js/scenes.js"></script>
-  <script src="js/golden_lion_scenes.js"></script>
-  <script src="js/schatzinsel_scenes.js"></script>
-  <script src="js/characters.js"></script>
-  <script src="js/dice.js"></script>
-  <script src="js/regie.js"></script>
-
-  <script>
-    const statusEl = document.getElementById('status');
-    let db = null;
-    let liveScene = null;       // aktuell für Spieler live gesetzte Szene (aus Firebase)
-    let viewState = { szene: null, ort: null, szeneDoc: false }; // welche Szene/Ort gerade in der Regie-Ansicht angesehen wird; szeneDoc: Detail-Spalte zeigt das Szenen-Dokument (Stimmung+Ghosts) statt eines Ort-Details
-
-    // Vorgezogen aus den Sound-/Charakter-Leisten-Abschnitten weiter unten:
-    // renderAll() kann synchron aus dem Firebase-Fallback (catch-Block direkt
-    // unten) heraus aufgerufen werden, noch bevor das Skript dort unten
-    // ankommt. Wären diese als let/const erst dort deklariert, würde das an
-    // einem "Cannot access before initialization"-Fehler (TDZ) scheitern.
-    const soundLinkInput = document.getElementById('soundLinkInput');
-    const soundLinkHint = document.getElementById('soundLinkHint');
-    const soundBarLabel = document.getElementById('soundBarLabel');
-    let soundBarScene = null; // welche Szene aktuell im Eingabefeld steht
-    const charCheckboxesEl = document.getElementById('charCheckboxes');
-    let charBarScene = null; // welche Szene aktuell die Checkboxen zeigen
-
-    // ---------- Live-Präsenz: wer hat welchen Ort gerade offen ----------
-    // Vorgezogen aus demselben Grund wie soundBarScene/charBarScene oben -
-    // renderOrte() (weiter unten) greift beim ersten Aufruf schon darauf zu.
-    let openMarkersRef = null;
-    let openMarkersListener = null;
-    let openMarkersScene = null;
-    let openMarkerCounts = {}; // { markerId: Anzahl offener Sessions }
-
-    let hiddenMarkersRef = null;
-    let hiddenMarkersListener = null;
-    let hiddenMarkersScene = null;
-    let hiddenMarkerIds = {}; // { markerId: true } - vom SL live ausgeblendete Orte
-
-    // ---------- Live-Vorschau (Spieleransicht) ----------
-    // Zeigt karte.html per iframe genau so, wie Spieler sie live sehen -
-    // kein eigener Render-Code nötig, da einfach dieselbe Seite eingebettet
-    // wird (bleibt automatisch über Firebase synchron). Ein-/ausklappbar,
-    // Zustand wird in localStorage gemerkt (rein UI-Komfort, kein Firebase-
-    // Pfad nötig, da nur diesen einen Admin-Browser betreffend).
-    (function () {
-      const toggle = document.getElementById('previewToggle');
-      const panel = document.getElementById('previewPanel');
-      const frame = document.getElementById('previewFrame');
-      const STORAGE_KEY = 'korsaren_regie_preview_open';
-      let loaded = false;
-
-      function setOpen(open) {
-        panel.classList.toggle('open', open);
-        toggle.textContent = (open ? '▼' : '▶') + ' Live-Vorschau (Spieleransicht)';
-        localStorage.setItem(STORAGE_KEY, open ? '1' : '0');
-        if (open && !loaded) { frame.src = 'karte.html?preview=1'; loaded = true; }
-      }
-      toggle.addEventListener('click', function () {
-        setOpen(!panel.classList.contains('open'));
-      });
-      setOpen(localStorage.getItem(STORAGE_KEY) === '1');
-    })();
-
-    // ---------- Firebase-Verbindung ----------
-    try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.database();
-      initDiceRoller(db, { allowPrivate: true });
-
-      db.ref('currentScene').on('value', function (snapshot) {
-        liveScene = snapshot.val() || DEFAULT_SCENE;
-        if (!viewState.szene) {
-          viewState.szene = liveScene;
-          viewState.ort = firstOrtOf(viewState.szene);
-        }
-        statusEl.textContent = 'Verbunden — live für Spieler: ' + getSceneLabel(liveScene);
-        statusEl.className = 'status connected';
-        renderAll();
-      }, function (err) {
-        statusEl.textContent = 'Fehler beim Verbinden: ' + err.message;
-        statusEl.className = 'status error';
-      });
-    } catch (e) {
-      statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft. Bitte js/firebase-config.js prüfen.';
-      statusEl.className = 'status error';
-      viewState.szene = DEFAULT_SCENE;
-      viewState.ort = firstOrtOf(viewState.szene);
-      renderAll();
-    }
-
-    function setLiveScene(sceneId) {
-      if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
-      db.ref('currentScene').set(sceneId);
-    }
-
-    function firstOrtOf(sceneId) {
-      const markers = getMarkersForScene(sceneId);
-      if (!markers || markers.length === 0) return null;
-      return markers[0].id;
-    }
-
-    // Vereinheitlichte Sicht auf beide Kartenquellen (Grimsgate-Stadt aus
-    // scenes.js + Golden-Lion-Schiff aus golden_lion_scenes.js), damit der
-    // Rest der Seite nicht wissen muss, aus welcher Datei eine Szene kommt.
-    // Neue Karten (z.B. eine dritte Insel später) können auf dieselbe Art
-    // angehängt werden, ohne dass hier viel geändert werden muss.
-
-    function getAllSceneEntries() {
-      const entries = [];
-      Object.keys(SCENES).forEach(function (id) {
-        entries.push({ id: id, label: SCENES[id].label, source: 'town' });
-      });
-      if (typeof GOLDEN_LION_SCENES !== 'undefined') {
-        Object.keys(GOLDEN_LION_SCENES).forEach(function (id) {
-          entries.push({ id: id, label: GOLDEN_LION_SCENES[id].label, source: 'ship' });
-        });
-      }
-      if (typeof SCHATZINSEL_SCENES !== 'undefined') {
-        Object.keys(SCHATZINSEL_SCENES).forEach(function (id) {
-          entries.push({ id: id, label: SCHATZINSEL_SCENES[id].label, source: 'island' });
-        });
-      }
-      return entries;
-    }
-
-    function getSceneLabel(sceneId) {
-      if (SCENES[sceneId]) return SCENES[sceneId].label;
-      if (typeof GOLDEN_LION_SCENES !== 'undefined' && GOLDEN_LION_SCENES[sceneId]) {
-        return GOLDEN_LION_SCENES[sceneId].label;
-      }
-      if (typeof SCHATZINSEL_SCENES !== 'undefined' && SCHATZINSEL_SCENES[sceneId]) {
-        return SCHATZINSEL_SCENES[sceneId].label;
-      }
-      return sceneId;
-    }
-
-    function getMarkersForScene(sceneId) {
-      if (SCENES[sceneId]) return SCENES[sceneId].markers;
-      if (typeof getGoldenLionMarkers === 'function' && typeof GOLDEN_LION_SCENES !== 'undefined' && GOLDEN_LION_SCENES[sceneId]) {
-        return getGoldenLionMarkers(sceneId);
-      }
-      if (typeof SCHATZINSEL_SCENES !== 'undefined' && SCHATZINSEL_SCENES[sceneId]) {
-        return SCHATZINSEL_SCENES[sceneId].markers;
-      }
-      return [];
-    }
-
-    // Firebase-Realtime-DB-Keys dürfen u.a. keinen Punkt enthalten.
-    // Szenen-IDs wie "1.1" müssen für Pfade umgewandelt werden (nur für
-    // den Firebase-Pfad, Anzeige/Label bleibt unverändert).
-    function fbKey(str) {
-      return String(str).replace(/[.#$\[\]]/g, '-');
-    }
-
-    // ---------- Spalte 1: Szenen ----------
-    function renderSzenen() {
-      const col = document.getElementById('col-szenen');
-      col.innerHTML = '<div class="col-head">Szenen</div>';
-      getAllSceneEntries().forEach(function (entry) {
-        const sceneId = entry.id;
-        const row = document.createElement('div');
-        row.className = 'scene-row' + (viewState.szene === sceneId ? ' selected' : '');
-        row.innerHTML =
-          '<span class="label">' +
-            (sceneId === liveScene ? '<span class="live-dot" title="aktuell live"></span>' : '') +
-            entry.label +
-          '</span>' +
-          '<button class="live-btn' + (sceneId === liveScene ? ' is-live' : '') + '">' +
-            (sceneId === liveScene ? 'live' : 'live setzen') +
-          '</button>';
-        row.querySelector('.label').onclick = function () {
-          viewState.szene = sceneId;
-          viewState.ort = firstOrtOf(sceneId);
-          viewState.szeneDoc = false; // neue Szene startet im Ort-Detail, nicht im Szenen-Dokument
-          renderAll();
-        };
-        row.querySelector('.live-btn').onclick = function (e) {
-          e.stopPropagation();
-          setLiveScene(sceneId);
-        };
-        col.appendChild(row);
-      });
-    }
-
-    // ---------- Spalte 2: Orte ----------
-    // Filtert die Interaktionen eines Ortes auf die für eine bestimmte
-    // Szene relevanten. Zwei optionale, sich ergänzende Felder pro
-    // Interaktion:
-    //   nurSzenen: [id, ...]      - Positivliste. Erscheint NUR, wenn eine
-    //                               dieser Szenen aktiv ist (z.B. "kanone_sturm"
-    //                               mit nurSzenen: ["3.1"] - reiner Sturm-Inhalt).
-    //   nichtInSzenen: [id, ...]  - Negativliste. Erscheint in JEDER Szene
-    //                               AUSSER diesen (z.B. "dirk_vertrauen" mit
-    //                               nichtInSzenen: ["3.1"] - gilt normalerweise
-    //                               immer, ist aber während des Sturms ausgesetzt,
-    //                               weil Dirk dort mit anderem beschäftigt ist).
-    // Fehlen beide Felder, ist die Interaktion wie bisher in JEDER Szene
-    // sichtbar (abwärtskompatibel).
-    function getSceneInteraktionen(ort, sceneId) {
-      const all = ort.interaktionen || {};
-      return Object.keys(all).filter(function (iaId) {
-        const ia = all[iaId];
-        if (ia.nurSzenen && ia.nurSzenen.indexOf(sceneId) === -1) return false;
-        if (ia.nichtInSzenen && ia.nichtInSzenen.indexOf(sceneId) !== -1) return false;
-        return true;
-      });
-    }
-
-    // Optionales Ort-Feld "szenenUeberschreibungen" (z.B. bei "achterdeck"
-    // für Szene "3.1" genutzt): { [sceneId]: { personen?, kurz?, ortHinweis? } }.
-    // Ein Ort ist zwar weiterhin FLACH definiert (ein Eintrag pro Ort-ID,
-    // siehe Datei-Kopf), aber personen/kurz/ortHinweis beschreiben oft nur
-    // den ruhigen Grundzustand - in einer inhaltlich komplett anderen Szene
-    // (z.B. der Sturm) wäre es irreführend, dieselbe Zusammenfassung zu
-    // zeigen. Ist für die aktuelle Szene ein Override gesetzt, überschreibt
-    // er NUR die angegebenen Felder; fehlende Felder fallen auf den
-    // Basiswert des Ortes zurück. "interaktionen" ist davon unabhängig und
-    // bleibt weiterhin über nurSzenen/nichtInSzenen gesteuert (s.o.).
-    function resolveOrtForScene(ort, sceneId) {
-      const override = (ort.szenenUeberschreibungen && ort.szenenUeberschreibungen[sceneId]) || {};
-      return {
-        personen: override.personen !== undefined ? override.personen : ort.personen,
-        kurz: override.kurz !== undefined ? override.kurz : ort.kurz,
-        ortHinweis: override.ortHinweis !== undefined ? override.ortHinweis : ort.ortHinweis,
-        npcs: override.npcs !== undefined ? override.npcs : ort.npcs,
-        interaktionen: ort.interaktionen
-      };
-    }
-
-    // Hängt einen Live-Listener auf openMarkers/{szene} - analog zum
-    // charRailRef/charRailListener-Muster in karte.html (dort zum Lesen der
-    // sichtbaren Portraits, hier zum Zählen offener Marker-Overlays). Der
-    // Guard unten ist nötig, weil renderAll() (und damit dieser Aufruf)
-    // sehr häufig läuft (jeder Klick/jede Eingabe) - anders als in
-    // karte.html, wo der Aufruf schon durch den currentScene-Listener
-    // selbst gedrosselt ist.
-    function attachOpenMarkersListener(sceneId) {
-      if (sceneId === openMarkersScene) return;
-      if (openMarkersRef && openMarkersListener) {
-        openMarkersRef.off('value', openMarkersListener);
-      }
-      openMarkersScene = sceneId;
-      openMarkerCounts = {};
-      if (!db || !sceneId) return;
-      openMarkersRef = db.ref('openMarkers/' + fbKey(sceneId));
-      openMarkersListener = openMarkersRef.on('value', function (snap) {
-        const data = snap.val() || {};
-        openMarkerCounts = {};
-        Object.keys(data).forEach(function (markerId) {
-          openMarkerCounts[markerId] = Object.keys(data[markerId] || {}).length;
-        });
-        renderOrte();
-      });
-    }
-
-    // Hängt einen Live-Listener auf hiddenMarkersLive/{szene} - gleiches
-    // Muster wie attachOpenMarkersListener oben. Steuert, welche Marker
-    // aktuell für Spieler ausgeblendet sind (siehe karte.html,
-    // attachHiddenMarkersListener, und KAMPAGNEN-BIBEL 13.x).
-    function attachHiddenMarkersListener(sceneId) {
-      if (sceneId === hiddenMarkersScene) return;
-      if (hiddenMarkersRef && hiddenMarkersListener) {
-        hiddenMarkersRef.off('value', hiddenMarkersListener);
-      }
-      hiddenMarkersScene = sceneId;
-      hiddenMarkerIds = {};
-      if (!db || !sceneId) return;
-      hiddenMarkersRef = db.ref('hiddenMarkersLive/' + fbKey(sceneId));
-      hiddenMarkersListener = hiddenMarkersRef.on('value', function (snap) {
-        hiddenMarkerIds = snap.val() || {};
-        renderOrte();
-      });
-    }
-
-    function toggleMarkerVisibility(sceneId, markerId) {
-      if (!db) return;
-      const ref = db.ref('hiddenMarkersLive/' + fbKey(sceneId) + '/' + markerId);
-      if (hiddenMarkerIds[markerId]) {
-        ref.remove();
-      } else {
-        ref.set(true);
-      }
-    }
-
-    function renderOrte() {
-      attachOpenMarkersListener(viewState.szene);
-      attachHiddenMarkersListener(viewState.szene);
-      const col = document.getElementById('col-orte');
-      col.innerHTML = '';
-
-      // Szenen-Überblick-Kopf (Grundstimmung + Ghosts) - nur, wenn für die
-      // Szene GM-Material hinterlegt ist. Klick schaltet die Detail-Spalte in
-      // den Szenen-Dokument-Modus (siehe renderSzeneDoc); ein Ort-Klick weiter
-      // unten schaltet zurück.
-      const szeneRegie = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[viewState.szene] : null;
-      if (szeneRegie) {
-        const docHead = document.createElement('div');
-        docHead.className = 'szene-doc-head' + (viewState.szeneDoc ? ' active' : '');
-        docHead.innerHTML = '<span class="szene-doc-icon">📖</span> Szene: Stimmung &amp; Leute';
-        docHead.onclick = function () { viewState.szeneDoc = true; renderAll(); };
-        col.appendChild(docHead);
-      }
-
-      const orteHead = document.createElement('div');
-      orteHead.className = 'col-head';
-      orteHead.textContent = 'Orte';
-      col.appendChild(orteHead);
-
-      const markers = getMarkersForScene(viewState.szene);
-      if (!markers || markers.length === 0) {
-        col.insertAdjacentHTML('beforeend', '<div class="empty-hint">Keine Orte in dieser Szene</div>');
-        return;
-      }
-      markers.forEach(function (marker) {
-        const ortRaw = ORTE[marker.id] || {};
-        const ort = resolveOrtForScene(ortRaw, viewState.szene);
-        const hatInhalt = getSceneInteraktionen(ort, viewState.szene).length > 0;
-        const openCount = openMarkerCounts[marker.id] || 0;
-        const istAusgeblendet = !!hiddenMarkerIds[marker.id];
-        const card = document.createElement('div');
-        card.className = 'ort-card' + (viewState.ort === marker.id ? ' active' : '') + (hatInhalt ? '' : ' leer') + (istAusgeblendet ? ' ausgeblendet' : '');
-        card.innerHTML =
-          '<div class="ort-card-head">' +
-            '<div class="title">' + marker.title +
-            (openCount > 0 ? ' <span class="ort-open-count" title="' + openCount + ' Spieler haben diesen Ort gerade offen">' + openCount + '</span>' : '') +
-            '</div>' +
-            '<button class="vis-btn' + (istAusgeblendet ? ' is-hidden' : '') + '" title="' +
-              (istAusgeblendet ? 'Für Spieler ausgeblendet - klicken zum Aufdecken' : 'Für Spieler sichtbar - klicken zum Ausblenden') +
-            '">' + (istAusgeblendet ? 'ausgeblendet' : 'sichtbar') + '</button>' +
-          '</div>' +
-          (ort.personen ? '<div class="personen">' + ort.personen + '</div>' : '') +
-          '<div class="kurz">' + (ort.kurz || marker.desc) + '</div>';
-        card.querySelector('.vis-btn').onclick = function (e) {
-          e.stopPropagation();
-          toggleMarkerVisibility(viewState.szene, marker.id);
-        };
-        card.onclick = function () { viewState.ort = marker.id; viewState.szeneDoc = false; renderAll(); };
-        col.appendChild(card);
-      });
-    }
-
-    // ---------- Spalte 3: Detail ----------
-    function debounce(fn, ms) {
-      let t = null;
-      return function (...args) { clearTimeout(t); t = setTimeout(function () { fn.apply(null, args); }, ms); };
-    }
-
-    // Baut die Steckbrief-Karten (name/rolle/verfassung/beduerfnis) für eine
-    // Liste von Figuren - gemeinsam genutzt von Ghosts (Szenen-Dokument) und
-    // verankerten NPCs (Ort-Detail). koerperlich:true markiert einen Ghost,
-    // an dem sich ein kampflustiger Spieler gefahrlos reiben kann.
-    function steckbriefCardsHTML(list) {
-      return (list || []).map(function (p) {
-        return '<div class="steckbrief' + (p.koerperlich ? ' koerperlich' : '') + '">' +
-          '<div class="sb-head">' +
-            '<span class="sb-name">' + (p.name || '') + '</span>' +
-            (p.rolle ? '<span class="sb-rolle">' + p.rolle + '</span>' : '') +
-            (p.koerperlich ? '<span class="sb-koerper" title="Gefahrloses körperliches Ventil - hier kann sich ein kampflustiger Spieler reiben">✊ körperlich</span>' : '') +
-          '</div>' +
-          (p.verfassung ? '<div class="sb-zeile"><span class="sb-label">Verfassung</span>' + p.verfassung + '</div>' : '') +
-          (p.beduerfnis ? '<div class="sb-zeile"><span class="sb-label">Bedürfnis</span>' + p.beduerfnis + '</div>' : '') +
-        '</div>';
-      }).join('');
-    }
-
-    // Szenen-Dokument (Grundstimmung + Ghost-Ensemble) in der breiten
-    // Detail-Spalte - zum Vorlesen / Spieler-Hinlocken. Aktiviert über den
-    // Szenen-Kopf in der Orte-Spalte (viewState.szeneDoc).
-    function renderSzeneDoc(col) {
-      const szeneRegie = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[viewState.szene] : null;
-      if (!szeneRegie) {
-        col.innerHTML = '<div class="empty-hint">Für diese Szene ist noch kein Stimmungs-Dokument hinterlegt.</div>';
-        return;
-      }
-      col.innerHTML =
-        '<div class="ort-detail-head"><h2>' + getSceneLabel(viewState.szene) + '</h2>' +
-          '<div class="personen-line">Grundstimmung &amp; frei platzierbare Leute — zum Vorlesen und Einstreuen</div>' +
-        '</div>' +
-        (szeneRegie.stimmung ? '<div class="szene-stimmung">' + szeneRegie.stimmung + '</div>' : '') +
-        (szeneRegie.ghosts && szeneRegie.ghosts.length
-          ? '<div class="steckbrief-block"><label>Leute in der Szene (frei platzierbar, plot-neutral)</label>' +
-              steckbriefCardsHTML(szeneRegie.ghosts) +
-            '</div>'
-          : '');
-    }
-
-    function renderDetail() {
-      const col = document.getElementById('col-detail');
-
-      // Szenen-Dokument-Modus: Detail-Spalte zeigt Stimmung + Ghosts statt
-      // eines einzelnen Ortes (umgeschaltet über den Szenen-Kopf in der
-      // Orte-Spalte).
-      if (viewState.szeneDoc) {
-        renderSzeneDoc(col);
-        return;
-      }
-
-      const sceneMarkers = getMarkersForScene(viewState.szene);
-      const markerInfo = sceneMarkers.find(function (m) { return m.id === viewState.ort; });
-
-      if (!markerInfo) {
-        col.innerHTML = '<div class="empty-hint">Ort wählen, um Regie-Details zu sehen.</div>';
-        return;
-      }
-
-      const ortRaw = ORTE[viewState.ort] || { personen: '', kurz: '', interaktionen: {}, ortHinweis: '' };
-      const ort = resolveOrtForScene(ortRaw, viewState.szene);
-      const dynPath = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort);
-
-      col.innerHTML =
-        '<div class="ort-detail-head"><h2>' + markerInfo.title + '</h2>' +
-          '<div class="personen-line">' + (ort.personen || '') + '</div>' +
-        '</div>' +
-        (ort.ortHinweis ? '<div class="ort-hinweis"><span class="ort-hinweis-label">Hinweis (Regie-Referenz)</span>' + ort.ortHinweis + '</div>' : '') +
-        (ort.npcs && ort.npcs.length
-          ? '<div class="steckbrief-block"><label>Vor Ort</label>' + steckbriefCardsHTML(ort.npcs) + '</div>'
-          : '') +
-        (markerInfo.variants ?
-          '<div class="ort-variant-block">' +
-            '<label>Aktives Bild (unabhängig von Szene/Trigger)</label>' +
-            '<div class="variant-buttons" id="variant-buttons"></div>' +
-            '<div class="variant-hint" id="variant-hint"></div>' +
-          '</div>'
-        : '') +
-        '<div class="ort-notiz-block">' +
-          '<label>Notizen zum Ort (übergeordnet)</label>' +
-          '<textarea id="ort-notiz" placeholder="z.B. allgemeine Stimmung, Vorfälle ohne Bezug zu einer einzelnen Interaktion…"></textarea>' +
-          '<div class="save-hint" id="ort-notiz-hint"></div>' +
-        '</div>' +
-        '<div class="interaktionen" id="interaktionen-list"></div>' +
-        '<div class="sync-warning" id="sync-warning" style="display:none; padding:0 24px 20px; font-size:11.5px; color:#c76a5a;"></div>';
-
-      const iaKeys = getSceneInteraktionen(ort, viewState.szene);
-
-      // Sofort mit statischen Daten rendern (Trigger ungesetzt, Notizfeld leer),
-      // damit die Spalte auch ohne/bei langsamer Firebase-Verbindung nie leer bleibt.
-      document.getElementById('ort-notiz').value = '';
-      renderInteraktionen(ort, iaKeys, {});
-
-      if (markerInfo.variants) {
-        renderVariantButtons(markerInfo);
-      }
-
-      document.getElementById('ort-notiz').addEventListener('input', debounce(function (e) {
-        saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
-      }, 600));
-      document.getElementById('ort-notiz').addEventListener('blur', function (e) {
-        saveField(dynPath + '/ortNotizen', e.target.value, 'ort-notiz-hint');
-      });
-
-      if (!db) return; // ohne Firebase: statischer Stand bleibt, kein Speichern möglich
-
-      // Danach asynchron echten Stand nachladen und drüberlegen, falls vorhanden.
-      db.ref(dynPath).once('value').then(function (snap) {
-        const dyn = snap.val() || {};
-        if (typeof dyn.ortNotizen === 'string') {
-          document.getElementById('ort-notiz').value = dyn.ortNotizen;
-        }
-        if (dyn.interaktionen) {
-          renderInteraktionen(ort, iaKeys, dyn.interaktionen);
-        }
-      }).catch(function (err) {
-        const warn = document.getElementById('sync-warning');
-        if (warn) {
-          warn.style.display = 'block';
-          warn.textContent = 'Gespeicherter Stand (Trigger/Notizen) konnte nicht geladen werden: ' + err.message + ' — angezeigt wird der unbearbeitete Ausgangsstand. Änderungen werden trotzdem versucht zu speichern.';
-        }
-        console.error('Fehler beim Laden von', dynPath, err);
-      });
-    }
-
-    function renderInteraktionen(ort, iaKeys, dynInteraktionen) {
-      const listEl = document.getElementById('interaktionen-list');
-      if (iaKeys.length === 0) return;
-      listEl.innerHTML = '';
-
-      iaKeys.forEach(function (iaId) {
-        const ia = ort.interaktionen[iaId];
-        const dynIa = dynInteraktionen[iaId] || {};
-        const dynTrigger = dynIa.trigger || {};
-
-        const wrap = document.createElement('div');
-        wrap.className = 'interaktion';
-        wrap.innerHTML =
-          '<div class="interaktion-head">' +
-            '<div><div class="title">' + ia.title + '</div><div class="kurz">' + ia.kurz + '</div></div>' +
-            '<div class="chevron">▶</div>' +
-          '</div>' +
-          '<div class="interaktion-body">' +
-            '<div class="details-text">' + ia.details + '</div>' +
-            '<div class="trigger-label">Trigger</div>' +
-            '<div class="trigger-list"></div>' +
-            '<div class="notiz-block">' +
-              '<label>Notizen zu dieser Interaktion</label>' +
-              '<textarea placeholder="z.B. besondere Reaktionen, Würfe, Abweichungen vom Skript…">' + (dynIa.notizen || '') + '</textarea>' +
-              '<div class="save-hint"></div>' +
-            '</div>' +
-          '</div>';
-
-        wrap.querySelector('.interaktion-head').onclick = function () {
-          wrap.classList.toggle('open');
-        };
-
-        const triggerList = wrap.querySelector('.trigger-list');
-        const triggerHint = document.createElement('div');
-        triggerHint.className = 'save-hint';
-        ia.trigger.forEach(function (t) {
-          const fired = !!dynTrigger[t.id];
-          const row = document.createElement('div');
-          row.className = 'trigger' + (fired ? ' fired' : '');
-          row.innerHTML = '<div class="seal"></div><div class="trigger-text">' + t.label + '</div>';
-          row.onclick = function () {
-            const nowFired = !row.classList.contains('fired');
-            row.classList.toggle('fired');
-            triggerHint.textContent = '';
-            triggerHint.style.color = '';
-            if (!db) return;
-            const path = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort) + '/interaktionen/' + iaId + '/trigger/' + t.id;
-            db.ref(path).set(nowFired).catch(function (err) {
-              console.error('Fehler beim Speichern von', path, err);
-              row.classList.toggle('fired'); // zurücksetzen, da nicht gespeichert
-              triggerHint.style.color = '#c76a5a';
-              triggerHint.textContent = 'NICHT gespeichert — ' + err.message;
-            });
-          };
-          triggerList.appendChild(row);
-        });
-        triggerList.insertAdjacentElement('afterend', triggerHint);
-
-        const notizTextarea = wrap.querySelector('.notiz-block textarea');
-        const notizHint = wrap.querySelector('.notiz-block .save-hint');
-        const notizPath = 'regie/' + fbKey(viewState.szene) + '/' + fbKey(viewState.ort) + '/interaktionen/' + iaId + '/notizen';
-        notizTextarea.addEventListener('input', debounce(function (e) {
-          saveField(notizPath, e.target.value, notizHint);
-        }, 600));
-        notizTextarea.addEventListener('blur', function (e) {
-          saveField(notizPath, e.target.value, notizHint);
-        });
-
-        listEl.appendChild(wrap);
-      });
-    }
-
-    // Rendert die Bild-Varianten-Buttons für einen Marker (z.B. Frachtraum
-    // "Standard" / "Leer"). Unabhängig vom Trigger-System: der aktive Wert
-    // liegt unter markerVariant/<markerId> und wirkt sich direkt auf das
-    // Bild aus, das Spieler auf der Karte sehen (siehe karte.html).
-    function renderVariantButtons(markerInfo) {
-      const wrap = document.getElementById('variant-buttons');
-      const hint = document.getElementById('variant-hint');
-      if (!wrap) return;
-
-      const variantKeys = Object.keys(markerInfo.variants);
-      // Fallback, falls in Firebase noch nichts gesetzt ist: die Variante
-      // nehmen, deren Bild dem aktuellen Basis-/Override-Bild entspricht.
-      const implicitDefault = variantKeys.find(function (k) {
-        return markerInfo.variants[k].img === markerInfo.img;
-      }) || variantKeys[0];
-
-      function draw(activeKey) {
-        wrap.innerHTML = '';
-        variantKeys.forEach(function (key) {
-          const variant = markerInfo.variants[key];
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'variant-btn' + (key === activeKey ? ' active' : '');
-          btn.textContent = variant.label || key;
-          btn.onclick = function () {
-            if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
-            const path = 'markerVariant/' + fbKey(markerInfo.id);
-            db.ref(path).set(key).then(function () {
-              draw(key);
-              hint.className = 'variant-hint saved';
-              hint.textContent = 'gespeichert — Spieler sehen jetzt „' + (variant.label || key) + '“';
-              setTimeout(function () { hint.textContent = ''; hint.className = 'variant-hint'; }, 2000);
-            }).catch(function (err) {
-              console.error('Fehler beim Speichern von', path, err);
-              hint.style.color = '#c76a5a';
-              hint.textContent = 'NICHT gespeichert — ' + err.message;
-            });
-          };
-          wrap.appendChild(btn);
-        });
-      }
-
-      draw(implicitDefault); // sofort mit sinnvollem Default zeichnen
-      if (!db) return;
-      db.ref('markerVariant/' + fbKey(markerInfo.id)).once('value').then(function (snap) {
-        const saved = snap.val();
-        if (saved && markerInfo.variants[saved]) draw(saved);
-      }).catch(function (err) {
-        console.error('Fehler beim Laden der aktiven Variante', err);
-      });
-    }
-
-    function saveField(path, value, hintTarget) {
-      const hintEl = typeof hintTarget === 'string' ? document.getElementById(hintTarget) : hintTarget;
-      if (!db) return;
-      db.ref(path).set(value).then(function () {
-        if (hintEl) {
-          hintEl.style.color = '';
-          hintEl.textContent = 'gespeichert';
-          hintEl.classList.add('saved');
-          setTimeout(function () { if (hintEl) { hintEl.textContent = ''; hintEl.classList.remove('saved'); } }, 1500);
-        }
-      }).catch(function (err) {
-        console.error('Fehler beim Speichern von', path, err);
-        if (hintEl) {
-          hintEl.style.color = '#c76a5a';
-          hintEl.textContent = 'NICHT gespeichert — ' + err.message;
-        }
-      });
-    }
-
-    function renderAll() {
-      renderSzenen();
-      renderOrte();
-      renderDetail();
-      renderSoundBar();
-      renderCharBar();
-    }
-
-    // ---------- Stoppuhr (rein admin-seitig, GM definiert eigene Merker) ----------
-    // Zustand liegt unter gmTimer/ in Firebase (nicht unter regie/ oder
-    // markerVariant/, da unabhängig von Szene/Ort - eine durchgehende
-    // Session-Uhr). So bleibt der Stand auch bei Neuladen der Admin-Seite
-    // erhalten. "Marks" sind frei benannte Erinnerungen (Label + Minute),
-    // die der SL live selbst setzt - keine im Code fest hinterlegten
-    // Zeitpunkte, damit sich später verzweigende Handlungsstränge nicht
-    // gegenseitig ins Gehege kommen.
-    const timerDisplayEl = document.getElementById('timerDisplay');
-    const timerTickerTimeEl = document.getElementById('timerTickerTime');
-    const timerTickerAlertEl = document.getElementById('timerTickerAlert');
-    const timerStartPauseBtn = document.getElementById('timerStartPause');
-    const timerResetBtn = document.getElementById('timerReset');
-    const timerMarkForm = document.getElementById('timerMarkForm');
-    const timerMarkLabelInput = document.getElementById('timerMarkLabel');
-    const timerMarkMinutesInput = document.getElementById('timerMarkMinutes');
-    const timerMarksEl = document.getElementById('timerMarks');
-
-    let gmTimerState = { running: false, startedAt: null, elapsedBeforeStart: 0, marks: {} };
-    let timerTickInterval = null;
-
-    function formatElapsed(totalSeconds) {
-      const s = Math.max(0, Math.floor(totalSeconds));
-      const hh = String(Math.floor(s / 3600)).padStart(2, '0');
-      const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
-      const ss = String(s % 60).padStart(2, '0');
-      return hh + ':' + mm + ':' + ss;
-    }
-
-    function currentElapsedSeconds() {
-      let sec = gmTimerState.elapsedBeforeStart || 0;
-      if (gmTimerState.running && gmTimerState.startedAt) {
-        sec += (Date.now() - gmTimerState.startedAt) / 1000;
-      }
-      return sec;
-    }
-
-    function renderTimerTick() {
-      const elapsedSec = currentElapsedSeconds();
-      timerDisplayEl.textContent = formatElapsed(elapsedSec);
-
-      const elapsedMin = elapsedSec / 60;
-      let anyDue = false;
-      timerMarksEl.querySelectorAll('.timer-mark').forEach(function (el) {
-        const targetMin = parseFloat(el.dataset.minutes);
-        const due = elapsedMin >= targetMin;
-        el.classList.toggle('due', due);
-        if (due) anyDue = true;
-      });
-
-      // Timer-Ticker im Werkzeug-Balken spiegeln (immer sichtbar, auch bei
-      // eingeklapptem Fach) - damit ein fälliger Merker nicht übersehen wird.
-      timerTickerTimeEl.textContent = timerDisplayEl.textContent;
-      timerTickerAlertEl.classList.toggle('on', anyDue);
-    }
-
-    function renderTimerBar() {
-      timerStartPauseBtn.textContent = gmTimerState.running ? 'Pause' : 'Start';
-      timerStartPauseBtn.classList.toggle('running', gmTimerState.running);
-
-      timerMarksEl.innerHTML = '';
-      Object.keys(gmTimerState.marks || {}).forEach(function (markId) {
-        const mark = gmTimerState.marks[markId];
-        const chip = document.createElement('div');
-        chip.className = 'timer-mark';
-        chip.dataset.minutes = mark.minutes;
-        chip.textContent = mark.label + ' (' + mark.minutes + ' Min)';
-        chip.title = 'Klicken zum Entfernen';
-        chip.onclick = function () {
-          if (!db) return;
-          db.ref('gmTimer/marks/' + markId).remove();
-        };
-        timerMarksEl.appendChild(chip);
-      });
-
-      renderTimerTick();
-
-      clearInterval(timerTickInterval);
-      if (gmTimerState.running) {
-        timerTickInterval = setInterval(renderTimerTick, 1000);
-      }
-    }
-
-    if (db) {
-      db.ref('gmTimer').on('value', function (snap) {
-        const val = snap.val() || {};
-        gmTimerState = {
-          running: !!val.running,
-          startedAt: val.startedAt || null,
-          elapsedBeforeStart: val.elapsedBeforeStart || 0,
-          marks: val.marks || {}
-        };
-        renderTimerBar();
-      });
-    } else {
-      renderTimerBar();
-    }
-
-    timerStartPauseBtn.onclick = function () {
-      if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
-      if (gmTimerState.running) {
-        // Pausieren: laufende Zeit einfrieren, startedAt löschen
-        db.ref('gmTimer').update({
-          running: false,
-          elapsedBeforeStart: currentElapsedSeconds(),
-          startedAt: null
-        });
-      } else {
-        // Starten: ab jetzt weiterzählen, vorhandene elapsedBeforeStart bleibt Basis
-        db.ref('gmTimer').update({
-          running: true,
-          startedAt: Date.now()
-        });
-      }
-    };
-
-    timerResetBtn.onclick = function () {
-      if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
-      db.ref('gmTimer').update({ running: false, startedAt: null, elapsedBeforeStart: 0 });
-    };
-
-    timerMarkForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
-      const label = timerMarkLabelInput.value.trim();
-      const minutes = parseFloat(timerMarkMinutesInput.value);
-      if (!label || isNaN(minutes)) return;
-      db.ref('gmTimer/marks').push({ label: label, minutes: minutes });
-      timerMarkLabelInput.value = '';
-      timerMarkMinutesInput.value = '';
-      timerMarkLabelInput.focus();
-    });
-
-    // ---------- Sound-Leiste (YouTube-Link pro Szene) ----------
-    // Deklarationen (soundLinkInput/-Hint/-Label, soundBarScene) liegen jetzt
-    // oben bei den anderen Skript-weiten Variablen, siehe Kommentar dort.
-
-    // Prüft, ob der eingegebene Text plausibel eine Audiodatei benennt
-    // (endet auf eine gängige Audio-Dateiendung). Erlaubt auch relative
-    // Pfade (z.B. "audio/sturm.mp3"), falls die Dateien in einem
-    // Unterordner liegen.
-    function isPlausibleAudioFilename(input) {
-      if (!input) return false;
-      const s = input.trim();
-      return /\.(mp3|ogg|wav|m4a|aac)$/i.test(s);
-    }
-
-    function renderSoundBar() {
-      soundBarScene = viewState.szene;
-      soundBarLabel.textContent = 'Szene: ' + (soundBarScene ? getSceneLabel(soundBarScene) : '–');
-      soundLinkInput.value = '';
-      soundLinkHint.textContent = '';
-      soundLinkHint.className = 'save-hint';
-
-      if (!db || !soundBarScene) return;
-      db.ref('sceneAudioFile/' + fbKey(soundBarScene)).once('value').then(function (snap) {
-        const savedFile = snap.val();
-        if (savedFile && soundBarScene === viewState.szene) {
-          soundLinkInput.value = savedFile;
-        }
-      });
-    }
-
-    soundLinkInput.addEventListener('blur', saveSoundLink);
-    soundLinkInput.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); soundLinkInput.blur(); }
-    });
-
-    function saveSoundLink() {
-      if (!db || !soundBarScene) return;
-      const raw = soundLinkInput.value.trim();
-
-      if (!raw) {
-        // Leeres Feld = Ton für diese Szene entfernen
-        db.ref('sceneAudioFile/' + fbKey(soundBarScene)).remove().then(function () {
-          soundLinkHint.textContent = 'entfernt';
-          soundLinkHint.className = 'save-hint saved';
-          setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
-        });
-        return;
-      }
-
-      if (!isPlausibleAudioFilename(raw)) {
-        soundLinkHint.textContent = 'Kein gültiger Dateiname (.mp3/.ogg/.wav/.m4a/.aac erwartet)';
-        soundLinkHint.className = 'save-hint error';
-        return;
-      }
-
-      db.ref('sceneAudioFile/' + fbKey(soundBarScene)).set(raw).then(function () {
-        soundLinkHint.textContent = 'gespeichert';
-        soundLinkHint.className = 'save-hint saved';
-        setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
-      }).catch(function (err) {
-        soundLinkHint.textContent = 'NICHT gespeichert — ' + err.message;
-        soundLinkHint.className = 'save-hint error';
-      });
-    }
-
-    // ---------- Charakter-Leiste (welche Portraits sind in der Szene sichtbar) ----------
-    // Deklarationen (charCheckboxesEl, charBarScene) liegen jetzt oben bei
-    // den anderen Skript-weiten Variablen, siehe Kommentar dort.
-
-    function renderCharBar() {
-      charBarScene = viewState.szene;
-      charCheckboxesEl.innerHTML = '';
-      if (typeof CHARACTERS === 'undefined' || !charBarScene) return;
-
-      // Kontextbezogen: Ist für die Szene eine charaktere-Liste in
-      // SZENEN_REGIE hinterlegt, zeigen wir nur diese Figuren (plus einen
-      // "+ weitere"-Knopf für den Rest). Fehlt die Liste, werden wie bisher
-      // ALLE Figuren gezeigt (abwärtskompatibel). Bereits aktive Figuren
-      // erscheinen immer, auch wenn sie nicht in der Liste stehen - sonst
-      // wäre ein sichtbares Portrait ohne zugehörige Checkbox verwirrend.
-      const szeneRegie = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[charBarScene] : null;
-      const relevant = (szeneRegie && Array.isArray(szeneRegie.charaktere)) ? szeneRegie.charaktere : null;
-
-      function renderList(active, showAll) {
-        charCheckboxesEl.innerHTML = '';
-        const primary = (relevant && !showAll)
-          ? CHARACTERS.filter(function (ch) { return relevant.indexOf(ch.id) !== -1 || !!active[ch.id]; })
-          : CHARACTERS;
-        primary.forEach(function (ch) {
-          charCheckboxesEl.appendChild(buildCharToggle(ch, !!active[ch.id]));
-        });
-        if (relevant && !showAll && primary.length < CHARACTERS.length) {
-          const moreBtn = document.createElement('button');
-          moreBtn.type = 'button';
-          moreBtn.className = 'char-more-btn';
-          moreBtn.textContent = '+ weitere (' + (CHARACTERS.length - primary.length) + ')';
-          moreBtn.onclick = function () { renderList(active, true); };
-          charCheckboxesEl.appendChild(moreBtn);
-        }
-      }
-
-      if (!db) { renderList({}, false); return; }
-
-      db.ref('sceneCharacters/' + fbKey(charBarScene)).once('value').then(function (snap) {
-        if (charBarScene !== viewState.szene) return; // Szene wurde inzwischen gewechselt
-        renderList(snap.val() || {}, false);
-      });
-    }
-
-    function buildCharToggle(ch, isActive) {
-      const label = document.createElement('label');
-      label.className = 'char-toggle' + (isActive ? ' active' : '');
-      label.innerHTML = '<input type="checkbox"' + (isActive ? ' checked' : '') + '> ' + ch.name;
-      const checkbox = label.querySelector('input');
-      checkbox.addEventListener('change', function () {
-        label.classList.toggle('active', checkbox.checked);
-        if (!db || !charBarScene) return;
-        db.ref('sceneCharacters/' + fbKey(charBarScene) + '/' + ch.id).set(checkbox.checked);
-      });
-      return label;
-    }
-
-    // ---------- Werkzeug-Fach (Sound/Timer/Charaktere ein-/ausklappbar) ----------
-    // Spart vertikalen Platz für die Inhaltsspalten. Der Timer-Ticker im
-    // Balken darüber bleibt sichtbar, auch wenn das Fach zu ist. Zustand
-    // (offen/zu) in localStorage, damit er über Reloads erhalten bleibt.
-    (function initToolDrawer() {
-      const drawer = document.getElementById('toolDrawer');
-      const toggle = document.getElementById('toolDrawerToggle');
-      if (!drawer || !toggle) return;
-      const OPEN_KEY = 'korsaren_tooldrawer_open';
-      function apply(open) {
-        drawer.classList.toggle('open', open);
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      }
-      let open = false;
-      try { open = localStorage.getItem(OPEN_KEY) === '1'; } catch (e) {}
-      apply(open);
-      toggle.addEventListener('click', function () {
-        const nowOpen = !drawer.classList.contains('open');
-        apply(nowOpen);
-        try { localStorage.setItem(OPEN_KEY, nowOpen ? '1' : '0'); } catch (e) {}
-      });
-    })();
-  </script>
-
+  <button id="previewToggle">▶ Live-Vorschau</button>
+</div>
+
+<div class="vault" id="vault">
+  <div class="v-tree" id="v-tree"></div>
+  <div class="v-pane" id="v-paneA"></div>
+  <div class="v-pane" id="v-paneB"></div>
+  <div class="v-rail" id="v-rail"></div>
+  <div class="v-status" id="v-status"></div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/scenes.js"></script>
+<script src="js/golden_lion_scenes.js"></script>
+<script src="js/schatzinsel_scenes.js"></script>
+<script src="js/characters.js"></script>
+<script src="js/npc_roster.js"></script>
+<script src="js/dice.js"></script>
+<script src="js/regie.js"></script>
+
+<script src="js/regie_vault.js"></script>
 </body>
 </html>
