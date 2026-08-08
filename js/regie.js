@@ -716,7 +716,13 @@ const ORTE = {
           { id: "harwicks_rueckzug", label: "Harwick weicht aus, wird in die Enge getrieben, zieht sich mit Tränen in den Augen zurück", info: "Harwick wird ernst: „Sie ist heute nicht bei uns.“ Er wird nicht sagen, dass sie tot ist. Sorathi fragt weiter, bis Harwick keinen Ausweg mehr hat. Die Spieler bemerken Tränen in seinen Augen; er bedankt sich, verabschiedet sich, geht zu den Zelten und starrt in den Wald." },
           { id: "cormacs_tribut", label: "Cormac erzählt von Jessica, hält seinen Knoten fest — Sorathi wird traurig", info: "Cormac erzählt von ihr — mit Bewunderung und Trauer in der Stimme, hält dabei den Knoten an seinem Gürtel fest. Sorathi wird sichtlich traurig: Sie wäre jetzt auch 14, der alte Ta'ahal hatte davon gesprochen, dass auch sie den Kupferritus hätte ablegen können." },
           { id: "sorathis_erkenntnis", label: "Sorathi erkennt: jetzt ist der Zeitpunkt, das Geschenk der Göttin zu überbringen", info: "Sorathi begreift: Jessicas Tod und Harwicks nie überwundene Trauer markieren den Zeitpunkt, an dem Vanthei das Geschenk der Göttin überbringen sollte. Die Göttin kann kein Leben zurückbringen — aber sie heilt die Wunden der Seele." },
-          { id: "offene_diskussion_siegel", label: "Offene, spielergetriebene Diskussion: der beste Weg zum Siegel", info: "Von hier aus entwickelt sich ein offenes Gespräch, in das die Spieler stark eingebunden werden: was der beste Weg ist, an das Siegel zu kommen. Bewusst nicht vorgeskriptet — das entscheidet sich am Tisch." }
+          {
+            id: "offene_diskussion_siegel", label: "Offene, spielergetriebene Diskussion: der beste Weg zum Siegel", info: "Von hier aus entwickelt sich ein offenes Gespräch, in das die Spieler stark eingebunden werden: was der beste Weg ist, an das Siegel zu kommen. Bewusst nicht vorgeskriptet — das entscheidet sich am Tisch.",
+            grantsQuest: { // Bibel 2.9 - erstes Beispiel
+              warum: "Es gibt andere im Dorf, die wie Sorathis denken und dieselbe Möglichkeit sehen: das Siegel zu stehlen, statt es Harwick öffentlich zu überlassen.",
+              was: "Einen Weg finden, an das Siegel zu kommen."
+            }
+          }
         ]
       }
     }
@@ -774,6 +780,7 @@ const ORTE = {
 const SZENEN_REGIE = {
   "1.1": {
     charaktere: ["francesco", "tom", "wat"], // in Grimsgate präsente Crew-Portraits (Taverne-Rekrutierer, Bibel 9.1)
+    uebergeordnetesZiel: "An Bord der Golden Lion gelangen.", // Bibel 2.9
     stimmung: "Grimsgate lebt über seine Verhältnisse. Im Hafen liegt der größte Geleitzug, den die Stadt je gesehen hat — keine Handelsflotte, sondern eine Siedlungsfahrt in die Neue Welt. Wer drüben von Bord geht, dem versprechen sie Land, Arbeit für jede Hand, ein Leben, das bei null beginnt — und man muss nicht einmal reich sein, ein Platz an Deck genügt. Die halbe Stadt redet von nichts anderem. Man spürt es an jeder Ecke: die fiebrige Euphorie derer, die morgen gehen und alles hinter sich lassen; die stille Angst derer, die bleiben und sich gegen das Versprechen von Sonne und Freiheit wappnen müssen; der Frust derer, die mitwollten — doch die Schiffe sind voll. Nichts davon ist Politik oder ferne Macht. Für jeden Einzelnen steht ganz persönlich der nächste Schritt auf dem Spiel: bleiben, wer man ist — oder sich in ein paar Wochen drüben völlig neu würfeln.",
     ghosts: [
       {
@@ -855,6 +862,7 @@ const SZENEN_REGIE = {
   // Wasserhöhle) folgen im laufenden Szenen-Durchgang. Ghosts hier = generische
   // Crew bei den Reparaturen. Personen-Aufschlag, noch nicht final geschärft.
   "4.1": {
+    uebergeordnetesZiel: "Harwicks Schatz der Thahal holen und die Insel wieder verlassen.", // Bibel 2.9
     stimmung: "Fester Boden nach dem Sturm — für die meisten an Bord grenzt das an reines Glück. Der Strand ist voller Betrieb: Balken werden herangeschleppt, der Schmied schlägt am improvisierten Amboss Beschläge zurecht, Leitern lehnen am Rumpf. Die Golden Lion liegt auf der Seite in der sandigen Bucht, der vordere Mast gebrochen, Tauwerk und Trümmer über den Sand verstreut. Ringsum dichter, grüner Dschungel — Vogelrufe, Insektensurren, feuchte Wärme. Unbekanntes Land hinter der Brandung.",
     ghosts: [
       {
