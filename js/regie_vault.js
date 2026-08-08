@@ -1,0 +1,783 @@
+// Regie-Admin, Vault-Ansicht: Szene→Orte→Ort→Interaktion als Klapp-Baum,
+// zwei Notiz-Panes, Charaktere (Crew/Ghosts/Spielercharaktere) fest am
+// rechten Rand. Ersetzt die alte 3-Spalten-Ansicht (Szenen/Orte/Detail).
+//
+// Wiederverwendet UNVERÄNDERT aus der alten regie.html: alle Firebase-Pfade
+// für Trigger/Notizen/Sichtbarkeit/Varianten/Sound/Timer/Charaktere sowie
+// die Kernfunktionen getAllSceneEntries/getSceneLabel/getMarkersForScene/
+// fbKey/getSceneInteraktionen/resolveOrtForScene - bestehende, in Firebase
+// bereits gespeicherte Sessions bleiben dadurch vollständig kompatibel.
+//
+// Bewusster Umfang dieser ersten Fassung: reale Interaktionen sind FLACHE
+// Trigger-Listen (kein Verzweigungs-Datenmodell wie in den Mockups) - das
+// wird hier 1:1 respektiert statt eine Struktur zu erzwingen, die im
+// echten regie.js gar nicht existiert. Ein optionales Info-Feld pro Beat
+// (siehe Mockup) ist vorbereitet (chk(), Feld "info"), aber noch bei
+// keinem echten Trigger gesetzt - das wäre ein eigener, von Hendrik zu
+// begleitender Inhalts-Durchgang durch alle ~40 Interaktionen.
+
+const statusEl = document.getElementById('status');
+let db = null;
+let liveScene = null;
+let viewState = { szene: null };
+let paneA = { type: 'ort', sceneId: null, ortId: null };
+let paneB = { type: 'npc', npcId: 'tom' };
+
+const soundLinkInput = document.getElementById('soundLinkInput');
+const soundLinkHint = document.getElementById('soundLinkHint');
+const soundBarLabel = document.getElementById('soundBarLabel');
+let soundBarScene = null;
+const charCheckboxesEl = document.getElementById('charCheckboxes');
+let charBarScene = null;
+
+let openMarkersRef = null, openMarkersListener = null, openMarkersScene = null, openMarkerCounts = {};
+let hiddenMarkersRef = null, hiddenMarkersListener = null, hiddenMarkersScene = null, hiddenMarkerIds = {};
+
+let extraGhosts = {};   // { [fbKey(sceneId)]: { [ghostId]: {name,rolle,verfassung,beduerfnis} } }
+let extraNpcIds = {};   // { [npcId]: true }
+let players = {};       // { [pcId]: {name} }
+let pcRuf = {};         // { [pcId]: { [npcKey]: tier(0-4) } }
+let vOpenNodes = new Set();
+let vShowAdd = null;    // 'npc' | 'pc' | null
+
+// ---------- Live-Vorschau (Spieleransicht) ----------
+(function () {
+  const toggle = document.getElementById('previewToggle');
+  const panel = document.getElementById('previewPanel');
+  const frame = document.getElementById('previewFrame');
+  const STORAGE_KEY = 'korsaren_regie_preview_open';
+  let loaded = false;
+  function setOpen(open) {
+    panel.classList.toggle('open', open);
+    toggle.textContent = (open ? '▼' : '▶') + ' Live-Vorschau (Spieleransicht)';
+    localStorage.setItem(STORAGE_KEY, open ? '1' : '0');
+    if (open && !loaded) { frame.src = 'karte.html?preview=1'; loaded = true; }
+  }
+  toggle.addEventListener('click', function () { setOpen(!panel.classList.contains('open')); });
+  setOpen(localStorage.getItem(STORAGE_KEY) === '1');
+})();
+
+// ---------- Firebase-Verbindung ----------
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  initDiceRoller(db, { allowPrivate: true });
+
+  db.ref('currentScene').on('value', function (snapshot) {
+    liveScene = snapshot.val() || DEFAULT_SCENE;
+    if (!viewState.szene) {
+      viewState.szene = liveScene;
+      paneA = { type: 'ort', sceneId: viewState.szene, ortId: firstOrtOf(viewState.szene) };
+      vOpenNodes.add('scene:' + viewState.szene);
+      vOpenNodes.add('scene:' + viewState.szene + ':orte');
+    }
+    statusEl.textContent = 'Verbunden — live für Spieler: ' + getSceneLabel(liveScene);
+    statusEl.className = 'status connected';
+    renderAll();
+  }, function (err) {
+    statusEl.textContent = 'Fehler beim Verbinden: ' + err.message;
+    statusEl.className = 'status error';
+  });
+
+  db.ref('extraGhosts').on('value', function (s) { extraGhosts = s.val() || {}; renderAll(); });
+  db.ref('extraNpcs').on('value', function (s) { extraNpcIds = s.val() || {}; renderAll(); });
+  db.ref('players').on('value', function (s) { players = s.val() || {}; renderAll(); });
+  db.ref('pcRuf').on('value', function (s) { pcRuf = s.val() || {}; renderAll(); });
+} catch (e) {
+  statusEl.textContent = 'Firebase-Konfiguration fehlt oder ist fehlerhaft. Bitte js/firebase-config.js prüfen.';
+  statusEl.className = 'status error';
+  viewState.szene = DEFAULT_SCENE;
+  paneA = { type: 'ort', sceneId: viewState.szene, ortId: firstOrtOf(viewState.szene) };
+  vOpenNodes.add('scene:' + viewState.szene);
+  vOpenNodes.add('scene:' + viewState.szene + ':orte');
+  renderAll();
+}
+
+function setLiveScene(sceneId) {
+  if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+  db.ref('currentScene').set(sceneId);
+}
+
+function firstOrtOf(sceneId) {
+  const markers = getMarkersForScene(sceneId);
+  if (!markers || markers.length === 0) return null;
+  return markers[0].id;
+}
+
+function getAllSceneEntries() {
+  const entries = [];
+  Object.keys(SCENES).forEach(function (id) { entries.push({ id: id, label: SCENES[id].label, source: 'town' }); });
+  if (typeof GOLDEN_LION_SCENES !== 'undefined') {
+    Object.keys(GOLDEN_LION_SCENES).forEach(function (id) { entries.push({ id: id, label: GOLDEN_LION_SCENES[id].label, source: 'ship' }); });
+  }
+  if (typeof SCHATZINSEL_SCENES !== 'undefined') {
+    Object.keys(SCHATZINSEL_SCENES).forEach(function (id) { entries.push({ id: id, label: SCHATZINSEL_SCENES[id].label, source: 'island' }); });
+  }
+  return entries;
+}
+
+function getSceneLabel(sceneId) {
+  if (SCENES[sceneId]) return SCENES[sceneId].label;
+  if (typeof GOLDEN_LION_SCENES !== 'undefined' && GOLDEN_LION_SCENES[sceneId]) return GOLDEN_LION_SCENES[sceneId].label;
+  if (typeof SCHATZINSEL_SCENES !== 'undefined' && SCHATZINSEL_SCENES[sceneId]) return SCHATZINSEL_SCENES[sceneId].label;
+  return sceneId;
+}
+
+function getMarkersForScene(sceneId) {
+  if (SCENES[sceneId]) return SCENES[sceneId].markers;
+  if (typeof getGoldenLionMarkers === 'function' && typeof GOLDEN_LION_SCENES !== 'undefined' && GOLDEN_LION_SCENES[sceneId]) return getGoldenLionMarkers(sceneId);
+  if (typeof SCHATZINSEL_SCENES !== 'undefined' && SCHATZINSEL_SCENES[sceneId]) return SCHATZINSEL_SCENES[sceneId].markers;
+  return [];
+}
+
+function fbKey(str) { return String(str).replace(/[.#$\[\]]/g, '-'); }
+
+function getSceneInteraktionen(ort, sceneId) {
+  const all = ort.interaktionen || {};
+  return Object.keys(all).filter(function (iaId) {
+    const ia = all[iaId];
+    if (ia.nurSzenen && ia.nurSzenen.indexOf(sceneId) === -1) return false;
+    if (ia.nichtInSzenen && ia.nichtInSzenen.indexOf(sceneId) !== -1) return false;
+    return true;
+  });
+}
+
+function resolveOrtForScene(ort, sceneId) {
+  const override = (ort.szenenUeberschreibungen && ort.szenenUeberschreibungen[sceneId]) || {};
+  return {
+    personen: override.personen !== undefined ? override.personen : ort.personen,
+    kurz: override.kurz !== undefined ? override.kurz : ort.kurz,
+    ortHinweis: override.ortHinweis !== undefined ? override.ortHinweis : ort.ortHinweis,
+    npcs: override.npcs !== undefined ? override.npcs : ort.npcs,
+    interaktionen: ort.interaktionen
+  };
+}
+
+function debounce(fn, ms) {
+  let t = null;
+  return function (...args) { clearTimeout(t); t = setTimeout(function () { fn.apply(null, args); }, ms); };
+}
+
+function saveField(path, value, hintEl) {
+  if (!db || !hintEl) return;
+  db.ref(path).set(value).then(function () {
+    hintEl.className = 'v-save-hint saved';
+    hintEl.textContent = 'gespeichert';
+    setTimeout(function () { if (hintEl) { hintEl.textContent = ''; hintEl.className = 'v-save-hint'; } }, 1500);
+  }).catch(function (err) {
+    hintEl.className = 'v-save-hint error';
+    hintEl.textContent = 'NICHT gespeichert — ' + err.message;
+  });
+}
+
+function steckbriefCardsHTML(list) {
+  return (list || []).map(function (p) {
+    return '<div class="v-sb"><div class="v-sb-head"><span class="v-sb-name">' + (p.name || '') + '</span>' +
+      (p.rolle ? '<span class="v-sb-rolle">' + p.rolle + (p.koerperlich ? ' · ✊ körperlich' : '') + '</span>' : '') + '</div>' +
+      (p.verfassung ? '<div class="v-sb-line"><b>Verfassung</b> ' + p.verfassung + '</div>' : '') +
+      (p.beduerfnis ? '<div class="v-sb-line"><b>Bedürfnis</b> ' + p.beduerfnis + '</div>' : '') +
+      '</div>';
+  }).join('');
+}
+
+// ---------- Live-Präsenz & Sichtbarkeit (unverändert aus der alten Ansicht) ----------
+function attachOpenMarkersListener(sceneId) {
+  if (sceneId === openMarkersScene) return;
+  if (openMarkersRef && openMarkersListener) openMarkersRef.off('value', openMarkersListener);
+  openMarkersScene = sceneId; openMarkerCounts = {};
+  if (!db || !sceneId) return;
+  openMarkersRef = db.ref('openMarkers/' + fbKey(sceneId));
+  openMarkersListener = openMarkersRef.on('value', function (snap) {
+    const data = snap.val() || {}; openMarkerCounts = {};
+    Object.keys(data).forEach(function (markerId) { openMarkerCounts[markerId] = Object.keys(data[markerId] || {}).length; });
+    renderTree();
+  });
+}
+function attachHiddenMarkersListener(sceneId) {
+  if (sceneId === hiddenMarkersScene) return;
+  if (hiddenMarkersRef && hiddenMarkersListener) hiddenMarkersRef.off('value', hiddenMarkersListener);
+  hiddenMarkersScene = sceneId; hiddenMarkerIds = {};
+  if (!db || !sceneId) return;
+  hiddenMarkersRef = db.ref('hiddenMarkersLive/' + fbKey(sceneId));
+  hiddenMarkersListener = hiddenMarkersRef.on('value', function (snap) { hiddenMarkerIds = snap.val() || {}; renderTree(); });
+}
+function toggleMarkerVisibility(sceneId, markerId) {
+  if (!db) return;
+  const ref = db.ref('hiddenMarkersLive/' + fbKey(sceneId) + '/' + markerId);
+  if (hiddenMarkerIds[markerId]) ref.remove(); else ref.set(true);
+}
+
+// ---------- Text-Suche für automatische Erwähnungen (Backlinks) ----------
+function textOfIa(ort, iaId) {
+  const ia = ort.interaktionen[iaId];
+  let t = ia.title + ' ' + ia.kurz + ' ' + ia.details;
+  if (ia.trigger) t += ' ' + ia.trigger.map(function (x) { return x.label; }).join(' ');
+  return t;
+}
+function slugify(s) { return (String(s).toLowerCase().replace(/[^a-z0-9äöüß]+/g, '_').replace(/^_+|_+$/g, '')) || ('x' + Date.now()); }
+function ghostsOfScene(sceneId) {
+  const sr = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[sceneId] : null;
+  const base = (sr && sr.ghosts) ? sr.ghosts.map(function (g) { return Object.assign({ id: slugify(g.name), sceneId: sceneId }, g); }) : [];
+  const extra = extraGhosts[fbKey(sceneId)] || {};
+  const extraList = Object.keys(extra).map(function (gid) { return Object.assign({ id: gid, sceneId: sceneId }, extra[gid]); });
+  return base.concat(extraList);
+}
+function ghostById(sceneId, ghostId) { return ghostsOfScene(sceneId).find(function (g) { return g.id === ghostId; }); }
+function npcRecord(npcId) { return CREW.find(function (c) { return c.id === npcId; }) || MANIFEST_EXTRA.find(function (m) { return m.id === npcId; }); }
+function trackableNpcs() {
+  return CREW.concat(MANIFEST_EXTRA.filter(function (m) { return extraNpcIds[m.id]; })).concat([{ id: 'crew_allgemein', name: 'Die Crew allgemein' }]);
+}
+// Backlinks für eine Interaktion: welche Crew/Zusatz-NPCs/Ghosts der Szene
+// im Interaktionstext namentlich vorkommen - automatisch berechnet, nicht
+// von Hand gepflegt (wie Obsidians "Linked mentions").
+function backlinksForIa(ort, sceneId, iaId) {
+  const text = textOfIa(ort, iaId);
+  const crewHits = CREW.filter(function (c) { return text.indexOf(c.name.split(' ')[0]) !== -1 || text.indexOf(c.name) !== -1; })
+    .map(function (c) { return { label: c.name, sub: '👤 Crew', ref: { type: 'npc', npcId: c.id } }; });
+  const extraHits = MANIFEST_EXTRA.filter(function (m) { return extraNpcIds[m.id] && text.indexOf(m.name) !== -1; })
+    .map(function (m) { return { label: m.name, sub: '👤 Crew', ref: { type: 'npc', npcId: m.id } }; });
+  const ghostHits = ghostsOfScene(sceneId).filter(function (g) { return text.indexOf(g.name) !== -1; })
+    .map(function (g) { return { label: g.name, sub: '👻 Ghost', ref: { type: 'ghost', sceneId: sceneId, ghostId: g.id } }; });
+  return crewHits.concat(extraHits, ghostHits);
+}
+// Backlinks für einen NPC/Crew-Namen: alle Interaktionen (über ALLE Orte
+// hinweg, campaignweit, da Crew wiederkehrt) die ihn erwähnen.
+// Findet für einen Ort/Interaktion-Treffer eine Szene, in der dieser Ort
+// tatsächlich vorkommt UND die Interaktion dort sichtbar ist (ein Ort kann
+// über mehrere Szenen hinweg auftauchen, z.B. "achterdeck" in "2.1"/"3.1").
+function firstSceneShowingIa(ortId, ort, iaId) {
+  let found = null;
+  getAllSceneEntries().some(function (entry) {
+    const markers = getMarkersForScene(entry.id);
+    if (!markers.some(function (mk) { return mk.id === ortId; })) return false;
+    const resolved = resolveOrtForScene(ort, entry.id);
+    if (getSceneInteraktionen(resolved, entry.id).indexOf(iaId) === -1) return false;
+    found = entry.id;
+    return true;
+  });
+  return found;
+}
+function iaMentioningNpc(npcName) {
+  const hits = [];
+  Object.keys(ORTE).forEach(function (ortId) {
+    const ort = ORTE[ortId];
+    Object.keys(ort.interaktionen || {}).forEach(function (iaId) {
+      if (textOfIa(ort, iaId).indexOf(npcName) === -1) return;
+      const sceneId = firstSceneShowingIa(ortId, ort, iaId);
+      const marker = sceneId ? (getMarkersForScene(sceneId) || []).find(function (mk) { return mk.id === ortId; }) : null;
+      hits.push({ ortId: ortId, iaId: iaId, sceneId: sceneId, title: ort.interaktionen[iaId].title, ortTitle: marker ? marker.title : ortId });
+    });
+  });
+  return hits;
+}
+function iaMentioningGhost(sceneId, ghostId) {
+  const g = ghostById(sceneId, ghostId); if (!g) return [];
+  const hits = [];
+  getMarkersForScene(sceneId).forEach(function (marker) {
+    const ortRaw = ORTE[marker.id]; if (!ortRaw) return;
+    const ort = resolveOrtForScene(ortRaw, sceneId);
+    getSceneInteraktionen(ort, sceneId).forEach(function (iaId) {
+      if (textOfIa(ort, iaId).indexOf(g.name) !== -1) hits.push({ sceneId: sceneId, ortId: marker.id, iaId: iaId, title: ort.interaktionen[iaId].title, ortTitle: marker.title });
+    });
+  });
+  return hits;
+}
+
+// ---------- Charaktere hinzufügen (aus dem Crew-Manifest bzw. frei anlegen) ----------
+function vToggleAdd(kind) { vShowAdd = vShowAdd === kind ? null : kind; renderAll(); }
+function vAddManifest(npcId) { if (db) db.ref('extraNpcs/' + npcId).set(true); }
+function vSubmitGhost(form, sceneId) {
+  const fd = new FormData(form);
+  const name = (fd.get('name') || '').trim();
+  if (!name || !db) return;
+  const gid = 'g_' + slugify(name) + '_' + Math.floor(Math.random() * 1000);
+  db.ref('extraGhosts/' + fbKey(sceneId) + '/' + gid).set({
+    name: name,
+    rolle: (fd.get('rolle') || '').trim() || '—',
+    verfassung: (fd.get('verfassung') || '').trim() || '—',
+    beduerfnis: (fd.get('beduerfnis') || '').trim() || '—'
+  });
+  vShowAdd = null; renderAll();
+}
+function vSubmitPc(form) {
+  const fd = new FormData(form);
+  const name = (fd.get('name') || '').trim();
+  if (!name || !db) return;
+  const pid = 'pc_' + slugify(name) + '_' + Math.floor(Math.random() * 1000);
+  db.ref('players/' + pid).set({ name: name });
+  vShowAdd = null; renderAll();
+}
+function nudgePcRuf(pcId, npcKey, tier) { if (db) db.ref('pcRuf/' + pcId + '/' + npcKey).set(tier); }
+function getPcRuf(pcId, npcKey) { const v = pcRuf[pcId] && pcRuf[pcId][npcKey]; return v === undefined ? 0 : v; }
+function rufTrackHtml(pcId, npcKey, tier) {
+  return '<span class="v-ruf-track">' + RUF_TIERS.map(function (_, i) {
+    return '<button class="v-ruf-seg' + (i <= tier ? ' on' : '') + '" onclick="nudgePcRuf(\'' + pcId + '\',\'' + npcKey + '\',' + i + ')" title="' + RUF_TIERS[i] + '"></button>';
+  }).join('') + '</span>';
+}
+
+// ---------- Baum: Szene → Orte → Ort → Interaktionen ----------
+function vToggleNode(key) { vOpenNodes.has(key) ? vOpenNodes.delete(key) : vOpenNodes.add(key); renderAll(); }
+function paneMatches(paneRef, ref) {
+  if (!paneRef || paneRef.type !== ref.type) return false;
+  return Object.keys(ref).every(function (k) { return paneRef[k] === ref[k]; });
+}
+function vFileRow(ref, label, icon, level) {
+  const inA = paneMatches(paneA, ref), inB = paneMatches(paneB, ref);
+  return '<div class="v-file lvl' + level + (inA ? ' inA' : '') + (inB ? ' inB' : '') + '" onclick="paneA=' + JSON.stringify(ref).replace(/"/g, '&quot;') + '; renderAll();">' +
+    '<span class="v-file-icon">' + icon + '</span><span class="v-file-label">' + label + '</span>' +
+    '<button class="v-add-btn" style="margin-left:auto" title="rechtes Pane" onclick="event.stopPropagation(); paneB=' + JSON.stringify(ref).replace(/"/g, '&quot;') + '; renderAll();">▸B</button>' +
+    '</div>';
+}
+function renderTree() {
+  attachOpenMarkersListener(viewState.szene);
+  attachHiddenMarkersListener(viewState.szene);
+  const el = document.getElementById('v-tree');
+  let html = '<div class="v-tree-head">VAULT</div>';
+  getAllSceneEntries().forEach(function (entry) {
+    const sceneId = entry.id;
+    const sKey = 'scene:' + sceneId, oKey = sKey + ':orte', sOpen = vOpenNodes.has(sKey);
+    html += '<div class="v-node lvl0" onclick="vToggleNode(\'' + sKey + '\')"><span class="v-caret">' + (sOpen ? '▾' : '▸') + '</span>' +
+      (sceneId === liveScene ? '<span class="v-live-dot" title="aktuell live"></span>' : '<span style="width:6px"></span>') +
+      '<span class="v-file-label">' + entry.label + '</span>' +
+      '<button class="v-live-btn' + (sceneId === liveScene ? ' is-live' : '') + '" style="margin-left:auto" onclick="event.stopPropagation(); setLiveScene(\'' + sceneId + '\')">' + (sceneId === liveScene ? 'live' : 'live setzen') + '</button></div>';
+    if (!sOpen) return;
+    const oOpen = vOpenNodes.has(oKey);
+    html += '<div class="v-node lvl1" onclick="vToggleNode(\'' + oKey + '\')"><span class="v-caret">' + (oOpen ? '▾' : '▸') + '</span><span class="v-file-icon">📁</span><span class="v-file-label">Orte</span></div>';
+    if (!oOpen) return;
+    getMarkersForScene(sceneId).forEach(function (marker) {
+      const ortRaw = ORTE[marker.id] || { interaktionen: {} };
+      const ort = resolveOrtForScene(ortRaw, sceneId);
+      const iaKeys = getSceneInteraktionen(ort, sceneId);
+      const lKey = oKey + ':' + marker.id, lOpen = vOpenNodes.has(lKey);
+      const openCount = openMarkerCounts[marker.id] || 0;
+      const hidden = !!hiddenMarkerIds[marker.id];
+      html += '<div class="v-node lvl2' + (hidden ? '' : '') + '" onclick="vToggleNode(\'' + lKey + '\')" style="opacity:' + (hidden ? '.55' : '1') + '"><span class="v-caret">' + (lOpen ? '▾' : '▸') + '</span><span class="v-file-icon">📁</span><span class="v-file-label">' + marker.title + '</span>' +
+        (openCount > 0 ? '<span class="v-tag" style="margin-left:auto">' + openCount + '</span>' : '') + '</div>';
+      if (!lOpen) return;
+      html += vFileRow({ type: 'ort', sceneId: sceneId, ortId: marker.id }, '📄 Übersicht', '📄', 3);
+      iaKeys.forEach(function (iaId) {
+        html += vFileRow({ type: 'ia', sceneId: sceneId, ortId: marker.id, iaId: iaId }, ort.interaktionen[iaId].title, '📄', 3);
+      });
+    });
+  });
+  el.innerHTML = html;
+}
+
+// ---------- Notiz-Panes ----------
+function paneLabel(ref) {
+  if (ref.type === 'ia') { const ort = ORTE[ref.ortId]; return '📄 ' + ((ort && ort.interaktionen[ref.iaId]) ? ort.interaktionen[ref.iaId].title : '?'); }
+  if (ref.type === 'ort') { const marker = (getMarkersForScene(ref.sceneId) || []).find(function (m) { return m.id === ref.ortId; }); return '📄 ' + (marker ? marker.title : ref.ortId); }
+  if (ref.type === 'npc') { const n = npcRecord(ref.npcId); return '👤 ' + (n ? n.name : '?'); }
+  if (ref.type === 'ghost') { const g = ghostById(ref.sceneId, ref.ghostId); return '👻 ' + (g ? g.name : '?'); }
+  if (ref.type === 'pc') { return '🎭 ' + ((players[ref.pcId] || {}).name || '?'); }
+  return '?';
+}
+
+// Ein Trigger-Punkt = Checkbox + Label, exakt wie im bisherigen Admin
+// (regie/{szene}/{ort}/interaktionen/{iaId}/trigger/{triggerId} = bool).
+// Notizen liegen weiterhin EINE gemeinsame Ebene höher, pro Interaktion
+// (nicht pro Trigger) - siehe renderIaNote() - genau wie im alten Schema.
+function chk(path, label, fired) {
+  return '<div class="v-chk' + (fired ? ' on' : '') + '">' +
+    '<button class="box' + (fired ? ' on' : '') + '" onclick="vToggleTrigger(\'' + path + '\',' + (fired ? 'false' : 'true') + ')">' + (fired ? '✓' : '') + '</button>' +
+    '<span class="lbl">' + label + '</span></div>';
+}
+function vToggleTrigger(path, val) {
+  if (!db) return;
+  db.ref(path).set(val).then(renderAll).catch(function (err) { alert('NICHT gespeichert — ' + err.message); });
+}
+function bindNoteFields(container) {
+  container.querySelectorAll('textarea[data-path]').forEach(function (ta) {
+    const hint = ta.nextElementSibling;
+    const save = debounce(function () { saveField(ta.dataset.path, ta.value, hint); }, 600);
+    ta.addEventListener('input', save);
+    ta.addEventListener('blur', function () { saveField(ta.dataset.path, ta.value, hint); });
+  });
+}
+
+function renderOrtNote(ref, target) {
+  const sceneId = ref.sceneId, ortId = ref.ortId;
+  const marker = (getMarkersForScene(sceneId) || []).find(function (m) { return m.id === ortId; });
+  const ortRaw = ORTE[ortId] || { personen: '', kurz: '', interaktionen: {} };
+  const ort = resolveOrtForScene(ortRaw, sceneId);
+  const hidden = !!hiddenMarkerIds[ortId];
+  const dynPath = 'regie/' + fbKey(sceneId) + '/' + fbKey(ortId);
+
+  let html = '<h1 class="v-h1">' + (marker ? marker.title : ortId) +
+    '<button class="v-vis-btn' + (hidden ? ' is-hidden' : '') + '" onclick="toggleMarkerVisibility(\'' + sceneId + '\',\'' + ortId + '\')">' + (hidden ? 'ausgeblendet' : 'sichtbar') + '</button></h1>';
+  html += '<dl class="v-prop"><dt>szene</dt><dd>' + getSceneLabel(sceneId) + '</dd>' + (ort.personen ? '<dt>personen</dt><dd>' + ort.personen + '</dd>' : '') + '</dl>';
+  if (ort.ortHinweis) html += '<div class="v-callout hinweis"><div class="v-callout-title">Hinweis (Regie-Referenz)</div>' + ort.ortHinweis + '</div>';
+  if (ort.npcs && ort.npcs.length) html += '<div class="v-callout"><div class="v-callout-title">Vor Ort</div>' + steckbriefCardsHTML(ort.npcs) + '</div>';
+  if (marker && marker.variants) html += '<div class="v-callout"><div class="v-callout-title">Aktives Bild (unabhängig von Szene/Trigger)</div><div id="v-variant-target"></div></div>';
+  html += '<div class="v-callout"><div class="v-callout-title">Notizen zum Ort</div><textarea class="v-note-field" placeholder="z.B. allgemeine Stimmung, Vorfälle ohne Bezug zu einer einzelnen Interaktion…" data-path="' + dynPath + '/ortNotizen"></textarea><div class="v-save-hint"></div></div>';
+
+  target.innerHTML = html;
+  bindNoteFields(target);
+  if (marker && marker.variants) renderVariantButtons(marker, target.querySelector('#v-variant-target'));
+
+  if (!db) return;
+  db.ref(dynPath + '/ortNotizen').once('value').then(function (snap) {
+    if (typeof snap.val() === 'string') {
+      const ta = target.querySelector('textarea[data-path="' + dynPath + '/ortNotizen"]');
+      if (ta) ta.value = snap.val();
+    }
+  });
+}
+
+function renderIaNote(ref, target) {
+  const sceneId = ref.sceneId, ortId = ref.ortId, iaId = ref.iaId;
+  const marker = (getMarkersForScene(sceneId) || []).find(function (m) { return m.id === ortId; });
+  const ortRaw = ORTE[ortId]; const ia = ortRaw && ortRaw.interaktionen[iaId];
+  if (!ia) { target.innerHTML = '<div class="v-empty">Nicht gefunden.</div>'; return; }
+  const ort = resolveOrtForScene(ortRaw, sceneId);
+  const basePath = 'regie/' + fbKey(sceneId) + '/' + fbKey(ortId) + '/interaktionen/' + iaId;
+  const backlinks = backlinksForIa(ort, sceneId, iaId);
+
+  function triggerListHtml(dynTrigger) {
+    return (ia.trigger || []).map(function (t) { return chk(basePath + '/trigger/' + t.id, t.label, !!dynTrigger[t.id]); }).join('');
+  }
+
+  function draw(dyn) {
+    let html = '<h1 class="v-h1">' + ia.title + '</h1>';
+    html += '<dl class="v-prop"><dt>ort</dt><dd>' + (marker ? marker.title : ortId) + '</dd><dt>tags</dt><dd><span class="v-tag">#' + fbKey(sceneId) + '</span></dd></dl>';
+    html += '<div class="v-callout readaloud"><div class="v-callout-title">📖 Lesetext</div>' + ia.details + '</div>';
+    html += '<div class="v-callout"><div class="v-callout-title">☑ Ablauf</div>' + triggerListHtml(dyn.trigger || {}) + '</div>';
+    html += '<div class="v-callout"><div class="v-callout-title">✎ Notiz zur Interaktion</div><textarea class="v-note-field" placeholder="z.B. besondere Reaktionen, Würfe, Abweichungen vom Skript…" data-path="' + basePath + '/notizen">' + (dyn.notizen || '') + '</textarea><div class="v-save-hint"></div></div>';
+    html += '<div class="v-backlinks"><h5>Erwähnt' + (backlinks.length ? ' (' + backlinks.length + ')' : '') + '</h5>' +
+      (backlinks.length ? backlinks.map(function (b) { return '<button class="v-backlink-item" onclick="paneB=' + JSON.stringify(b.ref).replace(/"/g, '&quot;') + '; renderAll();"><b>' + b.label + '</b> <span>' + b.sub + '</span></button>'; }).join('') : '<div class="v-empty">Keine Verknüpfungen gefunden.</div>') +
+      '</div>';
+    target.innerHTML = html;
+    bindNoteFields(target);
+  }
+
+  draw({}); // sofort mit unbearbeitetem Ausgangsstand zeichnen, nie leer bei langsamer Verbindung
+  if (!db) return;
+  db.ref(basePath).once('value').then(function (snap) { draw(snap.val() || {}); })
+    .catch(function (err) { console.error('Fehler beim Laden von', basePath, err); });
+}
+
+function renderNpcNote(ref, target) {
+  const n = npcRecord(ref.npcId);
+  if (!n) { target.innerHTML = '<div class="v-empty">Nicht gefunden.</div>'; return; }
+  let html = '<h1 class="v-h1">' + n.name + '</h1>';
+  html += '<dl class="v-prop"><dt>rolle</dt><dd>' + n.role + '</dd></dl>';
+  html += '<div class="v-callout"><div class="v-callout-title">± Trigger &amp; Ruf-Verbindungen</div>' +
+    (n.triggers || []).map(function (t) { return '<div class="v-sb-line">◆ ' + t + '</div>'; }).join('') + '</div>';
+  const pcs = Object.keys(players).map(function (id) { return Object.assign({ id: id }, players[id]); });
+  let rufHtml = '<div class="v-callout"><div class="v-callout-title">☆ Ruf pro Spielercharakter</div>';
+  rufHtml += pcs.length ? pcs.map(function (pc) {
+    const t = getPcRuf(pc.id, n.id);
+    return '<div class="v-ruf-row"><span class="v-ruf-name">' + pc.name + '</span>' + rufTrackHtml(pc.id, n.id, t) + '<span class="v-ruf-tier">' + RUF_TIERS[t] + '</span></div>';
+  }).join('') : '<div class="v-empty">Noch kein Spielercharakter angelegt.</div>';
+  rufHtml += '</div>';
+  html += rufHtml;
+  const mentions = iaMentioningNpc(n.name);
+  html += '<div class="v-backlinks"><h5>Erwähnt in' + (mentions.length ? ' (' + mentions.length + ')' : '') + '</h5>' +
+    (mentions.length ? mentions.map(function (m) {
+      return m.sceneId
+        ? '<button class="v-backlink-item" onclick="paneB={type:\'ia\',sceneId:\'' + m.sceneId + '\',ortId:\'' + m.ortId + '\',iaId:\'' + m.iaId + '\'}; renderAll();"><b>' + m.title + '</b> <span>· ' + m.ortTitle + '</span></button>'
+        : '<div class="v-backlink-item" style="cursor:default"><b>' + m.title + '</b> <span>· ' + m.ortTitle + '</span></div>';
+    }).join('') : '<div class="v-empty">Keine Verknüpfungen gefunden.</div>') +
+    '</div>';
+  target.innerHTML = html;
+}
+
+function renderGhostNote(ref, target) {
+  const g = ghostById(ref.sceneId, ref.ghostId);
+  if (!g) { target.innerHTML = '<div class="v-empty">Nicht gefunden.</div>'; return; }
+  let html = '<h1 class="v-h1">' + g.name + ' <span class="v-tag">👻 Ghost</span></h1>';
+  html += '<dl class="v-prop"><dt>rolle</dt><dd>' + g.rolle + '</dd><dt>szene</dt><dd>' + getSceneLabel(ref.sceneId) + '</dd></dl>';
+  html += '<div class="v-callout"><div class="v-callout-title">Verfassung &amp; Bedürfnis</div>' + g.verfassung + '<div class="v-sb-line" style="margin-top:4px"><b>Bedürfnis</b> ' + g.beduerfnis + '</div></div>';
+  const mentions = iaMentioningGhost(ref.sceneId, ref.ghostId);
+  html += '<div class="v-backlinks"><h5>Erwähnt in' + (mentions.length ? ' (' + mentions.length + ')' : '') + '</h5>' +
+    (mentions.length ? mentions.map(function (m) { return '<button class="v-backlink-item" onclick="paneB={type:\'ia\',sceneId:\'' + m.sceneId + '\',ortId:\'' + m.ortId + '\',iaId:\'' + m.iaId + '\'}; renderAll();"><b>' + m.title + '</b> <span>· ' + m.ortTitle + '</span></button>'; }).join('') : '<div class="v-empty">Keine Verknüpfungen gefunden.</div>') +
+    '</div>';
+  target.innerHTML = html;
+}
+
+function renderPcNote(ref, target) {
+  const pc = players[ref.pcId];
+  if (!pc) { target.innerHTML = '<div class="v-empty">Nicht gefunden.</div>'; return; }
+  let html = '<h1 class="v-h1">' + pc.name + ' <span class="v-tag">🎭 Spielercharakter</span></h1>';
+  html += '<div class="v-callout"><div class="v-callout-title">☆ Ruf bei den NPCs</div>' +
+    trackableNpcs().map(function (n) {
+      const t = getPcRuf(ref.pcId, n.id);
+      return '<div class="v-ruf-row"><span class="v-ruf-name">' + n.name + '</span>' + rufTrackHtml(ref.pcId, n.id, t) + '<span class="v-ruf-tier">' + RUF_TIERS[t] + '</span></div>';
+    }).join('') + '</div>';
+  target.innerHTML = html;
+}
+
+function renderPane(ref, target) {
+  if (ref.type === 'ort') return renderOrtNote(ref, target);
+  if (ref.type === 'ia') return renderIaNote(ref, target);
+  if (ref.type === 'npc') return renderNpcNote(ref, target);
+  if (ref.type === 'ghost') return renderGhostNote(ref, target);
+  if (ref.type === 'pc') return renderPcNote(ref, target);
+  target.innerHTML = '<div class="v-empty">Nichts ausgewählt.</div>';
+}
+
+function renderVariantButtons(markerInfo, wrap) {
+  if (!wrap) return;
+  const variantKeys = Object.keys(markerInfo.variants);
+  const implicitDefault = variantKeys.find(function (k) { return markerInfo.variants[k].img === markerInfo.img; }) || variantKeys[0];
+  function draw(activeKey) {
+    wrap.innerHTML = '';
+    variantKeys.forEach(function (key) {
+      const variant = markerInfo.variants[key];
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'v-variant-btn' + (key === activeKey ? ' active' : '');
+      btn.textContent = variant.label || key;
+      btn.onclick = function () {
+        if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+        db.ref('markerVariant/' + fbKey(markerInfo.id)).set(key).then(function () { draw(key); });
+      };
+      wrap.appendChild(btn);
+    });
+  }
+  draw(implicitDefault);
+  if (!db) return;
+  db.ref('markerVariant/' + fbKey(markerInfo.id)).once('value').then(function (snap) {
+    const saved = snap.val();
+    if (saved && markerInfo.variants[saved]) draw(saved);
+  });
+}
+
+// ---------- Charaktere fest am rechten Rand ----------
+function currentFocusSceneId() {
+  if (paneA.type === 'ia' || paneA.type === 'ort') return paneA.sceneId;
+  if (paneB.type === 'ia' || paneB.type === 'ort') return paneB.sceneId;
+  return viewState.szene;
+}
+function vRailItem(ref, label, icon) {
+  const inA = paneMatches(paneA, ref), inB = paneMatches(paneB, ref);
+  return '<button class="v-rail-item' + (inA ? ' inA' : '') + (inB ? ' inB' : '') + '" onclick="paneB=' + JSON.stringify(ref).replace(/"/g, '&quot;') + '; renderAll();">' + icon + ' <span>' + label + '</span></button>';
+}
+function renderRail() {
+  const el = document.getElementById('v-rail');
+  const npcs = CREW.concat(MANIFEST_EXTRA.filter(function (m) { return extraNpcIds[m.id]; }));
+  const focusScene = currentFocusSceneId();
+  const ghosts = focusScene ? ghostsOfScene(focusScene) : [];
+  const pcs = Object.keys(players).map(function (id) { return Object.assign({ id: id }, players[id]); });
+
+  let html = '<div class="v-rail-head">Charaktere</div>';
+  html += '<div class="v-rail-sub v-folder-row">NPCs <button class="v-add-btn" onclick="vToggleAdd(\'npc\')" title="NPC hinzufügen">+</button></div>';
+  if (vShowAdd === 'npc') {
+    const avail = MANIFEST_EXTRA.filter(function (m) { return !extraNpcIds[m.id]; });
+    html += '<div class="v-add-panel"><div class="v-add-sub">Aus dem Crew-Manifest</div>' +
+      (avail.length ? avail.map(function (m) { return '<button class="v-add-item" onclick="vAddManifest(\'' + m.id + '\')">+ ' + m.name + ' <i>(' + m.role + ')</i></button>'; }).join('') : '<div class="v-empty">alle bereits hinzugefügt</div>') +
+      '</div>';
+  }
+  html += npcs.map(function (n) { return vRailItem({ type: 'npc', npcId: n.id }, n.name, '👤'); }).join('');
+
+  if (focusScene) {
+    html += '<div class="v-rail-sub">Ghosts · ' + getSceneLabel(focusScene) + ' <button class="v-add-btn" onclick="vToggleAdd(\'ghost\')" title="Ghost anlegen" style="margin-left:6px">+</button></div>';
+    if (vShowAdd === 'ghost') {
+      html += '<div class="v-add-panel"><form class="v-form" onsubmit="event.preventDefault(); vSubmitGhost(this,\'' + focusScene + '\');">' +
+        '<input name="name" placeholder="Name" required>' +
+        '<input name="rolle" placeholder="Rolle">' +
+        '<input name="verfassung" placeholder="Verfassung">' +
+        '<input name="beduerfnis" placeholder="Bedürfnis">' +
+        '<button type="submit">Ghost anlegen (' + getSceneLabel(focusScene) + ')</button></form></div>';
+    }
+    html += ghosts.length ? ghosts.map(function (g) { return vRailItem({ type: 'ghost', sceneId: focusScene, ghostId: g.id }, g.name, '👻'); }).join('') : '<div class="v-empty">keine in dieser Szene</div>';
+  }
+
+  html += '<div class="v-rail-sub v-folder-row">Spielercharaktere <button class="v-add-btn" onclick="vToggleAdd(\'pc\')" title="Spielercharakter anlegen">+</button></div>';
+  if (vShowAdd === 'pc') {
+    html += '<div class="v-add-panel"><form class="v-form" onsubmit="event.preventDefault(); vSubmitPc(this);"><input name="name" placeholder="Name" required><button type="submit">Anlegen</button></form></div>';
+  }
+  html += pcs.length ? pcs.map(function (pc) { return vRailItem({ type: 'pc', pcId: pc.id }, pc.name, '🎭'); }).join('') : '<div class="v-empty">noch keine angelegt</div>';
+
+  el.innerHTML = html;
+}
+
+// ---------- Alles zusammen ----------
+function renderAll() {
+  if (!viewState.szene) return;
+  renderTree();
+  renderPane(paneA, document.getElementById('v-paneA'));
+  renderPane(paneB, document.getElementById('v-paneB'));
+  renderRail();
+  document.getElementById('v-status').innerHTML =
+    Object.keys(ORTE).length + ' Orte im Datenmodell · Pane A: ' + paneLabel(paneA) + ' · Pane B: ' + paneLabel(paneB) +
+    '<span style="margin-left:auto"></span>';
+  renderSoundBar();
+  renderCharBar();
+}
+
+// ---------- Stoppuhr (unverändert aus dem alten Admin) ----------
+const timerDisplayEl = document.getElementById('timerDisplay');
+const timerTickerTimeEl = document.getElementById('timerTickerTime');
+const timerTickerAlertEl = document.getElementById('timerTickerAlert');
+const timerStartPauseBtn = document.getElementById('timerStartPause');
+const timerResetBtn = document.getElementById('timerReset');
+const timerMarkForm = document.getElementById('timerMarkForm');
+const timerMarkLabelInput = document.getElementById('timerMarkLabel');
+const timerMarkMinutesInput = document.getElementById('timerMarkMinutes');
+const timerMarksEl = document.getElementById('timerMarks');
+
+let gmTimerState = { running: false, startedAt: null, elapsedBeforeStart: 0, marks: {} };
+let timerTickInterval = null;
+
+function formatElapsed(totalSeconds) {
+  const s = Math.max(0, Math.floor(totalSeconds));
+  const hh = String(Math.floor(s / 3600)).padStart(2, '0');
+  const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+  const ss = String(s % 60).padStart(2, '0');
+  return hh + ':' + mm + ':' + ss;
+}
+function currentElapsedSeconds() {
+  let sec = gmTimerState.elapsedBeforeStart || 0;
+  if (gmTimerState.running && gmTimerState.startedAt) sec += (Date.now() - gmTimerState.startedAt) / 1000;
+  return sec;
+}
+function renderTimerTick() {
+  const elapsedSec = currentElapsedSeconds();
+  timerDisplayEl.textContent = formatElapsed(elapsedSec);
+  const elapsedMin = elapsedSec / 60;
+  let anyDue = false;
+  timerMarksEl.querySelectorAll('.timer-mark').forEach(function (el) {
+    const due = elapsedMin >= parseFloat(el.dataset.minutes);
+    el.classList.toggle('due', due);
+    if (due) anyDue = true;
+  });
+  timerTickerTimeEl.textContent = timerDisplayEl.textContent;
+  timerTickerAlertEl.classList.toggle('on', anyDue);
+}
+function renderTimerBar() {
+  timerStartPauseBtn.textContent = gmTimerState.running ? 'Pause' : 'Start';
+  timerStartPauseBtn.classList.toggle('running', gmTimerState.running);
+  timerMarksEl.innerHTML = '';
+  Object.keys(gmTimerState.marks || {}).forEach(function (markId) {
+    const mark = gmTimerState.marks[markId];
+    const chip = document.createElement('div');
+    chip.className = 'timer-mark';
+    chip.dataset.minutes = mark.minutes;
+    chip.textContent = mark.label + ' (' + mark.minutes + ' Min)';
+    chip.title = 'Klicken zum Entfernen';
+    chip.onclick = function () { if (db) db.ref('gmTimer/marks/' + markId).remove(); };
+    timerMarksEl.appendChild(chip);
+  });
+  renderTimerTick();
+  clearInterval(timerTickInterval);
+  if (gmTimerState.running) timerTickInterval = setInterval(renderTimerTick, 1000);
+}
+if (db) {
+  db.ref('gmTimer').on('value', function (snap) {
+    const val = snap.val() || {};
+    gmTimerState = { running: !!val.running, startedAt: val.startedAt || null, elapsedBeforeStart: val.elapsedBeforeStart || 0, marks: val.marks || {} };
+    renderTimerBar();
+  });
+} else { renderTimerBar(); }
+timerStartPauseBtn.onclick = function () {
+  if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+  if (gmTimerState.running) db.ref('gmTimer').update({ running: false, elapsedBeforeStart: currentElapsedSeconds(), startedAt: null });
+  else db.ref('gmTimer').update({ running: true, startedAt: Date.now() });
+};
+timerResetBtn.onclick = function () {
+  if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+  db.ref('gmTimer').update({ running: false, startedAt: null, elapsedBeforeStart: 0 });
+};
+timerMarkForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+  if (!db) { alert('Keine Verbindung zu Firebase — js/firebase-config.js prüfen.'); return; }
+  const label = timerMarkLabelInput.value.trim();
+  const minutes = parseFloat(timerMarkMinutesInput.value);
+  if (!label || isNaN(minutes)) return;
+  db.ref('gmTimer/marks').push({ label: label, minutes: minutes });
+  timerMarkLabelInput.value = ''; timerMarkMinutesInput.value = ''; timerMarkLabelInput.focus();
+});
+
+// ---------- Sound-Leiste (unverändert aus dem alten Admin) ----------
+function isPlausibleAudioFilename(input) {
+  if (!input) return false;
+  return /\.(mp3|ogg|wav|m4a|aac)$/i.test(input.trim());
+}
+function renderSoundBar() {
+  soundBarScene = viewState.szene;
+  soundBarLabel.textContent = 'Szene: ' + (soundBarScene ? getSceneLabel(soundBarScene) : '–');
+  soundLinkInput.value = ''; soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint';
+  if (!db || !soundBarScene) return;
+  db.ref('sceneAudioFile/' + fbKey(soundBarScene)).once('value').then(function (snap) {
+    const savedFile = snap.val();
+    if (savedFile && soundBarScene === viewState.szene) soundLinkInput.value = savedFile;
+  });
+}
+soundLinkInput.addEventListener('blur', saveSoundLink);
+soundLinkInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); soundLinkInput.blur(); } });
+function saveSoundLink() {
+  if (!db || !soundBarScene) return;
+  const raw = soundLinkInput.value.trim();
+  if (!raw) {
+    db.ref('sceneAudioFile/' + fbKey(soundBarScene)).remove().then(function () {
+      soundLinkHint.textContent = 'entfernt'; soundLinkHint.className = 'save-hint saved';
+      setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
+    });
+    return;
+  }
+  if (!isPlausibleAudioFilename(raw)) {
+    soundLinkHint.textContent = 'Kein gültiger Dateiname (.mp3/.ogg/.wav/.m4a/.aac erwartet)';
+    soundLinkHint.className = 'save-hint error';
+    return;
+  }
+  db.ref('sceneAudioFile/' + fbKey(soundBarScene)).set(raw).then(function () {
+    soundLinkHint.textContent = 'gespeichert'; soundLinkHint.className = 'save-hint saved';
+    setTimeout(function () { soundLinkHint.textContent = ''; soundLinkHint.className = 'save-hint'; }, 1500);
+  }).catch(function (err) { soundLinkHint.textContent = 'NICHT gespeichert — ' + err.message; soundLinkHint.className = 'save-hint error'; });
+}
+
+// ---------- Charakter-Portrait-Leiste (unverändert aus dem alten Admin) ----------
+function renderCharBar() {
+  charBarScene = viewState.szene;
+  charCheckboxesEl.innerHTML = '';
+  if (typeof CHARACTERS === 'undefined' || !charBarScene) return;
+  const szeneRegie = (typeof SZENEN_REGIE !== 'undefined') ? SZENEN_REGIE[charBarScene] : null;
+  const relevant = (szeneRegie && Array.isArray(szeneRegie.charaktere)) ? szeneRegie.charaktere : null;
+  function renderList(active, showAll) {
+    charCheckboxesEl.innerHTML = '';
+    const primary = (relevant && !showAll) ? CHARACTERS.filter(function (ch) { return relevant.indexOf(ch.id) !== -1 || !!active[ch.id]; }) : CHARACTERS;
+    primary.forEach(function (ch) { charCheckboxesEl.appendChild(buildCharToggle(ch, !!active[ch.id])); });
+    if (relevant && !showAll && primary.length < CHARACTERS.length) {
+      const moreBtn = document.createElement('button');
+      moreBtn.type = 'button'; moreBtn.className = 'char-more-btn';
+      moreBtn.textContent = '+ weitere (' + (CHARACTERS.length - primary.length) + ')';
+      moreBtn.onclick = function () { renderList(active, true); };
+      charCheckboxesEl.appendChild(moreBtn);
+    }
+  }
+  if (!db) { renderList({}, false); return; }
+  db.ref('sceneCharacters/' + fbKey(charBarScene)).once('value').then(function (snap) {
+    if (charBarScene !== viewState.szene) return;
+    renderList(snap.val() || {}, false);
+  });
+}
+function buildCharToggle(ch, isActive) {
+  const label = document.createElement('label');
+  label.className = 'char-toggle' + (isActive ? ' active' : '');
+  label.innerHTML = '<input type="checkbox"' + (isActive ? ' checked' : '') + '> ' + ch.name;
+  const checkbox = label.querySelector('input');
+  checkbox.addEventListener('change', function () {
+    label.classList.toggle('active', checkbox.checked);
+    if (!db || !charBarScene) return;
+    db.ref('sceneCharacters/' + fbKey(charBarScene) + '/' + ch.id).set(checkbox.checked);
+  });
+  return label;
+}
+
+// ---------- Werkzeug-Fach ein-/ausklappbar (unverändert aus dem alten Admin) ----------
+(function initToolDrawer() {
+  const drawer = document.getElementById('toolDrawer');
+  const toggle = document.getElementById('toolDrawerToggle');
+  if (!drawer || !toggle) return;
+  const OPEN_KEY = 'korsaren_tooldrawer_open';
+  function apply(open) { drawer.classList.toggle('open', open); toggle.setAttribute('aria-expanded', open ? 'true' : 'false'); }
+  let open = false;
+  try { open = localStorage.getItem(OPEN_KEY) === '1'; } catch (e) {}
+  apply(open);
+  toggle.addEventListener('click', function () {
+    const nowOpen = !drawer.classList.contains('open');
+    apply(nowOpen);
+    try { localStorage.setItem(OPEN_KEY, nowOpen ? '1' : '0'); } catch (e) {}
+  });
+})();
