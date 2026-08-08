@@ -679,6 +679,160 @@ function renderAll() {
   renderCharBar();
 }
 
+// ---------- Session-Export ----------
+// buildSessionExportMarkdown() ist bewusst eine reine Funktion (nimmt den
+// bereits geladenen regie/-Teilbaum als Parameter, statt selbst db.ref(...)
+// aufzurufen) - dadurch offline testbar (siehe Skill pnp-safe-test), ohne
+// echte Firebase-Verbindung zu brauchen. Der Firebase-Zugriff selbst passiert
+// getrennt in refreshExportPreview().
+function characterStatusSection() {
+  const lines = [];
+  trackableNpcs().forEach(function (n) {
+    const val = (charStatus[charKeyFor({ type: 'npc', npcId: n.id })] || '').trim();
+    if (val) lines.push('- **' + n.name + '** (NPC): ' + val);
+  });
+  getAllSceneEntries().forEach(function (entry) {
+    ghostsOfScene(entry.id).forEach(function (g) {
+      const val = (charStatus[charKeyFor({ type: 'ghost', sceneId: entry.id, ghostId: g.id })] || '').trim();
+      if (val) lines.push('- **' + g.name + '** (Ghost, ' + getSceneLabel(entry.id) + '): ' + val);
+    });
+  });
+  Object.keys(players).forEach(function (pcId) {
+    const val = (charStatus[charKeyFor({ type: 'pc', pcId: pcId })] || '').trim();
+    if (val) lines.push('- **' + ((players[pcId] && players[pcId].name) || pcId) + '** (Spielercharakter): ' + val);
+  });
+  return lines;
+}
+function reputationSection() {
+  const blocks = [];
+  Object.keys(players).forEach(function (pcId) {
+    const pcName = (players[pcId] && players[pcId].name) || pcId;
+    const npcLines = [];
+    trackableNpcs().forEach(function (n) {
+      const tier = getPcRuf(pcId, n.id);
+      if (tier > 0) npcLines.push('- ' + n.name + ': ' + RUF_TIERS[tier]);
+    });
+    if (npcLines.length) blocks.push('### ' + pcName + '\n' + npcLines.join('\n'));
+  });
+  return blocks;
+}
+function buildSessionExportMarkdown(scopeAllScenes, regieSnapshot) {
+  const snap = regieSnapshot || {};
+  const sceneIds = scopeAllScenes ? getAllSceneEntries().map(function (e) { return e.id; }) : [viewState.szene];
+  const sceneLabels = sceneIds.map(getSceneLabel).join(', ');
+  const dateStr = new Date().toLocaleDateString('de-DE');
+  let md = '# Session-Export — ' + sceneLabels + ' (' + dateStr + ')\n\n';
+
+  let eventsMd = '';
+  let notesMd = '';
+  sceneIds.forEach(function (sceneId) {
+    const sceneRegie = snap[fbKey(sceneId)] || {};
+    getMarkersForScene(sceneId).forEach(function (marker) {
+      const ortRaw = ORTE[marker.id] || { interaktionen: {} };
+      const ort = resolveOrtForScene(ortRaw, sceneId);
+      const iaKeys = getSceneInteraktionen(ort, sceneId);
+      const ortRegie = sceneRegie[marker.id] || {};
+      let ortEvents = '';
+      iaKeys.forEach(function (iaId) {
+        const ia = ort.interaktionen[iaId];
+        const iaRegie = (ortRegie.interaktionen && ortRegie.interaktionen[iaId]) || {};
+        const firedTriggers = (ia.trigger || []).filter(function (t) { return iaRegie.trigger && iaRegie.trigger[t.id]; });
+        const iaNote = ((iaRegie.notizen || '') + '').trim();
+        if (!firedTriggers.length && !iaNote) return;
+        ortEvents += '**' + ia.title + '**\n';
+        firedTriggers.forEach(function (t) {
+          const note = ((iaRegie.trigger_notizen && iaRegie.trigger_notizen[t.id]) || '').trim();
+          ortEvents += '- [x] ' + t.label + (note ? ' — ' + note : '') + '\n';
+        });
+        if (iaNote) ortEvents += '\n' + iaNote + '\n';
+        ortEvents += '\n';
+      });
+      if (ortEvents) eventsMd += '### ' + marker.title + '\n\n' + ortEvents;
+
+      const ortNote = ((ortRegie.ortNotizen || '') + '').trim();
+      if (ortNote) notesMd += '### ' + marker.title + '\n\n' + ortNote + '\n\n';
+    });
+  });
+
+  md += '## Ausgelöste Ereignisse\n\n';
+  md += eventsMd || '_Keine ausgelösten Ereignisse im gewählten Bereich._\n\n';
+
+  md += '## Notizen zu Orten\n\n';
+  md += notesMd || '_Keine Ort-Notizen im gewählten Bereich._\n\n';
+
+  md += '## Charakter-Status\n\n';
+  const statusLines = characterStatusSection();
+  md += statusLines.length ? statusLines.join('\n') + '\n\n' : '_Kein Status gesetzt._\n\n';
+
+  md += '## Ruf-Stand (Spielercharaktere)\n\n';
+  const rufBlocks = reputationSection();
+  md += rufBlocks.length ? rufBlocks.join('\n\n') + '\n' : '_Keine Spielercharaktere angelegt oder kein Ruf gesetzt._\n';
+
+  return md;
+}
+function downloadMarkdown(text, filename) {
+  const blob = new Blob([text], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+function refreshExportPreview() {
+  const scopeAllScenes = document.querySelector('input[name="exportScope"]:checked').value === 'all';
+  const previewEl = document.getElementById('exportPreview');
+  const msgEl = document.getElementById('exportMsg');
+  if (!db) {
+    previewEl.value = buildSessionExportMarkdown(scopeAllScenes, {});
+    msgEl.textContent = 'Keine Firebase-Verbindung — Ereignisse/Notizen fehlen, Status/Ruf sind trotzdem aktuell.';
+    msgEl.className = 'save-hint error';
+    return;
+  }
+  msgEl.textContent = 'Lädt…'; msgEl.className = 'save-hint';
+  db.ref('regie').once('value').then(function (snap) {
+    previewEl.value = buildSessionExportMarkdown(scopeAllScenes, snap.val() || {});
+    msgEl.textContent = 'Aktualisiert.'; msgEl.className = 'save-hint saved';
+  }).catch(function (err) {
+    msgEl.textContent = 'Fehler: ' + err.message; msgEl.className = 'save-hint error';
+  });
+}
+(function initExportPanel() {
+  const overlay = document.getElementById('exportOverlay');
+  const toggle = document.getElementById('exportToggle');
+  const close = document.getElementById('exportClose');
+  const regen = document.getElementById('exportRegen');
+  const copyBtn = document.getElementById('exportCopyBtn');
+  const downloadBtn = document.getElementById('exportDownloadBtn');
+  if (!overlay || !toggle) return;
+  toggle.addEventListener('click', function () {
+    overlay.classList.add('open');
+    refreshExportPreview();
+  });
+  close.addEventListener('click', function () { overlay.classList.remove('open'); });
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.classList.remove('open'); });
+  regen.addEventListener('click', refreshExportPreview);
+  document.querySelectorAll('input[name="exportScope"]').forEach(function (el) {
+    el.addEventListener('change', refreshExportPreview);
+  });
+  copyBtn.addEventListener('click', function () {
+    const msgEl = document.getElementById('exportMsg');
+    navigator.clipboard.writeText(document.getElementById('exportPreview').value).then(function () {
+      msgEl.textContent = 'In Zwischenablage kopiert.'; msgEl.className = 'save-hint saved';
+    }).catch(function () {
+      msgEl.textContent = 'Kopieren fehlgeschlagen (Berechtigung?).'; msgEl.className = 'save-hint error';
+    });
+  });
+  downloadBtn.addEventListener('click', function () {
+    const scopeAllScenes = document.querySelector('input[name="exportScope"]:checked').value === 'all';
+    const slug = scopeAllScenes ? 'alle-szenen' : slugify(getSceneLabel(viewState.szene));
+    const dateSlug = new Date().toISOString().slice(0, 10);
+    downloadMarkdown(document.getElementById('exportPreview').value, 'sitzung-export-' + slug + '-' + dateSlug + '.md');
+  });
+})();
+
 // ---------- Stoppuhr (unverändert aus dem alten Admin) ----------
 const timerDisplayEl = document.getElementById('timerDisplay');
 const timerTickerTimeEl = document.getElementById('timerTickerTime');

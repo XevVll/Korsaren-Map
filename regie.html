@@ -58,6 +58,27 @@
   #previewFrame { width: 100%; height: 100%; border: none; }
   @media (max-width: 500px) { #previewPanel { width: 88vw; height: 66vw; } }
 
+  #exportToggle { font-family: inherit; font-size: 12px; background: transparent; border: 1px solid var(--line); color: var(--ink-dim); border-radius: 3px; padding: 4px 12px; cursor: pointer; }
+  #exportToggle:hover { border-color: var(--gold); color: var(--ink); }
+  #exportOverlay { position: fixed; inset: 0; background: rgba(10,8,5,0.82); display: none; align-items: center; justify-content: center; z-index: 500; padding: 20px; }
+  #exportOverlay.open { display: flex; }
+  #exportModal { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; max-width: 720px; width: 100%; max-height: 88vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.6); display: flex; flex-direction: column; }
+  #exportHdr { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--gold); font-size: 13px; letter-spacing: 1px; text-transform: uppercase; flex: none; }
+  #exportClose { background: none; border: none; color: var(--ink-dim); font-size: 18px; cursor: pointer; line-height: 1; }
+  #exportClose:hover { color: var(--ink); }
+  #exportBody { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  #exportScopeRow { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+  .export-scope-opt { display: flex; align-items: center; gap: 5px; color: var(--ink-dim); cursor: pointer; }
+  .export-scope-opt input { accent-color: var(--gold); cursor: pointer; }
+  #exportRegen { font-family: inherit; font-size: 12px; background: transparent; border: 1px solid var(--line); color: var(--ink-dim); border-radius: 3px; padding: 5px 12px; cursor: pointer; margin-left: auto; }
+  #exportRegen:hover { border-color: var(--gold); color: var(--ink); }
+  #exportPreview { width: 100%; min-height: 340px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; color: var(--ink); font-family: 'Consolas', 'Courier New', monospace; font-size: 12.5px; line-height: 1.5; padding: 12px; resize: vertical; }
+  #exportPreview:focus { outline: none; border-color: var(--gold); }
+  #exportActionsRow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  #exportCopyBtn, #exportDownloadBtn { font-family: inherit; font-size: 12px; background: transparent; border: 1px solid var(--line); color: var(--ink-dim); border-radius: 3px; padding: 6px 12px; cursor: pointer; }
+  #exportCopyBtn:hover, #exportDownloadBtn:hover { border-color: var(--gold); color: var(--ink); }
+  @media (max-width: 560px) { #exportModal { max-width: 100%; } #exportPreview { min-height: 240px; } }
+
   #timerBar { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 10px 24px; border-bottom: 1px solid var(--line); background: var(--panel); font-size: 13px; }
   #timerDisplay { font-family: 'Georgia', serif; font-size: 18px; letter-spacing: 1px; color: var(--gold); min-width: 78px; }
   .timer-btn { font-family: inherit; font-size: 11.5px; background: transparent; border: 1px solid var(--line); color: var(--ink-faint); border-radius: 3px; padding: 5px 10px; cursor: pointer; }
@@ -240,6 +261,7 @@
 
 <div id="toolbarStrip">
   <button id="toolDrawerToggle" aria-expanded="false">⚙ Werkzeuge <span class="chev">▾</span></button>
+  <button id="exportToggle">📤 Export</button>
   <div id="timerTicker" title="Stoppuhr (Details im Werkzeug-Fach)">
     <span id="timerTickerTime">00:00:00</span>
     <span id="timerTickerAlert" title="Ein Zeit-Merker ist fällig">⏰ Merker fällig</span>
@@ -277,6 +299,28 @@
     <iframe id="previewFrame" title="Live-Vorschau Spieleransicht"></iframe>
   </div>
   <button id="previewToggle">▶ Live-Vorschau</button>
+</div>
+
+<div id="exportOverlay">
+  <div id="exportModal">
+    <div id="exportHdr">
+      <span>Session-Export</span>
+      <button id="exportClose" aria-label="Schließen">✕</button>
+    </div>
+    <div id="exportBody">
+      <div id="exportScopeRow">
+        <label class="export-scope-opt"><input type="radio" name="exportScope" value="scene" checked> Aktuelle Szene</label>
+        <label class="export-scope-opt"><input type="radio" name="exportScope" value="all"> Ganze Kampagne</label>
+        <button id="exportRegen">🔄 Neu generieren</button>
+      </div>
+      <textarea id="exportPreview" readonly placeholder="„Neu generieren“ klicken, um den aktuellen Stand als Markdown aufzubereiten…"></textarea>
+      <div id="exportActionsRow">
+        <button id="exportCopyBtn">📋 In Zwischenablage kopieren</button>
+        <button id="exportDownloadBtn">⬇ Als Datei herunterladen</button>
+        <span class="save-hint" id="exportMsg"></span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="vault" id="vault">
